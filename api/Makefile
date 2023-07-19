@@ -4,5 +4,5 @@ clean:
 	rm -rf byteorder 
 
 byteorder:
-	gcc -o byteorder byteorder.c -Wall
+	gcc -o byteorder byteorder.c -Wall -g
 
