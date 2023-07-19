@@ -1,7 +1,27 @@
 #include <stdio.h>
 
+int isLittleEndian()
+{
+    union
+    {
+        short val;
+        char c;
+    } test;
+
+    test.val = 0x0001;
+    return test.c == 0x01;
+}
+
 int main()
 {
+    if ( isLittleEndian() ) {
+        printf( "little endian\n" );
+    } else {
+        printf( "big endian\n" );
+    }
+
+    return 0;
+
     union
     {
         short value;
