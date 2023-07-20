@@ -1,8 +1,12 @@
-all: byteorder 
+all: select epoll 
 
 clean:
-	rm -rf byteorder 
+	rm -rf select epoll
 
-byteorder:
-	gcc -o byteorder byteorder.c -Wall -g
+epoll:
+	gcc  -o epoll epoll.c -Wall -g
+
+
+select:
+	gcc -o select select.c -Wall -g
 

@@ -1,13 +1,14 @@
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <neinet/in.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
-#include <stdilb.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 int main( int argc, char ** argv )
 {
@@ -43,7 +44,7 @@ int main( int argc, char ** argv )
 
     char buf[1024];
     fd_set read_fds;
-    fd_set exceptions_fds;
+    fd_set exception_fds;
     FD_ZERO( &read_fds );
     FD_ZERO( &exception_fds );
 
@@ -51,6 +52,31 @@ int main( int argc, char ** argv )
 
         memset( buf, 0, sizeof( buf ) );
         FD_SET( connfd, &read_fds );
-        FD_SET( connfd, &exceptions_fds );
+        FD_SET( connfd, &exception_fds );
+
+        ret = select( connfd + 1, &read_fds, NULL, &exception_fds, NULL );
+        if ( ret < 0 ) {
+            printf( "selection failure\n" );
+            break;
+        }
+
+        // 对于可读事件
+        if ( FD_ISSET( connfd, &read_fds ) ) {
+            ret = recv( connfd, buf, sizeof( buf ) - 1, 0 );
+            if ( ret <= 0 ) {
+                break;
+            }
+        } /* 对于异常事件，采用带MSG_OOB标志的recv函数读取带外数据*/
+        else if ( FD_ISSET( connfd, &exception_fds ) ) {
+            ret = recv( connfd, buf, sizeof( buf ) - 1, MSG_OOB );
+            if ( ret <= 0 ) {
+                break;
+            }
+            printf( "get %d bytes of oob data: %s\n", ret, buf );
+        }
     }
+
+    close( connfd );
+    close( listenfd );
+    return 0;
 }
