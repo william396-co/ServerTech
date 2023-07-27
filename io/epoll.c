@@ -124,6 +124,9 @@ int main( int argc, char ** argv )
     ret = bind( listenfd, (struct sockaddr *)&addr, sizeof( addr ) );
     assert( ret != -1 && "bind failed" );
 
+    ret = listen( listenfd, 5 );
+    assert( ret != -1 && "listen failed" );
+
     struct epoll_event events[MAX_EVENT_NUMBER];
     int epollfd = epoll_create( 5 );
     assert( epollfd != -1 );
@@ -135,8 +138,8 @@ int main( int argc, char ** argv )
             printf( "epoll failure\n" );
             break;
         }
-        lt( events, ret, epollfd, listenfd ); /* LT 模式*/
-                                              // et(events,ret,epollfd,listenfd);/* ET 模式*/
+        //        lt( events, ret, epollfd, listenfd ); /* LT 模式*/
+        et( events, ret, epollfd, listenfd ); /* ET 模式*/
     }
     close( listenfd );
     return 0;
