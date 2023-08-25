@@ -4,7 +4,7 @@
 #include <cstdio>
 
 
-SOCKET open_clientfd(const char* hostname, char* port) {
+SOCKET open_clientfd(const char* hostname, const char* port) {
 	SOCKET clientfd;
 	int rc;
 	struct addrinfo hints, * listp, * p;
