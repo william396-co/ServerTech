@@ -47,6 +47,7 @@ int main()
 
 	SOCKET listenfd = open_listenfd(port);
 	if (listenfd == INVALID_SOCKET) {
+		std::cerr << "open_listenfd failed!\n";
 		return 1;
 	}
 
