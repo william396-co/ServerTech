@@ -141,6 +141,8 @@
     <ClInclude Include="..\common\util.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\common\Socket.cpp" />
+    <Text Include="..\common\Socket.hpp" />
     <Text Include="..\common\socketDefines.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

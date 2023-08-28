@@ -52,5 +52,11 @@
     <Text Include="..\common\socketDefines.hpp">
       <Filter>common</Filter>
     </Text>
+    <Text Include="..\common\Socket.cpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\Socket.hpp">
+      <Filter>common</Filter>
+    </Text>
   </ItemGroup>
 </Project>

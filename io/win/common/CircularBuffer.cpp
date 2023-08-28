@@ -21,7 +21,6 @@
  *
  */
 
-#include "Platform.hpp"
 #include "CircularBuffer.hpp"
 
 /** Constructor
