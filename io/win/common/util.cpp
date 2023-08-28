@@ -32,7 +32,6 @@ SOCKET open_clientfd(const char* hostname, const char* port) {
 			std::cerr << "open_clientfd: close failed:" << strerror(errno) << "\n";
 			return -1;
 		}
-
 	}
 
 	/* Clean up */
@@ -77,7 +76,6 @@ SOCKET open_listenfd(const char* port) {
 			std::cerr << "open_listenfd close failed:" << strerror(errno) << "\n";
 			return -1;
 		}
-
 	}
 
 	/* clean up*/
