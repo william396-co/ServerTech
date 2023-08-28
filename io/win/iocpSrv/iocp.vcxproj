@@ -128,11 +128,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\CircularBuffer.cpp" />
     <ClCompile Include="..\common\util.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\CircularBuffer.hpp" />
+    <ClInclude Include="..\common\Platform.hpp" />
+    <ClInclude Include="..\common\safeQueue.hpp" />
+    <ClInclude Include="..\common\singleton.hpp" />
+    <ClInclude Include="..\common\threadpool.hpp" />
     <ClInclude Include="..\common\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\common\Socket.cpp" />
+    <Text Include="..\common\Socket.hpp" />
+    <Text Include="..\common\socketDefines.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
