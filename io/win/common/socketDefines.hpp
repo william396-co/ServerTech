@@ -3,11 +3,15 @@
 #include "Platform.hpp"
 #include <atomic>
 
-#define USE_IOCP
+
+/* Implementation Selection */
+#ifdef WIN32		// Easy
+#define CONFIG_USE_IOCP
 
 // complete event type
 enum class SockeIOEvent
 {
+	SOCKET_IO_NONE,
 	SOCKET_IO_EVENT_READ_COMPLETE,
 	SOCKET_IO_EVENT_WRITE_END,
 	SOCKET_IO_THREAD_SHUT_DOWN,
@@ -26,6 +30,9 @@ struct OverlappedRec
 		memset(&overlap, 0, sizeof(overlap));
 	}
 
+	OverlappedRec() 
+		:OverlappedRec(SockeIOEvent::SOCKET_IO_NONE) {}
+
 	inline void Reset(SockeIOEvent ev) {
 		memset(&overlap, 0, sizeof(overlap));
 		event = ev;
@@ -40,3 +47,4 @@ struct OverlappedRec
 };
 
 
+#endif

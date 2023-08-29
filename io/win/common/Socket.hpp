@@ -3,10 +3,11 @@
 #include "Platform.hpp"
 #include "CircularBuffer.hpp"
 #include "socketDefines.hpp"
-#include "util.h"
+#include "util.hpp"
 
 #include <mutex>
 #include <string>
+
 
 class Socket
 {
@@ -15,7 +16,7 @@ public:
 	Socket(SOCKET fd, uint32 sendBufSize, uint32 recvBufSize);
 
 	// Destructor
-	virtual ~Socket();
+	virtual ~Socket() {}
 
 	bool Connect(const char* host, uint32 port);
 
@@ -41,7 +42,7 @@ public:
 	bool Send(const uint8* Bytes, uint32 Size);
 
 	// Burst system - Locks the sending mutex.
-	void BurstBegin() { m_wMtx.lock(); }
+	inline void BurstBegin() { m_wMtx.lock(); }
 
 	// Burst system - Adds bytes to output buffer.
 	bool BurstSend(const uint8* Bytes, uint32 Size);
@@ -50,20 +51,43 @@ public:
 	void BurstPush();
 
 	// Burst system - Unlocks the sending mutex.
-	void BurstEnd() { m_wMtx.unlock(); }
+	inline void BurstEnd() { m_wMtx.unlock(); }
 
 	/* Platform-specific methods */
 	void SetupReadEvent();
 	void ReadCallback(uint32 len);
 	void WriteCallback();
 
+	// Set completion port that this socket will be assigned to.
+	inline void SetCompletionPort(HANDLE cp) {
+		m_completionPort = cp;
+	}
+	// Assigns the socket to his completion port.(bind fd to completionPort)
+	inline void AssignToCompletionPort() {
+		if (m_fd && m_completionPort) {
+			CreateIoCompletionPort(HANDLE(m_fd), m_completionPort, (ULONG_PTR)this, 0);
+		}
+	}
 
+	inline const sockaddr_in& GetRemoteStruct()const { return m_client; }
+	inline const in_addr& GetRemoteAddress()const { return m_client.sin_addr; }
+	inline const SOCKET& GetFd()const { return m_fd; }
+	inline uint32 GetRemotePort()const { return ntohs(m_client.sin_port); }
+	void Delete();
+protected:
+	void _OnConnect();
+
+	size_t m_BytesSent, m_BytesRecved;
+	sockaddr_in m_client;
+	std::mutex m_wMtx, m_rMtx;
+
+	CircularBuffer readBuffer;
+	CircularBuffer writeBuffer;
 private:
 	SOCKET m_fd;
 	OverlappedRec m_readEvent;
 	OverlappedRec m_writeEvent;
 	HANDLE m_completionPort;// IOCP handle
-	std::mutex m_wMtx, m_rMtx;
 };
 
 /** Connect to a server.
