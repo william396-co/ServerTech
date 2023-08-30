@@ -1,3 +1,4 @@
+#pragma once
 #include <WS2tcpip.h>
 
 SOCKET open_clientfd(const char* hostname, const char* port);
