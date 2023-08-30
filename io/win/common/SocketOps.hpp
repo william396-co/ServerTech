@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Platform.hpp"
+#include <WinSock2.h>
+#include "type.hpp"
 
 namespace SocketOps
 {

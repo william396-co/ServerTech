@@ -138,12 +138,17 @@
     <ClInclude Include="..\common\safeQueue.hpp" />
     <ClInclude Include="..\common\singleton.hpp" />
     <ClInclude Include="..\common\threadpool.hpp" />
-    <ClInclude Include="..\common\util.h" />
+    <ClInclude Include="..\common\util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\common\Socket.cpp" />
     <Text Include="..\common\Socket.hpp" />
     <Text Include="..\common\socketDefines.hpp" />
+    <Text Include="..\common\SocketMgr.cpp" />
+    <Text Include="..\common\SocketMgr.hpp" />
+    <Text Include="..\common\SocketOps.cpp" />
+    <Text Include="..\common\SocketOps.hpp" />
+    <Text Include="..\common\type.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

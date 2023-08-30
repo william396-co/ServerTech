@@ -1,8 +1,5 @@
 #pragma once
-
-#include "Platform.hpp"
 #include <atomic>
-
 
 /* Implementation Selection */
 #ifdef WIN32		// Easy
@@ -23,14 +20,14 @@ struct OverlappedRec
 {
 	OVERLAPPED overlap;
 	SockeIOEvent event;
-	std::atomic<size_t> inUse;
+	std::atomic_flag inUse = ATOMIC_FLAG_INIT;
 
 	OverlappedRec(SockeIOEvent ev) :event {ev}, inUse{ 0 }
 	{
 		memset(&overlap, 0, sizeof(overlap));
 	}
 
-	OverlappedRec() 
+	OverlappedRec()
 		:OverlappedRec(SockeIOEvent::SOCKET_IO_NONE) {}
 
 	inline void Reset(SockeIOEvent ev) {
@@ -38,11 +35,11 @@ struct OverlappedRec
 		event = ev;
 	}
 
-	void Mark() {
-		inUse.store(1, std::memory_order_acq_rel);//TODO 
+	void Mark() {		
+		while (inUse.test_and_set(std::memory_order_acq_rel));
 	}
 	void Unmark() {
-		inUse.store(0, std::memory_order_acq_rel);
+		inUse.clear(std::memory_order_relaxed);
 	}
 };
 
