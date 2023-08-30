@@ -103,7 +103,7 @@ void SocketMgr::SpawnWorkerThreads() {
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 
-	threadCnt = si.dwNumberOfProcessors * 2;
+	threadCnt = si.dwNumberOfProcessors * 2;// CpuNum * 2
 
 	for (int i = 0; i != threadCnt; ++i) {
 		workerThreads.emplace_back(WorkerRun, m_completionPort);

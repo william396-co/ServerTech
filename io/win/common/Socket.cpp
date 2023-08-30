@@ -1,5 +1,6 @@
 #include "Socket.hpp"
 #include "SocketOps.hpp"
+#include "SocketMgr.hpp"
 #include <ws2def.h>
 #include <iostream>
 
@@ -60,6 +61,16 @@ void Socket::Accept(sockaddr_in* address) {
 
 void Socket::_OnConnect() {
 
+	SocketOps::Nonblocking(m_fd);
+	SocketOps::DisableBuffering(m_fd);
+
+	AssignToCompletionPort();
+	SetupReadEvent();
+
+	SocketMgr::instance().AddSocket(this);
+
+	// call virtual onConnect
+	OnConnect();
 }
 
 bool Socket::Send(const uint8* Bytes, uint32 Size) {
@@ -84,8 +95,10 @@ void Socket::BurstPush()
 
 void Socket::Disconnect()
 {
+	SocketMgr::instance().DelSocket(this);
 	// call virtual onDisconnect
 	OnDisconnect();
+	
 }
 
 void Socket::Delete() {
@@ -120,12 +133,6 @@ void Socket::WriteCallback()
 	else {
 		DecSendLock();
 	}
-}
-
-void Socket::ReadCallback(uint32 len) {
-	m_readBuffer.IncrementWritten(len);
-	OnRead();
-	SetupReadEvent();
 }
 
 void Socket::SetupReadEvent()

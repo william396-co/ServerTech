@@ -53,8 +53,7 @@ public:
 	inline void BurstEnd() { m_wMtx.unlock(); }
 
 	/* Platform-specific methods */
-	void SetupReadEvent();
-	void ReadCallback(uint32 len);
+	void SetupReadEvent();	
 	void WriteCallback();
 
 	// Set completion port that this socket will be assigned to.
