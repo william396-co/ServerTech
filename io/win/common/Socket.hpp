@@ -8,7 +8,6 @@
 #include <mutex>
 #include <string>
 
-
 class Socket
 {
 public:
@@ -74,6 +73,16 @@ public:
 	inline const SOCKET& GetFd()const { return m_fd; }
 	inline uint32 GetRemotePort()const { return ntohs(m_client.sin_port); }
 	void Delete();
+
+	inline void IncSendLock() { m_writeLock.fetch_add(1); }
+	inline void DecSendLock() { m_writeLock.fetch_sub(1); }
+	inline bool AcquireSendLock() {
+		return m_writeLock.exchange(1, std::memory_order_acq_rel) != 0 ? false : true;
+	}
+	inline OverlappedRec& getReadEvent() { return m_readEvent; }
+	inline OverlappedRec& getWriteEvent() { return m_writeEvent; }
+	inline CircularBuffer& getReadBuffer() { return m_readBuffer; }
+	inline CircularBuffer& getWriteBuffer() { return m_writeBuffer; }
 protected:
 	void _OnConnect();
 
@@ -81,13 +90,14 @@ protected:
 	sockaddr_in m_client;
 	std::mutex m_wMtx, m_rMtx;
 
-	CircularBuffer readBuffer;
-	CircularBuffer writeBuffer;
+	CircularBuffer m_readBuffer;
+	CircularBuffer m_writeBuffer;
 private:
 	SOCKET m_fd;
 	OverlappedRec m_readEvent;
 	OverlappedRec m_writeEvent;
 	HANDLE m_completionPort;// IOCP handle
+	std::atomic<int> m_writeLock;
 };
 
 /** Connect to a server.

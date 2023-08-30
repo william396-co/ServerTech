@@ -29,7 +29,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\util.h">
+    <ClInclude Include="..\common\util.hpp">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="..\common\singleton.hpp">
@@ -56,6 +56,21 @@
       <Filter>common</Filter>
     </Text>
     <Text Include="..\common\Socket.hpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\SocketOps.cpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\SocketOps.hpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\SocketMgr.cpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\SocketMgr.hpp">
+      <Filter>common</Filter>
+    </Text>
+    <Text Include="..\common\type.hpp">
       <Filter>common</Filter>
     </Text>
   </ItemGroup>
