@@ -141,6 +141,7 @@
     <ClInclude Include="SocketMgr.hpp" />
     <ClInclude Include="SocketOps.hpp" />
     <ClInclude Include="threadpool.hpp" />
+    <ClInclude Include="thread_guard.hpp" />
     <ClInclude Include="type.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
