@@ -13,75 +13,81 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="NetWork">
+      <UniqueIdentifier>{4d99bbb9-56c9-4256-99f9-adafd53e9f57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{4d2891a0-2baa-4af0-90a1-590a07a03cec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{723c79d9-abd6-4aeb-982a-cd92a4402733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{9628c2f4-1bcd-4f38-926a-ca63100b0d61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\ByteBuffer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\PacketBuffer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ByteBuffer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CircularBuffer.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="ListenSocket.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketBuffer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="safeQueue.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="singleton.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="Socket.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="socketDefines.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="SocketMgr.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="SocketOps.hpp">
-      <Filter>头文件</Filter>
+      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="threadpool.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="type.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="util.hpp">
-      <Filter>头文件</Filter>
+      <Filter>Thread</Filter>
     </ClInclude>
     <ClInclude Include="thread_guard.hpp">
-      <Filter>头文件</Filter>
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="safeQueue.hpp">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="CircularBuffer.hpp">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="util.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketBuffer.hpp">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="type.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton.hpp">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Socket.cpp">
-      <Filter>源文件</Filter>
+      <Filter>NetWork</Filter>
     </ClCompile>
     <ClCompile Include="SocketMgr.cpp">
-      <Filter>源文件</Filter>
+      <Filter>NetWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>NetWork</Filter>
     </ClCompile>
     <ClCompile Include="SocketOps.cpp">
-      <Filter>源文件</Filter>
+      <Filter>NetWork</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
-      <Filter>源文件</Filter>
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

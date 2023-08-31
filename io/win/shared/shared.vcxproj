@@ -127,8 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\ByteBuffer.hpp" />
-    <ClInclude Include="..\common\PacketBuffer.hpp" />
     <ClInclude Include="ByteBuffer.hpp" />
     <ClInclude Include="CircularBuffer.hpp" />
     <ClInclude Include="ListenSocket.hpp" />
