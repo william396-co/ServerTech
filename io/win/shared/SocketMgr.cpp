@@ -3,6 +3,9 @@
 #include <thread>
 #include <algorithm>
 #include <functional>
+#include <iostream>
+
+#include "print.hpp"
 
 void HandleReadComplete(Socket* s, uint32 len) {
 	s->getReadEvent().Unmark();
@@ -28,11 +31,6 @@ void HandleWriteComplete(Socket* s, uint32 len) {
 	s->BurstEnd();
 }
 
-
-void HandleShutdown(Socket* s) {
-	s->Disconnect();//??
-}
-
 // 工作线程
 void WorkerRun(HANDLE iocpHandle) {
 
@@ -47,10 +45,10 @@ void WorkerRun(HANDLE iocpHandle) {
 			continue;
 
 		ov = CONTAINING_RECORD(ol_ptr, OverlappedRec, overlap);
-		if (ov->event == SockeIOEvent::SOCKET_IO_THREAD_SHUT_DOWN) {
-			HandleShutdown(s);
+		if (ov->event == SockeIOEvent::SOCKET_IO_THREAD_SHUT_DOWN) {	
+			println("finished workthread ", std::this_thread::get_id());
 			delete ov;
-			break;
+			break;// finished this thread
 		}
 
 		switch (ov->event)

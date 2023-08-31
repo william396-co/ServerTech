@@ -132,6 +132,7 @@
     <ClInclude Include="ListenSocket.hpp" />
     <ClInclude Include="PacketBuffer.hpp" />
     <ClInclude Include="Platform.hpp" />
+    <ClInclude Include="print.hpp" />
     <ClInclude Include="safeQueue.hpp" />
     <ClInclude Include="singleton.hpp" />
     <ClInclude Include="Socket.hpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp" />
+    <ClCompile Include="print.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SocketMgr.cpp" />
     <ClCompile Include="SocketOps.cpp" />

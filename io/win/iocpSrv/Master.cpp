@@ -38,14 +38,21 @@ bool Master::Run(int argc, char** argv)
 	// Main Loop for Application
 
 	auto MainLoop = [&]() {
+		time_t start = time(nullptr);
 		while (!m_stopEvent) {
+			
 			std::cout << "Server running\n";
+
+			if (time(nullptr) - start > 10) {
+				m_stopEvent = true;
+			}
 
 		}
 
 		listenfd->Close();
 		SocketMgr::instance().CloseAll();
 		SocketMgr::instance().ShutdownThreads();
+		std::cout << "finished workthread " << std::this_thread::get_id() << "\n";
 	};
 
 	// listen thread working
@@ -58,6 +65,10 @@ bool Master::Run(int argc, char** argv)
 
 	// IOCP workthread start	
 	SocketMgr::instance().SpawnWorkerThreads();
+
+	std::cout << "finished all\n";
+	puts("Puase");
+
 	return true;
 }
 

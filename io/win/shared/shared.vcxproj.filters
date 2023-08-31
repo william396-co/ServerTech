@@ -72,6 +72,9 @@
     <ClInclude Include="singleton.hpp">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="print.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp">
@@ -87,6 +90,9 @@
       <Filter>NetWork</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="print.cpp">
       <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
