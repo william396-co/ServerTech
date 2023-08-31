@@ -1,5 +1,6 @@
 #include "Socket.hpp"
 #include "SocketOps.hpp"
+#include "SocketMgr.hpp"
 #include <ws2def.h>
 #include <iostream>
 
@@ -18,35 +19,14 @@ Socket::Socket(SOCKET fd, uint32 sendbufSize, uint32 recvBufSize)
 
 bool Socket::Connect(const char* Address, uint32 Port) {
 
-	struct addrinfo hints, * listp, * p;
-	int rc;
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_socktype = SOCK_STREAM; /* Open a connect */
-	hints.ai_flags = AI_NUMERICSERV;/* using a numeric port arg */
-	hints.ai_flags |= AI_ADDRCONFIG;/* Recommand for connections */
-	if ((rc = getaddrinfo(Address, std::to_string(Port).c_str(), &hints, &listp)) != 0) {
-		std::cerr << "getaddrinfo failed(" << Address << ":" << Port << "):" << gai_strerror(rc) << "\n";
+	m_fd = open_clientfd(Address, std::to_string(Port).c_str());
+	if (m_fd <= 0) {
 		return false;
 	}
-
-	for (p = listp; p; p = p->ai_next) {
-
-		if (connect(m_fd, p->ai_addr, (int)p->ai_addrlen) != 1)
-			break;
-		if (closesocket(m_fd) < 0) {
-			std::cerr << "open_clientfd: close failed:" << strerror(errno) << "\n";
-			return false;
-		}
-	}
-
-	freeaddrinfo(listp);
-	if (!p)
-		return false;
 
 	// at this point the connection was established
 #ifdef CONFIG_USE_IOCP
-	//m_completionPort = sSocketMgr.GetCompletionPort();
+	m_completionPort = SocketMgr::instance().GetCompletionPort();
 #endif
 
 	_OnConnect();
@@ -60,6 +40,16 @@ void Socket::Accept(sockaddr_in* address) {
 
 void Socket::_OnConnect() {
 
+	SocketOps::Nonblocking(m_fd);
+	SocketOps::DisableBuffering(m_fd);
+
+	AssignToCompletionPort();
+	SetupReadEvent();
+
+	SocketMgr::instance().AddSocket(this);
+
+	// call virtual onConnect
+	OnConnect();
 }
 
 bool Socket::Send(const uint8* Bytes, uint32 Size) {
@@ -84,8 +74,10 @@ void Socket::BurstPush()
 
 void Socket::Disconnect()
 {
+	SocketMgr::instance().DelSocket(this);
 	// call virtual onDisconnect
 	OnDisconnect();
+	
 }
 
 void Socket::Delete() {
@@ -120,12 +112,6 @@ void Socket::WriteCallback()
 	else {
 		DecSendLock();
 	}
-}
-
-void Socket::ReadCallback(uint32 len) {
-	m_readBuffer.IncrementWritten(len);
-	OnRead();
-	SetupReadEvent();
 }
 
 void Socket::SetupReadEvent()

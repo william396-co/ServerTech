@@ -1,13 +1,9 @@
-
-#include "../common/util.h"
-
+#include "util.hpp"
 #include <iostream>
 #include <string>
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-using namespace std;
 
 #pragma comment(lib,"ws2_32.lib")
+
 
 const char* hostname = "127.0.0.1";
 const char* port = "9527";

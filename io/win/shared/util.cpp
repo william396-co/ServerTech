@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include <cerrno>
 
 
 SOCKET open_clientfd(const char* hostname, const char* port) {

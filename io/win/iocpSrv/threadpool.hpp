@@ -73,7 +73,7 @@ public:
     void init()
     {
         for (size_t i = 0; i != m_threads.size(); ++i)
-            m_threads[i] = std::thread(ThreadWork(this, i));
+            m_threads[i] = std::thread(ThreadWork(this, (int)i));
     }
 
     void shutdown()
@@ -106,7 +106,7 @@ public:
 		};
 
         // 队列通过安全封装函数，并压入安全队列
-        unique_lock<mutex> lock(m_condition_mutex); // 生产者
+        std::unique_lock<std::mutex> lock(m_condition_mutex); // 生产者
         m_queue.enqueue(wrapper_func);
         lock.unlock();
 

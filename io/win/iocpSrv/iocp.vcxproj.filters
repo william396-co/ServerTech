@@ -13,65 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="common">
-      <UniqueIdentifier>{1ad37d05-d8f3-422d-88c1-bded4b192d99}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\util.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\CircularBuffer.cpp">
-      <Filter>common</Filter>
+    <ClCompile Include="ServerSocket.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\util.hpp">
-      <Filter>common</Filter>
+    <ClInclude Include="ServerSocket.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\singleton.hpp">
-      <Filter>common</Filter>
+    <ClInclude Include="OpCode.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\safeQueue.hpp">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\threadpool.hpp">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\CircularBuffer.hpp">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\Platform.hpp">
-      <Filter>common</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\common\socketDefines.hpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\Socket.cpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\Socket.hpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\SocketOps.cpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\SocketOps.hpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\SocketMgr.cpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\SocketMgr.hpp">
-      <Filter>common</Filter>
-    </Text>
-    <Text Include="..\common\type.hpp">
-      <Filter>common</Filter>
-    </Text>
   </ItemGroup>
 </Project>

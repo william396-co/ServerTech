@@ -53,8 +53,7 @@ public:
 	inline void BurstEnd() { m_wMtx.unlock(); }
 
 	/* Platform-specific methods */
-	void SetupReadEvent();
-	void ReadCallback(uint32 len);
+	void SetupReadEvent();	
 	void WriteCallback();
 
 	// Set completion port that this socket will be assigned to.
@@ -105,7 +104,6 @@ private:
 * @param port Port to connect to
 * @return templated type if successful, otherwise null
 */
-
 template<typename T>
 T* connectTCPSocket(const char* host, u_short port) {
 
