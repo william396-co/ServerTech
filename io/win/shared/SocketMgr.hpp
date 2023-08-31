@@ -17,11 +17,11 @@ public:
 
 	inline HANDLE GetCompletionPort()const { return m_completionPort; }
 	void CloseAll();
-	void AddSocket(Socket* s) {
+	inline void AddSocket(Socket* s) {
 		std::lock_guard<std::mutex> lock(sockMtx);
 		socketList.emplace(s);
 	}
-	void DelSocket(Socket* s) {
+	inline void DelSocket(Socket* s) {
 		std::lock_guard<std::mutex> lock(sockMtx);
 		socketList.erase(s);
 	}

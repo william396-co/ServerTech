@@ -21,12 +21,18 @@
     <ClCompile Include="ServerSocket.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Master.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerSocket.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="OpCode.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Master.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

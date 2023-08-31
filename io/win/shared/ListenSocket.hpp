@@ -49,11 +49,10 @@ public:
 			socket->Accept(&m_tempAddres);
 		}
 	}
-
+	
 	~ListenSocket() {
 		Close();
 	}
-private:
 	void Close() {
 		if (m_IsOpen) {
 			SocketOps::CloseSocket(m_fd);
