@@ -63,6 +63,9 @@
     <ClInclude Include="util.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="thread_guard.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp">
