@@ -1,4 +1,5 @@
 #include "SocketOps.hpp"
+#include <WS2tcpip.h>
 
 namespace SocketOps
 {

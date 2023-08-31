@@ -104,7 +104,6 @@ private:
 * @param port Port to connect to
 * @return templated type if successful, otherwise null
 */
-
 template<typename T>
 T* connectTCPSocket(const char* host, u_short port) {
 
