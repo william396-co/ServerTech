@@ -9,6 +9,8 @@ Socket::Socket(SOCKET fd, uint32 sendbufSize, uint32 recvBufSize)
 	m_BytesRecved(0),
 	m_BytesSent(0),
 	m_completionPort(0),
+	m_connected(false),
+	m_deleted(false),
 	m_client()
 {
 	m_readBuffer.Allocate(recvBufSize);
@@ -43,6 +45,9 @@ void Socket::_OnConnect() {
 	SocketOps::Nonblocking(m_fd);
 	SocketOps::DisableBuffering(m_fd);
 
+	m_connected = true;
+
+	// IOCP stuff
 	AssignToCompletionPort();
 	SetupReadEvent();
 
@@ -55,7 +60,7 @@ void Socket::_OnConnect() {
 bool Socket::Send(const uint8* Bytes, uint32 Size) {
 
 	bool rv = false;
-	std::lock_guard<std::mutex> lock(m_wMtx);
+	std::lock_guard<std::mutex> lock(m_writeMutex);
 	rv = m_writeBuffer.Write(Bytes, Size);
 	if (rv)
 		BurstPush();
@@ -74,20 +79,41 @@ void Socket::BurstPush()
 
 void Socket::Disconnect()
 {
+	if (!m_connected)
+		return;
+
+	m_connected = false;
+
+	printEx("Socket::Disconnect on socket ", m_fd);
+
 	SocketMgr::instance().DelSocket(this);
 	// call virtual onDisconnect
 	OnDisconnect();
-	
+
+	if (!IsDeleted())
+		Delete();	
 }
 
 void Socket::Delete() {
+
+	if (!m_deleted)return;
+
+	m_deleted = true;
+
+	printEx("Socket::Delete on socket ", m_fd);
+
+	if (IsConnected())
+		Disconnect();
 
 	SocketOps::CloseSocket(m_fd);
 }
 
 void Socket::WriteCallback()
 {
-	std::lock_guard<std::mutex> lock(m_rMtx);
+	if (IsDeleted() || !IsConnected())
+		return;
+
+	std::lock_guard<std::mutex> lock(m_writeMutex);
 
 	if (m_writeBuffer.GetContiguiousBytes()) {
 
@@ -116,7 +142,10 @@ void Socket::WriteCallback()
 
 void Socket::SetupReadEvent()
 {
-	std::lock_guard<std::mutex> lock(m_rMtx);
+	if (IsDeleted() || !IsConnected())
+		return;
+
+	std::lock_guard<std::mutex> lock(m_readMutex);
 	DWORD rlen = 0;
 	DWORD flags = 0;
 	WSABUF buf;

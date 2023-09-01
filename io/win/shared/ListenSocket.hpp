@@ -3,15 +3,15 @@
 #include <thread>
 #include <string>
 #include <type_traits>
+#include <shared_mutex>
+#include <mutex>
 
 #include "type.hpp"
 #include "util.hpp"
 #include "Socket.hpp"
 #include "SocketOps.hpp"
 #include "SocketMgr.hpp"
-
-template<typename T>
-using EnableIsSocket = std::enable_if_t<std::is_constructible_v<T, Socket>>;
+#include "print.hpp"
 
 template<typename T>
 class ListenSocket {
@@ -39,24 +39,31 @@ public:
 
 	void run()
 	{
-		socklen_t len;
+		socklen_t len = 0;
 		while (m_IsOpen) {
 			SOCKET s = WSAAccept(m_fd, (sockaddr*)&m_tempAddres, (socklen_t*)&len, nullptr, NULL);
 			if (s == INVALID_SOCKET)continue;
+
+			if (!m_IsOpen)
+				break;
 
 			T* socket = new T{ s };
 			socket->SetCompletionPort(m_cp);
 			socket->Accept(&m_tempAddres);
 		}
+
+		printlnEx("finished ListenThread [", std::this_thread::get_id(),"]");
 	}
-	
+
 	~ListenSocket() {
 		Close();
 	}
+
 	void Close() {
+
 		if (m_IsOpen) {
-			SocketOps::CloseSocket(m_fd);
-			m_IsOpen = false;
+			SocketOps::CloseSocket(m_fd);			
+			m_IsOpen.store(false);
 		}
 	}
 private:
@@ -64,5 +71,5 @@ private:
 	HANDLE m_cp;
 	struct sockaddr_in m_address;
 	struct sockaddr_in m_tempAddres;
-	bool m_IsOpen;
+	std::atomic_bool m_IsOpen; // multithread change value
 };

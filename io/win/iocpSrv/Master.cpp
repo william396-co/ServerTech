@@ -11,6 +11,7 @@
 #include "Socket.hpp"
 #include "ListenSocket.hpp"
 #include "thread_guard.hpp"
+#include "print.hpp"
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -38,14 +39,24 @@ bool Master::Run(int argc, char** argv)
 	// Main Loop for Application
 
 	auto MainLoop = [&]() {
+		time_t start = time(nullptr);
+		time_t curr = time(nullptr);
 		while (!m_stopEvent) {
-			std::cout << "Server running\n";
 
+			if (time(nullptr) - start > 1) {			// print per second
+				printlnEx("Server running [", std::this_thread::get_id(), "]");
+				curr = time(nullptr);
+			}
+
+			if (time(nullptr) - start > 5) {
+				m_stopEvent = true;
+			}
 		}
 
 		listenfd->Close();
 		SocketMgr::instance().CloseAll();
 		SocketMgr::instance().ShutdownThreads();
+		printlnEx("finished mainLoop [", std::this_thread::get_id(),"]");
 	};
 
 	// listen thread working
@@ -58,6 +69,10 @@ bool Master::Run(int argc, char** argv)
 
 	// IOCP workthread start	
 	SocketMgr::instance().SpawnWorkerThreads();
+
+	
+	printlnEx("finished all [",std::this_thread::get_id(),"]");
+
 	return true;
 }
 
@@ -76,7 +91,7 @@ void Master::_OnSignal(int s)
 #ifdef _WIN32
 	case SIGBREAK:
 #endif
-		Master::m_stopEvent = true;
+		m_stopEvent = true;
 		break;
 	}
 

@@ -104,6 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +134,7 @@
     <ClInclude Include="ListenSocket.hpp" />
     <ClInclude Include="PacketBuffer.hpp" />
     <ClInclude Include="Platform.hpp" />
+    <ClInclude Include="print.hpp" />
     <ClInclude Include="safeQueue.hpp" />
     <ClInclude Include="singleton.hpp" />
     <ClInclude Include="Socket.hpp" />
@@ -145,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp" />
+    <ClCompile Include="print.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SocketMgr.cpp" />
     <ClCompile Include="SocketOps.cpp" />
