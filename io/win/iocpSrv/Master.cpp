@@ -12,6 +12,7 @@
 #include "ListenSocket.hpp"
 #include "thread_guard.hpp"
 #include "print.hpp"
+#include "joining_thread.hpp"
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -60,13 +61,11 @@ bool Master::Run(int argc, char** argv)
 	};
 
 	// listen thread working
-	std::thread listenRun(&ListenHandle::run, listenfd.get());
-	thread_guard glistenRun(listenRun);
-
+	joining_thread listenRun(&ListenHandle::run, listenfd.get());
+	
 	// Main Loop for Application
-	std::thread mainRun(MainLoop);
-	thread_guard gmainRun(mainRun);
-
+	joining_thread mainRun(MainLoop);
+	
 	// IOCP workthread start	
 	SocketMgr::instance().SpawnWorkerThreads();
 
