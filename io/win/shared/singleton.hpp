@@ -10,6 +10,7 @@ public:
 	}
 
 	Singleton(Singleton const&) = delete;
+	Singleton(Singleton&&) = delete;
 	~Singleton() {}
 protected:
 	Singleton() {}

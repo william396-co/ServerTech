@@ -45,7 +45,7 @@ bool Master::Run(int argc, char** argv)
 		while (!m_stopEvent) {
 
 			if (time(nullptr) - start > 1) {			// print per second
-				printlnEx("Server running [", std::this_thread::get_id(), "]");
+				//printlnEx("Server running [", std::this_thread::get_id(), "]");
 				curr = time(nullptr);
 			}
 
@@ -70,7 +70,7 @@ bool Master::Run(int argc, char** argv)
 	SocketMgr::instance().SpawnWorkerThreads();
 
 	
-	printlnEx("finished all [",std::this_thread::get_id(),"]");
+//	printlnEx("finished all [",std::this_thread::get_id(),"]");
 
 	return true;
 }

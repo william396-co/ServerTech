@@ -8,6 +8,7 @@
 #include <set>
 #include <mutex>
 #include <Windows.h>
+#include "joining_thread.hpp"
 
 class SocketMgr : public Singleton<SocketMgr>
 {
@@ -32,5 +33,5 @@ private:
 	std::set<Socket*> socketList;
 	std::mutex sockMtx;
 	int threadCnt;
-	std::vector<std::thread> workerThreads;
+	std::vector<joining_thread> workerThreads;
 };

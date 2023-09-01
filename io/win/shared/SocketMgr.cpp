@@ -112,7 +112,7 @@ void SocketMgr::SpawnWorkerThreads() {
 	for (int i = 0; i != threadCnt; ++i) {
 		workerThreads.emplace_back(WorkerRun, m_completionPort);
 	}
-	std::for_each(workerThreads.begin(), workerThreads.end(), std::mem_fn(&std::thread::join));
+	//std::for_each(workerThreads.begin(), workerThreads.end(), std::mem_fn(&std::thread::join));
 }
 
 void SocketMgr::ShutdownThreads() {
