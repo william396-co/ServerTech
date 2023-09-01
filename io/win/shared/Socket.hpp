@@ -41,7 +41,7 @@ public:
 	bool Send(const uint8* Bytes, uint32 Size);
 
 	// Burst system - Locks the sending mutex.
-	inline void BurstBegin() { m_wMtx.lock(); }
+	inline void BurstBegin() { m_writeMutex.lock(); }
 
 	// Burst system - Adds bytes to output buffer.
 	bool BurstSend(const uint8* Bytes, uint32 Size);
@@ -50,7 +50,7 @@ public:
 	void BurstPush();
 
 	// Burst system - Unlocks the sending mutex.
-	inline void BurstEnd() { m_wMtx.unlock(); }
+	inline void BurstEnd() { m_writeMutex.unlock(); }
 
 	/* Platform-specific methods */
 	void SetupReadEvent();	
@@ -82,12 +82,14 @@ public:
 	inline OverlappedRec& getWriteEvent() { return m_writeEvent; }
 	inline CircularBuffer& getReadBuffer() { return m_readBuffer; }
 	inline CircularBuffer& getWriteBuffer() { return m_writeBuffer; }
+	inline bool IsDeleted()const { return m_deleted; }
+	inline bool IsConnected()const { return m_connected; }
 protected:
 	void _OnConnect();
 
 	size_t m_BytesSent, m_BytesRecved;
 	sockaddr_in m_client;
-	std::mutex m_wMtx, m_rMtx;
+	std::mutex m_writeMutex, m_readMutex;//lock for writeBuffer/readBuffer
 
 	CircularBuffer m_readBuffer;
 	CircularBuffer m_writeBuffer;
@@ -97,6 +99,8 @@ private:
 	OverlappedRec m_writeEvent;
 	HANDLE m_completionPort;// IOCP handle
 	std::atomic<int> m_writeLock;
+	bool m_connected;
+	bool m_deleted;
 };
 
 /** Connect to a server.

@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include "print.hpp"
 
 /* Implementation Selection */
 #ifdef WIN32		// Easy
@@ -22,7 +23,7 @@ struct OverlappedRec
 	SockeIOEvent event;
 	std::atomic_flag inUse = ATOMIC_FLAG_INIT;
 
-	OverlappedRec(SockeIOEvent ev) :event {ev}, inUse{ 0 }
+	OverlappedRec(SockeIOEvent ev) :event {ev}
 	{
 		memset(&overlap, 0, sizeof(overlap));
 	}
@@ -35,8 +36,10 @@ struct OverlappedRec
 		event = ev;
 	}
 
-	void Mark() {		
-		while (inUse.test_and_set(std::memory_order_acq_rel));
+	void Mark() {
+		if (inUse.test_and_set(std::memory_order_seq_cst)) {
+			printlnEx("!!!! Network: Detected double use of read/write event! Previous event was ", (int)event);
+		}
 	}
 	void Unmark() {
 		inUse.clear(std::memory_order_relaxed);

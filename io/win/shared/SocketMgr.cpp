@@ -8,27 +8,32 @@
 #include "print.hpp"
 
 void HandleReadComplete(Socket* s, uint32 len) {
-	s->getReadEvent().Unmark();
-	if (len) {
-		s->getReadBuffer().IncrementWritten(len);
-		s->OnRead();
-		s->SetupReadEvent();
-	}
-	else {
-		s->Delete();
+
+	if (!s->IsDeleted()) {
+		s->getReadEvent().Unmark();
+		if (len) {
+			s->getReadBuffer().IncrementWritten(len);
+			s->OnRead();
+			s->SetupReadEvent();
+		}
+		else {
+			s->Delete();
+		}
 	}
 }
 
 void HandleWriteComplete(Socket* s, uint32 len) {
 
-	s->getWriteEvent().Unmark();
-	s->BurstBegin();
-	s->getWriteBuffer().Remove(len);
-	if (s->getWriteBuffer().GetContiguiousBytes() > 0)
-		s->WriteCallback();
-	else
-		s->DecSendLock();
-	s->BurstEnd();
+	if (!s->IsDeleted()) {
+		s->getWriteEvent().Unmark();
+		s->BurstBegin();
+		s->getWriteBuffer().Remove(len);
+		if (s->getWriteBuffer().GetContiguiousBytes() > 0)
+			s->WriteCallback();
+		else
+			s->DecSendLock();
+		s->BurstEnd();
+	}
 }
 
 // 工作线程
@@ -46,7 +51,7 @@ void WorkerRun(HANDLE iocpHandle) {
 
 		ov = CONTAINING_RECORD(ol_ptr, OverlappedRec, overlap);
 		if (ov->event == SockeIOEvent::SOCKET_IO_THREAD_SHUT_DOWN) {	
-			println("finished workthread ", std::this_thread::get_id());
+			printlnEx("finished workthread [", std::this_thread::get_id(), "]");
 			delete ov;
 			break;// finished this thread
 		}
@@ -97,11 +102,12 @@ void SocketMgr::CloseAll()
 }
 
 void SocketMgr::SpawnWorkerThreads() {
+	
+	/* 一般地，我们创建CPU核心数*2的工作线程，
+	*  使得在某个线程 Sleep() 或WSAWaitForMultipleEvents() 将线程挂起时（此时不占用CPU时间片），
+	*  CPU的内核仍旧有线程在工作，减少线程调度的时间，保证程序的执行效率）。*/
 
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-
-	threadCnt = si.dwNumberOfProcessors * 2;// CpuNum * 2
+	threadCnt = std::thread::hardware_concurrency() * 2;//CpuNum * 2
 
 	for (int i = 0; i != threadCnt; ++i) {
 		workerThreads.emplace_back(WorkerRun, m_completionPort);

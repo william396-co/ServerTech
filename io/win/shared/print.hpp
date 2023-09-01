@@ -5,9 +5,7 @@
 #include <utility>
 #include <mutex>
 
-extern std::mutex os_mutex;
-
-#if __cplusplus < 201703L //below c++17
+#if __cplusplus > 201703L //below c++17
 
 template<typename T>
 void print(T const& t)
@@ -16,10 +14,10 @@ void print(T const& t)
 }
 
 template<typename T, typename... Args>
-void print(T const& first, Args... args)
+void print(T const& first, Args&&... args)
 {
     std::cout << first;
-    print(args...);
+	print(std::forward<Args>(args)...);
 }
 
 inline void println()
@@ -34,24 +32,22 @@ void println(T const& t)
 }
 
 template<typename T, typename... Args>
-void println(T const& first, Args... args)
+void println(T const& first, Args&&... args)
 {
     std::cout << first;
-    println(args...);
+	println(std::forward<Args>(args)...);
 }
 #else
 
 template<typename... Args>
 void print(Args &&... args)
 {    
-    std::lock_guard<std::mutex> lock(os_mutex);
     (std::cout << ... << std::forward<Args>(args));
 }
 
 template<typename... Args>
 void println(Args &&... args)
-{
-    std::lock_guard<std::mutex> lock(os_mutex);
+{    
     (std::cout << ... << std::forward<Args>(args)) << "\n";
 }
 
@@ -81,4 +77,19 @@ void print_arr(Arr&& arr)
     for (auto const& i : std::forward<Arr>(arr))
         print(i, ",");
     println("]");
+}
+
+// lock iostream, made screen output 
+extern std::mutex os_mutex;
+
+template<typename...Args>
+void printlnEx(Args&&...args) {
+    std::lock_guard<std::mutex> lock(os_mutex);
+    println(std::forward<Args>(args)...);
+}
+
+template<typename...Args>
+void printEx(Args&&...args) {
+    std::lock_guard<std::mutex> lock(os_mutex);
+    print(std::forward<Args>(args)...);
 }

@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cerrno>
 
-
 SOCKET open_clientfd(const char* hostname, const char* port) {
 	SOCKET clientfd;
 	int rc;
@@ -16,7 +15,7 @@ SOCKET open_clientfd(const char* hostname, const char* port) {
 	hints.ai_flags = AI_NUMERICSERV;/* using a numeric port arg */
 	hints.ai_flags |= AI_ADDRCONFIG;/* Recommand for conneciton */
 	if ((rc = getaddrinfo(hostname, port, &hints, &listp)) != 0) {
-		std::cerr << "getaddrinfo failed(" << hostname << ":" << port << "):" << gai_strerror(rc) << "\n";
+		//printlnEx("getaddrinfo failed(", hostname, ":", port, "):", (wchar_t*)gai_strerror(rc));
 		return -2;
 	}
 
@@ -30,7 +29,7 @@ SOCKET open_clientfd(const char* hostname, const char* port) {
 		if (connect(clientfd, p->ai_addr, (int)p->ai_addrlen) != 1)
 			break;
 		if (closesocket(clientfd) < 0) {
-			std::cerr << "open_clientfd: close failed:" << strerror(errno) << "\n";
+			//printlnEx("open_clientfd: close failed:", (char*)strerror(errno));
 			return -1;
 		}
 	}
@@ -56,7 +55,7 @@ SOCKET open_listenfd(const char* port) {
 	hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;/* on any IP address */
 	hints.ai_flags |= AI_NUMERICSERV;/* using port number */
 	if ((rc = getaddrinfo(NULL, port, &hints, &listp)) != 0) {
-		std::cerr << "getaddrinfo failed(port" << port << "):" << gai_strerror(rc) << "\n";
+		//printlnEx("getaddrinfo failed (port", port, "):", (wchar_t*)gai_strerror(rc));
 		return -2;
 	}
 
@@ -74,7 +73,7 @@ SOCKET open_listenfd(const char* port) {
 			break;
 
 		if (closesocket(listenfd) < 0) {
-			std::cerr << "open_listenfd close failed:" << strerror(errno) << "\n";
+			//printlnEx("open_listenfd close failed:", (char*)strerror(errno));
 			return -1;
 		}
 	}

@@ -14,9 +14,6 @@
 #include "print.hpp"
 
 template<typename T>
-using EnableIsSocket = std::enable_if_t<std::is_constructible_v<T, Socket>>;
-
-template<typename T>
 class ListenSocket {
 public:
 	ListenSocket(const char* host, uint32 port)
@@ -55,7 +52,7 @@ public:
 			socket->Accept(&m_tempAddres);
 		}
 
-		println("finished ListenThread ", std::this_thread::get_id());
+		printlnEx("finished ListenThread [", std::this_thread::get_id(),"]");
 	}
 
 	~ListenSocket() {
