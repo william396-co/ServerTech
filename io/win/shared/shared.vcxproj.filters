@@ -75,6 +75,9 @@
     <ClInclude Include="print.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="joining_thread.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp">

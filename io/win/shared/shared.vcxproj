@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClInclude Include="ByteBuffer.hpp" />
     <ClInclude Include="CircularBuffer.hpp" />
+    <ClInclude Include="joining_thread.hpp" />
     <ClInclude Include="ListenSocket.hpp" />
     <ClInclude Include="PacketBuffer.hpp" />
     <ClInclude Include="Platform.hpp" />
