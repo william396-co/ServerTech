@@ -9,6 +9,7 @@ int main()
     EventLoop * loop = new EventLoop();
     Server sever( loop, ip, port );
     loop->loop();
+    delete loop;
 
     return 0;
 }
