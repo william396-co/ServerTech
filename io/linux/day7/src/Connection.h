@@ -11,9 +11,8 @@ class Connection
 {
 public:
     Connection( EventLoop * _loop, Socket * _s );
-    ~Connection(){}
-
-    void echo();
+    ~Connection();
+    void echo( int fd );
     void setDeleteConnectionCallback( ConnectionCallback cb )
     {
         deleteCallback = cb;
@@ -21,7 +20,7 @@ public:
 
 private:
     EventLoop * loop;
-    std::unique_ptr<Socket> s;
-    std::unique_ptr<Channel> channel;
+    Socket * s;
+    Channel * channel;
     ConnectionCallback deleteCallback;
 };

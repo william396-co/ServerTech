@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include "util.h"
 
 class EventLoop;
@@ -14,19 +13,15 @@ class Acceptor
 public:
     Acceptor( EventLoop * _loop, const char * ip, uint16_t port );
     ~Acceptor();
-    void acceptConnection()
-    {
-        if ( newConCallback ) newConCallback( s.get() );
-    }
+    void acceptConnection();
     void setNewConnectionCallback( ConnectionCallback cb )
     {
-        newConCallback = cb;
+        newConnectionCallback = cb;
     }
 
 private:
-    std::unique_ptr<EventLoop> loop;
-    std::unique_ptr<Socket> s;
-    std::unique_ptr<InetAddress> addr;
-    std::unique_ptr<Channel> acceptChannel;
-    ConnectionCallback newConCallback = nullptr;
+    EventLoop * loop;
+    Socket * listenSock;
+    Channel * acceptChannel;
+    ConnectionCallback newConnectionCallback;
 };

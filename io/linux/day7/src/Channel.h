@@ -29,5 +29,5 @@ private:
     uint32_t events;
     uint32_t revents;
     bool inEpoll;
-    ChannelCallback callback = nullptr;
+    ChannelCallback callback;
 };

@@ -8,13 +8,18 @@
 constexpr auto READ_BUFFER = 1024;
 
 Connection::Connection( EventLoop * _loop, Socket * _s )
-    : loop { _loop }, s { nullptr }, channel { nullptr }
+    : loop { _loop }, s { _s }, channel { nullptr }
 {
-    s = std::make_unique<Socket>( s );
-    channel = std::make_unique<Channel>( loop, s->getFd() );
-    ConnectionCallback cb = std::bind( &Connection::echo, this, s->getFd() );
+    channel = new Channel( loop, s->getFd() );
+    ChannelCallback cb = std::bind( &Connection::echo, this, s->getFd() );
     channel->setCallback( cb );
     channel->enableReading();
+}
+
+Connection::~Connection()
+{
+    delete s;
+    delete channel;
 }
 
 void Connection::echo( int fd )
@@ -35,7 +40,7 @@ void Connection::echo( int fd )
             break;
         } else if ( bytes_read == 0 ) { // EOF, disconnect
             printf( "EOF, client fd %d disconnect\n", fd );
-            deleteConnectionCallback( s );
+            deleteCallback( s );
             break;
         }
     }

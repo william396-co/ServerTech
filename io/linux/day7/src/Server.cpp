@@ -6,6 +6,7 @@
 #include "Channel.h"
 #include "Acceptor.h"
 #include "Connection.h"
+#include "util.h"
 #include <functional>
 #include <cstring>
 #include <unistd.h>
@@ -26,22 +27,26 @@ Server::Server( EventLoop * _loop, const char * ip, uint16_t port )
 
 Server::~Server()
 {
+    for ( auto & it : connections ) {
+        delete it.second;
+    }
+
     delete acceptor;
 }
 
-void Server::deleteConnection( Socket * s )
+void Server::deleteConnection( Socket * _s )
 {
-    auto it = connections.find( s->getFd() );
+    auto it = connections.find( _s->getFd() );
     if ( it != connections.end() ) {
         delete it->second;
         connections.erase( it );
     }
 }
 
-void Server::newConnection( Socket * s )
+void Server::newConnection( Socket * _s )
 {
-    Connection * conn = new Connection( loop, s );
+    Connection * conn = new Connection( loop, _s );
     ConnectionCallback cb = std::bind( &Server::deleteConnection, this, std::placeholders::_1 );
     conn->setDeleteConnectionCallback( cb );
-    connections[s->getFd()] = conn;
+    connections.emplace( _s->getFd(), conn );
 }

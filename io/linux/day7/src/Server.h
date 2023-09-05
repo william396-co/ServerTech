@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <memory>
 
 class EventLoop;
 class Socket;
@@ -17,12 +16,8 @@ public:
     ~Server();
 
     void handleReadEvent( int fd );
-    void newConnection( Socket * listenfd );
-
-private:
-    void addSocketChannel( int fd, Socket * s, Channel * ch );
-    void delSocketChannel( int fd );
-    void clear();
+    void newConnection( Socket * _s );
+    void deleteConnection( Socket * _s );
 
 private:
     EventLoop * loop;

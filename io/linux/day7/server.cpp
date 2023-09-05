@@ -7,7 +7,7 @@ constexpr auto port = 9527;
 int main()
 {
     EventLoop * loop = new EventLoop();
-    Server sever( loop, "127.0.0.1", 9527 );
+    Server sever( loop, ip, port );
     loop->loop();
 
     return 0;

@@ -14,7 +14,5 @@ void Channel::enableReading()
 
 void Channel::handleEvent()
 {
-    if ( callback ) {
-        callback();
-    }
+    callback();
 }
