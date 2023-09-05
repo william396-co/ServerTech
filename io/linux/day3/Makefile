@@ -1,0 +1,10 @@
+all: server client
+
+clean:
+	rm -rf server client
+
+server:
+	g++ -std=c++17 util.cpp InetAddress.cpp Socket.cpp Epoll.cpp server.cpp -o server
+
+client:
+	g++ -std=c++17 util.cpp client.cpp -o client
