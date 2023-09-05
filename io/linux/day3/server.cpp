@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <vector>
-#include <memory>
 #include <unordered_map>
 #include "util.h"
 #include "Epoll.h"
@@ -12,8 +11,6 @@
 #include "InetAddress.h"
 
 constexpr auto READ_BUFFER = 1024;
-constexpr auto ip = "0.0.0.1";
-constexpr auto port = 9527;
 
 void handleReadEvent( int fd );
 
@@ -35,13 +32,12 @@ void delSocket( int fd )
 
 int main()
 {
-    std::unique_ptr<Socket> listenSock = std::make_unique<Socket>();
-    std::unique_ptr<InetAddress> s_addr = std::make_unique<InetAddress>( ip, port );
-    listenSock->bind( s_addr.get() );
-
+    Socket * listenSock = new Socket();
+    InetAddress s_addr( "127.0.0.1", 9527 );
+    listenSock->bind( s_addr );
     listenSock->listen();
 
-    std::unique_ptr<Epoll> ep = std::make_unique<Epoll>();
+    Epoll * ep = new Epoll();
     listenSock->setnonblocking();
     ep->addFd( listenSock->getFd(), EPOLLIN | EPOLLET );
 
@@ -49,9 +45,9 @@ int main()
         auto events = ep->poll();
         for ( size_t i = 0; i != events.size(); ++i ) {
             if ( events[i].data.fd == listenSock->getFd() ) {
-                std::unique_ptr<InetAddress> c_addr = std::make_unique<InetAddress>();
-                Socket * clientSock = new Socket( listenSock->accept( c_addr.get() ) ); // memory leak
-                printf( "new client fd %d! IP: %s Port: %d\n", clientSock->getFd(), inet_ntoa( c_addr->addr.sin_addr ), ntohs( c_addr->addr.sin_port ) );
+                InetAddress c_addr {};
+                Socket * clientSock = new Socket( listenSock->accept( c_addr ) );
+                printf( "new client fd %d! IP: %s Port: %d\n", clientSock->getFd(), inet_ntoa( c_addr.addr.sin_addr ), ntohs( c_addr.addr.sin_port ) );
                 clientSock->setnonblocking();
                 ep->addFd( clientSock->getFd(), EPOLLIN | EPOLLET );
                 addSocket( clientSock );
@@ -62,6 +58,9 @@ int main()
             }
         }
     }
+
+    delete ep;
+    delete listenSock;
 }
 
 void handleReadEvent( int fd )

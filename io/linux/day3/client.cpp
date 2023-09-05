@@ -6,8 +6,6 @@
 #include "util.h"
 
 constexpr auto BUFFER_SIZE = 1024;
-constexpr auto ip = "127.0.0.1";
-constexpr auto port = 9527;
 
 int main()
 {
@@ -18,7 +16,7 @@ int main()
     bzero( &serv_addr, sizeof( serv_addr ) );
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    serv_addr.sin_port = htons( port );
+    serv_addr.sin_port = htons( 9527 );
 
     errif( connect( sockfd, (sockaddr *)&serv_addr, sizeof( serv_addr ) ) == -1, "socket connect error" );
 

@@ -26,9 +26,9 @@ Socket::~Socket()
     }
 }
 
-void Socket::bind( InetAddress * addr )
+void Socket::bind( InetAddress & addr )
 {
-    errif( ::bind( fd, (sockaddr *)&addr->addr, addr->addr_len ) == -1, "socket bind error" );
+    errif( ::bind( fd, (sockaddr *)&addr.addr, addr.addr_len ) == -1, "socket bind error" );
 }
 
 void Socket::listen()
@@ -41,9 +41,9 @@ void Socket::setnonblocking()
     fcntl( fd, F_SETFL, fcntl( fd, F_GETFL ) | O_NONBLOCK );
 }
 
-int Socket::accept( InetAddress * addr )
+int Socket::accept( InetAddress & addr )
 {
-    int client_fd = ::accept( fd, (sockaddr *)&addr->addr, &addr->addr_len );
+    int client_fd = ::accept( fd, (sockaddr *)&addr.addr, &addr.addr_len );
     errif( client_fd == -1, "socket accept error" );
     return client_fd;
 }

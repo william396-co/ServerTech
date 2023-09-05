@@ -1,6 +1,6 @@
 #pragma once
 
-class InetAddress;
+struct InetAddress;
 class Socket
 {
 public:
@@ -8,10 +8,10 @@ public:
     Socket( int fd );
     ~Socket();
 
-    void bind( InetAddress * addr );
+    void bind( InetAddress & addr );
     void listen();
     void setnonblocking();
-    int accept( InetAddress * addr );
+    int accept( InetAddress & addr );
     int getFd() const { return fd; }
 
 private:
