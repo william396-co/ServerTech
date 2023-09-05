@@ -12,7 +12,7 @@ Epoll::Epoll()
     epfd = epoll_create1( 0 );
     errif( epfd == -1, "epoll create error" );
     events = new epoll_event[MAX_EVENTS];
-    bzero( &events, sizeof( nullptr ) * MAX_EVENTS );
+    bzero( events, sizeof( *events ) * MAX_EVENTS );
 }
 
 Epoll::~Epoll()
