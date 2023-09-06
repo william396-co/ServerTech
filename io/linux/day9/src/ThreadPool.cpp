@@ -14,7 +14,7 @@ ThreadPool::ThreadPool( int size )
                     } );
                     if ( stop && tasks.empty() ) return;
 
-                    auto task = tasks.front();
+                    task = tasks.front();
                     tasks.pop();
                 }
                 task();
