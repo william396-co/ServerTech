@@ -36,7 +36,7 @@ ThreadPool::~ThreadPool()
             it.join();
     }
 }
-
+/*
 void ThreadPool::add( Task task )
 {
     {
@@ -47,4 +47,4 @@ void ThreadPool::add( Task task )
     }
 
     cv.notify_one();
-}
+}*/
