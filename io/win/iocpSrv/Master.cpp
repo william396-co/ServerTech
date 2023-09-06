@@ -13,6 +13,7 @@
 #include "thread_guard.hpp"
 #include "print.hpp"
 #include "joining_thread.hpp"
+#include "chrono_util.hpp"
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -40,16 +41,16 @@ bool Master::Run(int argc, char** argv)
 	// Main Loop for Application
 
 	auto MainLoop = [&]() {
-		time_t start = time(nullptr);
-		time_t curr = time(nullptr);
+		time_t start = utils::now();
+		time_t curr = utils::now();
 		while (!m_stopEvent) {
 
-			if (time(nullptr) - start > 1) {			// print per second
+			if (utils::now() - start > 1) {			// print per second
 				//printlnEx("Server running [", std::this_thread::get_id(), "]");
-				curr = time(nullptr);
+				curr = utils::now();
 			}
 
-			if (time(nullptr) - start > 5) {
+			if (utils::now() - start > 5) {
 				m_stopEvent = true;
 			}
 		}
@@ -57,20 +58,20 @@ bool Master::Run(int argc, char** argv)
 		listenfd->Close();
 		SocketMgr::instance().CloseAll();
 		SocketMgr::instance().ShutdownThreads();
-		printlnEx("finished mainLoop [", std::this_thread::get_id(),"]");
+		printlnEx("finished mainLoop [", std::this_thread::get_id(), "]");
 	};
 
 	// listen thread working
 	joining_thread listenRun(&ListenHandle::run, listenfd.get());
-	
+
 	// Main Loop for Application
 	joining_thread mainRun(MainLoop);
-	
+
 	// IOCP workthread start	
 	SocketMgr::instance().SpawnWorkerThreads();
 
-	
-//	printlnEx("finished all [",std::this_thread::get_id(),"]");
+
+	//	printlnEx("finished all [",std::this_thread::get_id(),"]");
 
 	return true;
 }

@@ -78,6 +78,9 @@
     <ClInclude Include="joining_thread.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="chrono_util.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircularBuffer.cpp">
