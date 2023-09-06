@@ -25,10 +25,12 @@ ThreadPool::ThreadPool( int size )
 
 ThreadPool::~ThreadPool()
 {
+    {
+        std::scoped_lock lock( tasks_mtx );
+        stop = true;
+    }
 
-    std::unique_lock lock( tasks_mtx );
-    stop = true;
-
+    cv.notify_all();
     for ( auto & it : threads ) {
         if ( it.joinable() )
             it.join();
@@ -37,11 +39,12 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::add( Task task )
 {
-    std::unique_lock lock( tasks_mtx );
-    if ( stop )
-        throw std::runtime_error( "ThreadPool already stop, can't add task any more" );
-
-    tasks.emplace( task );
+    {
+        std::scoped_lock lock( tasks_mtx );
+        if ( stop )
+            throw std::runtime_error( "ThreadPool already stop, can't add task any more" );
+        tasks.emplace( task );
+    }
 
     cv.notify_one();
 }

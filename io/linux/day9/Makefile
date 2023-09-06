@@ -1,7 +1,7 @@
 all: server client threadTest
 
 clean:
-	rm -rf server client threadTest
+	rm -rf server client ThreadPoolTest 
 
 threadTest:
 	g++ -std=c++17 -pthread src/util.cpp src/ThreadPool.cpp ThreadPoolTest.cpp -o ThreadPoolTest
