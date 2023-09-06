@@ -7,6 +7,7 @@
 class Socket;
 class EventLoop;
 class Channel;
+class Buffer;
 class Connection
 {
 public:
@@ -22,5 +23,7 @@ private:
     EventLoop * loop;
     Socket * s;
     Channel * channel;
+    Buffer * readBuffer;
+    Buffer * writeBuffer;
     ConnectionCallback deleteCallback;
 };
