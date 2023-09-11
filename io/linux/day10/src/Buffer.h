@@ -12,6 +12,7 @@ public:
     const char * c_str() { return buf.c_str(); }
     void clear() { buf.clear(); }
     void getline();
+    void setBuf( const char * data );
 
 private:
     std::string buf;
