@@ -12,7 +12,7 @@ client:
 	g++ -std=c++17 -lpthread -g $(src) client.cpp -o client
 
 threadTest:
-	g++ -std=c++17 -lpthread -g $(src) ThreadPoolTest.cpp -o ThreadPooTest
+	g++ -std=c++17 -lpthread -g $(src) ThreadPoolTest.cpp -o ThreadPoolTest
 
 test:
 	g++ -std=c++17 -lpthread -g $(src) test.cpp -o test

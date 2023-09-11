@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
+#include <cstring>
 
 constexpr auto ip = "127.0.0.1";
 constexpr auto port = 9527;

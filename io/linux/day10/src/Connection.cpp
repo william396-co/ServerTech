@@ -62,7 +62,15 @@ void Connection::echo( int fd )
 
 void Connection::send( int fd )
 {
-    //    char buf[readBuffer->size()];
-    //  strcpy( buf, readBuffer->c_str() );
-    // size_t data_size = readBuffer->size();
+    char buf[readBuffer->size()];
+    strcpy( buf, readBuffer->c_str() );
+    int data_size = readBuffer->size();
+    int data_left = data_size;
+    while ( data_left > 0 ) {
+        ssize_t bytes_write = write( fd, buf + data_size - data_left, data_left );
+        if ( bytes_write == -1 && errno == EAGAIN ) {
+            break;
+        }
+        data_left -= bytes_write;
+    }
 }
