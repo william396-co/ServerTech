@@ -16,7 +16,6 @@ Connection::Connection( EventLoop * _loop, Socket * _s )
     channel->useET();
     ChannelReadCallback cb = std::bind( &Connection::echo, this, s->getFd() );
     channel->setReadCallback( cb );
-    channel->setUseThreadPool();
 
     readBuffer = new Buffer();
     writeBuffer = new Buffer();
