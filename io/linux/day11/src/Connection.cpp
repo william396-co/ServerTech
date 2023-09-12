@@ -53,8 +53,9 @@ void Connection::echo( int fd )
             deleteCallback( fd );
             break;
         } else {
-            printf( "Connection reset by perr\n" );
+            printf( "Connection reset by perr(fd:%d)\n", fd );
             deleteCallback( fd );
+            break;
         }
     }
 }
