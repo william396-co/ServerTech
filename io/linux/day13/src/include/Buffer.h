@@ -12,7 +12,7 @@ public:
     DISALLOW_COPY_AND_MOVE( Buffer );
 
     void append( const char * _str, size_t sz );
-    ssize_t size() const { return buf.size(); }
+    size_t size() const { return buf.size(); }
     const char * c_str() { return buf.c_str(); }
     void clear() { buf.clear(); }
     void getline();

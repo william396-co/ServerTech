@@ -16,50 +16,61 @@
 
 constexpr auto READ_BUFFER = 1024;
 
-Server::Server(EventLoop *_loop, const char *ip, uint16_t port) : mainReactor{_loop}, acceptor{nullptr} {
-  acceptor = new Acceptor{mainReactor, ip, port};
-  ConnectionCallback cb = std::bind(&Server::newConnection, this, std::placeholders::_1);
-  acceptor->setNewConnectionCallback(cb);
+Server::Server( EventLoop * _loop, const char * ip, uint16_t port )
+    : mainReactor_ { _loop }, acceptor_ { nullptr }
+{
+    acceptor_ = new Acceptor { mainReactor_, ip, port };
+    NewConnectionCallback cb = std::bind( &Server::newConnection, this, std::placeholders::_1 );
+    acceptor_->setNewConnectionCallback( cb );
 
-  int size = std::thread::hardware_concurrency();
-  thpool = new ThreadPool(size);
-  for (int i = 0; i < size; ++i) {
-    subReactors.emplace_back(new EventLoop());
-  }
+    int size = std::thread::hardware_concurrency();
+    thpool_ = new ThreadPool( size );
+    for ( int i = 0; i < size; ++i ) {
+        subReactors_.emplace_back( new EventLoop() );
+    }
 
-  for (int i = 0; i < size; ++i) {
-    std::function<void()> sub_loop = std::bind(&EventLoop::loop, subReactors[i]);
-    thpool->add(sub_loop);
-  }
+    for ( int i = 0; i < size; ++i ) {
+        std::function<void()> sub_loop = std::bind( &EventLoop::loop, subReactors_[i] );
+        thpool_->add( sub_loop );
+    }
 }
 
-Server::~Server() {
-  for (auto &it : connections) {
-    delete it.second;
-  }
+Server::~Server()
+{
+    for ( auto & it : connections_ ) {
+        delete it.second;
+    }
 
-  delete acceptor;
-  delete thpool;
+    delete acceptor_;
+    delete thpool_;
 
-  for (auto &it : subReactors) {
-    delete it;
-  }
+    for ( auto & it : subReactors_ ) {
+        delete it;
+    }
 }
 
-void Server::deleteConnection(int fd) {
-  auto it = connections.find(fd);
-  if (it != connections.end()) {
-    delete it->second;
-    connections.erase(it);
-  }
+void Server::deleteConnection( int fd )
+{
+    auto it = connections_.find( fd );
+    if ( it != connections_.end() ) {
+        delete it->second;
+        connections_.erase( it );
+    }
 }
 
-void Server::newConnection(Socket *_s) {
-  if (_s->getFd() != -1) {
-    int random = _s->getFd() % subReactors.size();
-    Connection *conn = new Connection(subReactors[random], _s);
-    DeleteConnectionCallback cb = std::bind(&Server::deleteConnection, this, std::placeholders::_1);
-    conn->setDeleteConnectionCallback(cb);
-    connections.emplace(_s->getFd(), conn);
-  }
+void Server::newConnection( Socket * _s )
+{
+    if ( _s->getFd() != -1 ) {
+        int random = _s->getFd() % subReactors_.size();
+        Connection * conn = new Connection( subReactors_[random], _s );
+        DeleteConnectionCallback cb = std::bind( &Server::deleteConnection, this, std::placeholders::_1 );
+        conn->setDeleteConnectionCallback( cb );
+        conn->setOnConnectedCallback( on_connected_callback_ );
+        connections_.emplace( _s->getFd(), conn );
+    }
+}
+
+void Server::onConnected( ConnectedCallback && fn )
+{
+    on_connected_callback_ = std::move( fn );
 }

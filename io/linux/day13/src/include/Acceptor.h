@@ -15,12 +15,12 @@ public:
     Acceptor( EventLoop * _loop, const char * ip, uint16_t port );
     ~Acceptor();
     void acceptConnection();
-    void setNewConnectionCallback( ConnectionCallback cb ) { newConnectionCallback = cb; }
+    void setNewConnectionCallback( NewConnectionCallback const & cb ) { newConnectionCallback = cb; }
     DISALLOW_COPY_AND_MOVE( Acceptor );
 
 private:
     EventLoop * loop;
     Socket * listenSock;
     Channel * acceptChannel;
-    ConnectionCallback newConnectionCallback;
+    NewConnectionCallback newConnectionCallback;
 };

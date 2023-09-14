@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include "Macros.h"
+#include "Types.h"
 
 class EventLoop;
 class Socket;
@@ -20,14 +21,15 @@ public:
 
     DISALLOW_COPY_AND_MOVE( Server );
 
-    void handleReadEvent( int fd );
     void newConnection( Socket * _s );
     void deleteConnection( int fd );
+    void onConnected( ConnectedCallback && fn );
 
 private:
-    EventLoop * mainReactor;
-    Acceptor * acceptor;
-    ConnectionList connections;
-    std::vector<EventLoop *> subReactors;
-    ThreadPool * thpool;
+    EventLoop * mainReactor_;
+    Acceptor * acceptor_;
+    ConnectionList connections_;
+    std::vector<EventLoop *> subReactors_;
+    ThreadPool * thpool_;
+    ConnectedCallback on_connected_callback_;
 };
