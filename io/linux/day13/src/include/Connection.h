@@ -2,8 +2,8 @@
 
 #include <functional>
 #include <memory>
-#include "util.h"
 #include "Macros.h"
+#include "Types.h"
 
 class Socket;
 class EventLoop;

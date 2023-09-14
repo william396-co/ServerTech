@@ -9,8 +9,9 @@
 #include <future>
 #include <type_traits>
 #include <stdexcept>
-#include "util.h"
+
 #include "Macros.h"
+#include "Types.h"
 
 class ThreadPool
 {

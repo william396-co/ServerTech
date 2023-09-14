@@ -2,8 +2,8 @@
 
 #include <sys/epoll.h>
 #include <functional>
-#include "util.h"
 #include "Macros.h"
+#include "Types.h"
 
 class EventLoop;
 

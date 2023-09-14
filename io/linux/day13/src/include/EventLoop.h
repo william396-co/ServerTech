@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util.h"
 #include "Macros.h"
+#include "Types.h"
 
 class Epoll;
 class Channel;
