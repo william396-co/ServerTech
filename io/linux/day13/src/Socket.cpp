@@ -49,7 +49,7 @@ void Socket::setNonBlocking()
 }
 bool Socket::isNonBlocking()
 {
-    return fcntl( fd, F_GETFL ) & O_NONBLOCK != 0;
+    return ( fcntl( fd, F_GETFL ) & O_NONBLOCK ) != 0;
 }
 
 int Socket::accept( InetAddress & addr )

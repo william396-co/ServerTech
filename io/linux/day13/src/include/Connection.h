@@ -30,9 +30,9 @@ public:
 
     inline void setDeleteConnectionCallback( DeleteConnectionCallback const & cb )
     {
-        delete_connect_callback_ = cb;
+        delete_connection_callback_ = cb;
     }
-    void setOnConnectCallback( ConnectionCallback const & cb );
+    void setOnConnectedCallback( ConnectedCallback const & cb );
 
     State getState() const { return state_; }
     void close();
@@ -54,8 +54,8 @@ private:
     Buffer * send_buffer_ { nullptr };
     State state_ { State::Invalid };
 
-    DeleteConnectionCallback delete_connect_callback_;
-    ConnectionCallback on_connect_callback_;
+    DeleteConnectionCallback delete_connection_callback_;
+    ConnectedCallback on_connected_callback_;
     void readNonBlocking();
     void writeNonBlocking();
     void readBlocking();
