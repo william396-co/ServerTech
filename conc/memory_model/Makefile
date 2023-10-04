@@ -1,7 +1,7 @@
-all: spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer
+all: spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer transitivity acquireReleaseWithWaiting
 
 clean:
-	rm -rf spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer
+	rm -rf spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer transitivity acquireReleaseWithWaiting
 
 spinlock:
 	g++ -std=c++17 -o spinlock spinlock.cpp -Wall -lpthread -g
@@ -23,3 +23,9 @@ atomic_shared_ptr_ref:
 
 producerConsumer:
 	g++ -std=c++17 -o producerConsumer producerConsumer.cpp -Wall -lpthread -g
+
+transitivity:
+	g++ -std=c++17 -o transitivity transitivity.cpp -Wall -lpthread -g
+
+acquireReleaseWithWaiting:
+	g++ -std=c++17 -o acquireReleaseWithWaiting acquireReleaseWithWaiting.cpp -Wall -lpthread -g

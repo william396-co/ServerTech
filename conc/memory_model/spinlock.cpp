@@ -23,8 +23,8 @@ struct S
     std::string g; // serveral memory locations
 };
 
-Spinlock spin;
-//std::mutex spin;
+//Spinlock spin;
+std::mutex spin;
 
 void work( int n )
 {
