@@ -1,7 +1,7 @@
-all: spinlock condition_variable atomic_condition fetch_mult
+all: spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref
 
 clean:
-	rm -rf spinlock condition_variable atomic_condition fetch_mult
+	rm -rf spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref
 
 spinlock:
 	g++ -std=c++17 -o spinlock spinlock.cpp -Wall -lpthread -g
@@ -15,3 +15,8 @@ atomic_condition:
 fetch_mult:
 	g++ -std=c++17 -o fetch_mult fetch_mult.cpp -Wall -lpthread -g
 
+atomic_shared_ptr:
+	g++ -std=c++17 -o atomic_shared_ptr atomic_shared_ptr.cpp -Wall -lpthread -g
+
+atomic_shared_ptr_ref:
+	g++ -std=c++17 -o atomic_shared_ptr_ref atomic_shared_ptr_ref.cpp -Wall -lpthread -g
