@@ -15,16 +15,19 @@ void dataProducer()
 
 void deliveryBoy()
 {
-    while ( !dataProduced.load( std::memory_order_acquire ) )
-        ;
+    while ( !dataProduced.load( std::memory_order_acquire ) ) {
+        std::cout << __FUNCTION__ << " waiting...\n";
+    }
     dataConsumed.store( true, std::memory_order_release );
 }
 
 void dataConsumer()
 {
 
-    while ( !dataConsumed.load( std::memory_order_acquire ) )
-        ;
+    while ( !dataConsumed.load( std::memory_order_acquire ) ) {
+        std::cout << __FUNCTION__ << " waiting...\n";
+    }
+
     mySharedWork[1] = 2;
 }
 

@@ -14,8 +14,9 @@ void dataProducer()
 
 void dataConsumer()
 {
-    while ( !dataProduced.load( std::memory_order_acquire ) )
-        ;
+    while ( !dataProduced.load( std::memory_order_acquire ) ) {
+        std::cout << "waiting...\n";
+    }
     // dataProduced.load( std::memory_order_acquire );
     mySharedWork[1] = 2;
 }
