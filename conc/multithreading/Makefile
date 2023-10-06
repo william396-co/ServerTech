@@ -1,7 +1,7 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments 
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised
 
 createThread:
 	g++ -std=c++17 -o createThread createThread.cpp -Wall -lpthread -g
@@ -14,3 +14,12 @@ threadWithJoin:
 
 threadArguments:
 	g++ -std=c++17 -o threadArguments threadArguments.cpp -Wall -lpthread -g
+
+threadMethods:
+	g++ -std=c++17 -o threadMethods threadMethods.cpp -Wall -lpthread -g
+
+coutUnsynchronised:
+	g++ -std=c++17 -o coutUnsynchronised coutUnsynchronised.cpp -Wall -lpthread -g
+
+coutSynchronised:
+	g++ -std=c++17 -o coutSynchronised coutSynchronised.cpp -Wall -lpthread -g
