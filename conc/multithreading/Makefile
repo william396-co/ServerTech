@@ -1,7 +1,7 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved
 
 createThread:
 	g++ -std=c++17 -o createThread createThread.cpp -Wall -lpthread -g
@@ -23,3 +23,9 @@ coutUnsynchronised:
 
 coutSynchronised:
 	g++ -std=c++17 -o coutSynchronised coutSynchronised.cpp -Wall -lpthread -g
+
+deadlock:
+	g++ -std=c++17 -o deadlock deadlock.cpp -Wall -lpthread -g
+
+deadlockResolved:
+	g++ -std=c++17 -o deadlockResolved deadlockResolved.cpp -Wall -lpthread -g
