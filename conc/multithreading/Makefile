@@ -1,8 +1,26 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState
 
+
+threadLocalState:
+	g++ -std=c++17 -o threadLocalState threadLocalState.cpp -Wall -lpthread -g
+
+threadLocal:
+	g++ -std=c++17 -o threadLocal threadLocal.cpp -Wall -lpthread -g
+
+meyerSingleton:
+	g++ -std=c++17 -o meyerSingleton meyerSingleton.cpp -Wall -lpthread -g
+
+singletonCallOnce:
+	g++ -std=c++17 -o singletonCallOnce singletonCallOnce.cpp -Wall -lpthread -g
+
+callOnce:
+	g++ -std=c++17 -o callOnce callOnce.cpp -Wall -lpthread -g
+
+constexpr:
+	g++ -std=c++17 -o constexpr constexpr.cpp -Wall
 
 readerWriterLock:
 	g++ -std=c++17 -o readerWriterLock readerWriterLock.cpp -Wall -lpthread -g
