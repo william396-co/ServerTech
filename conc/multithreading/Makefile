@@ -1,7 +1,17 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures
+
+
+fireAndForgetFutures:
+	g++ -std=c++17 -o fireAndForgetFutures fireAndForgetFutures.cpp -Wall -lpthread -g
+
+asyncLazy:
+	g++ -std=c++17 -o asyncLazy asyncLazy.cpp -Wall -lpthread -g
+
+asyncVsThread:
+	g++ -std=c++17 -o asyncVsThread asyncVsThread.cpp -Wall -lpthread -g
 
 conditionVariable:
 	g++ -std=c++17 -o conditionVariable conditionVariable.cpp -Wall -lpthread -g

@@ -16,9 +16,8 @@ void doTheWork()
 void waitingForWork()
 {
     std::cout << "Worker: waiting  for work\n";
-    std::unique_lock lck( mutex_ ); // unique_lock is needed
-                                    //    condVar.wait( lck, [] { return dataReady; } ); // here unlock-susupend, wakeup-lock
-    condVar.wait( lck );
+    std::unique_lock lck( mutex_ );                // unique_lock is needed(lock mutex)
+    condVar.wait( lck, [] { return dataReady; } ); //  unlock-susupend, wakeup-lock
 
     doTheWork();
     std::cout << "Work done\n";
