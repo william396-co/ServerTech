@@ -1,7 +1,11 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock
+
+
+readerWriterLock:
+	g++ -std=c++17 -o readerWriterLock readerWriterLock.cpp -Wall -lpthread -g
 
 createThread:
 	g++ -std=c++17 -o createThread createThread.cpp -Wall -lpthread -g
@@ -29,3 +33,6 @@ deadlock:
 
 deadlockResolved:
 	g++ -std=c++17 -o deadlockResolved deadlockResolved.cpp -Wall -lpthread -g
+
+deadlockResolvedScopedLock:
+	g++ -std=c++17 -o deadlockResolvedScopedLock deadlockResolvedScopedLock.cpp -Wall -lpthread -g
