@@ -1,8 +1,10 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable
 
+conditionVariable:
+	g++ -std=c++17 -o conditionVariable conditionVariable.cpp -Wall -lpthread -g
 
 threadLocalState:
 	g++ -std=c++17 -o threadLocalState threadLocalState.cpp -Wall -lpthread -g
