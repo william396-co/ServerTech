@@ -1,8 +1,13 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask sharedFuture promiseFutureException
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask sharedFuture promiseFutureException
 
+promiseFutureException:
+	g++ -std=c++17 -o promiseFutureException promiseFutureException.cpp -Wall -lpthread -g
+
+sharedFuture:
+	g++ -std=c++17 -o sharedFuture sharedFuture.cpp -Wall -lpthread -g
 
 packagedTask:
 	g++ -std=c++17 -o packagedTask packagedTask.cpp -Wall -lpthread -g
