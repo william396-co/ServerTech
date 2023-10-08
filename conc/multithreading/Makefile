@@ -1,8 +1,15 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask
 
+
+packagedTask:
+	g++ -std=c++17 -o packagedTask packagedTask.cpp -Wall -lpthread -g
+
+
+dotProductAsync:
+	g++ -std=c++17 -o dotProductAsync dotProductAsync.cpp -Wall -lpthread -g
 
 fireAndForgetFutures:
 	g++ -std=c++17 -o fireAndForgetFutures fireAndForgetFutures.cpp -Wall -lpthread -g
