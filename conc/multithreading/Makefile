@@ -1,7 +1,17 @@
-all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask sharedFuture promiseFutureException
+all: createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask packagedTaskReuse promiseFuture waitFor sharedFuture promiseFutureException 
 
 clean:
-	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask sharedFuture promiseFutureException
+	rm -rf createThread threadWithoutJoin threadWithJoin threadArguments threadMethods coutUnsynchronised coutSynchronised deadlock deadlockResolved deadlockResolvedScopedLock readerWriterLock constexpr callOnce singletonCallOnce meyerSingleton threadLocal threadLocalState conditionVariable asyncVsThread asyncLazy fireAndForgetFutures dotProductAsync packagedTask packagedTaskReuse promiseFuture waitFor sharedFuture promiseFutureException
+
+
+waitFor:
+	g++ -std=c++17 -o waitFor waitFor.cpp -Wall -lpthread -g
+
+promiseFuture:
+	g++ -std=c++17 -o promiseFuture promiseFuture.cpp -Wall -lpthread -g
+
+packagedTaskReuse:
+	g++ -std=c++17 -o packagedTaskReuse packagedTaskReuse.cpp -Wall -lpthread -g
 
 promiseFutureException:
 	g++ -std=c++17 -o promiseFutureException promiseFutureException.cpp -Wall -lpthread -g
