@@ -1,18 +1,20 @@
 #include <iostream>
 #include <thread>
+#include <atomic>
 
-int x = 0;
-int y = 0;
+std::atomic<int> x = { 0 };
+std::atomic<int> y = { 0 };
 
 void writing()
 {
-    x = 2000;
-    y = 11;
+    x.store( 2000 );
+    y.store( 11 );
 }
 
 void reading()
 {
-    std::cout << "y: " << y << " x: " << x << "\n";
+    std::cout << "y: " << y.load() << "";
+    std::cout << " x: " << x.load() << "\n";
 }
 
 int main()
