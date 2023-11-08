@@ -1,7 +1,7 @@
 #pragma once
-#include "src/util.h"
-#include "src/udpsocket.h"
-#include "src/ikcp.h"
+#include "../src/util.h"
+#include "../src/udpsocket.h"
+#include "../include/ikcp.h"
 
 #include <unordered_map>
 #include <functional>
