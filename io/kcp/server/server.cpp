@@ -1,6 +1,6 @@
 #include "server.h"
 
-#include "src/connection.h"
+#include "connection.h"
 
 #include <cstdio>
 #include <cstring>
@@ -13,6 +13,7 @@ Server::Server( uint16_t port, uint32_t conv )
 {
     listen = std::make_unique<UdpSocket>();
     listen->setNonblocking();
+    listen->setSocketopt(); // reuse_addr reuse_port
     if ( !listen->bind( port ) ) {
         throw std::runtime_error( "listen socket bind error" );
     }

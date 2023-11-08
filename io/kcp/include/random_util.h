@@ -7,11 +7,11 @@ using namespace std;
 /* random(start,end)*/
 int random( int start, int end );
 
-//random_default()
+// random_default()
 int random_default();
 
-//random_string(len)
-string random_string( int len );
+// random_string(len)
+string random_string( int beg, int end );
 
 // 高德纳洗牌算法
 template<typename T>

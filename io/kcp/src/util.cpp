@@ -14,6 +14,7 @@ void ikcp_set_mode( ikcpcb * kcp, int mode )
 {
     assert( mode >= 0 && mode < 3 );
 
+#ifndef USE_TCP
     ikcp_wndsize( kcp, 128, 128 );
     switch ( mode ) {
         case 1: // normal mode
@@ -34,7 +35,8 @@ void ikcp_set_mode( ikcpcb * kcp, int mode )
             break;
         }
     }
-    //    printf( "KCP run on [%s] mode\n", mode_name[mode] );
+        //    printf( "KCP run on [%s] mode\n", mode_name[mode] );
+#endif
 }
 
 void kcp_log( const char * log, ikcpcb * kcp, void * user )
@@ -50,9 +52,11 @@ void ikcp_set_log( ikcpcb * kcp, int mask )
 
 int32_t kcp_output( const char * buf, int len, ikcpcb * kcp, void * user )
 {
+#ifndef USE_TCP
     UdpSocket * s = (UdpSocket *)user;
     if ( s )
         return s->send( buf, len );
+#endif
     return -1;
 }
 

@@ -290,6 +290,7 @@ ikcpcb* ikcp_create(IUINT32 conv, void *user)
 	kcp->dead_link = IKCP_DEADLINK;
 	kcp->output = NULL;
 	kcp->writelog = NULL;
+    kcp->resend_cnt=0;
 
 	return kcp;
 }
@@ -1100,6 +1101,10 @@ void ikcp_flush(ikcpcb *kcp)
 				ikcp_output(kcp, buffer, size);
 				ptr = buffer;
 			}
+
+            if (segment->xmit>1) {
+                ++kcp->resend_cnt;
+            }
 
 			ptr = ikcp_encode_seg(ptr, segment);
 

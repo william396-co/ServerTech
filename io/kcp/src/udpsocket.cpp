@@ -1,6 +1,7 @@
 #include "udpsocket.h"
+#include <iostream>
 #include <cstring> // memset
-#include "random_util.h"
+#include "../include/random_util.h"
 
 UdpSocket::UdpSocket()
     : m_fd { 0 }, lost_rate { 0 }
@@ -21,7 +22,7 @@ bool UdpSocket::bind( uint16_t port )
     m_local_addr.sin_addr.s_addr = htonl( INADDR_ANY ); // 接收任意IP发来的数据
 
     setSocketopt();
-
+    setNonblocking();
     if ( ::bind( m_fd, (struct sockaddr *)&m_local_addr, sizeof( m_local_addr ) ) == -1 ) {
         close();
         return false;
@@ -36,7 +37,7 @@ bool UdpSocket::connect( const char * ip, uint16_t port )
     m_remote_addr.sin_port = htons( port );
     m_remote_addr.sin_addr.s_addr = inet_addr( ip );
 
-    setSocketopt();
+    setNonblocking();
     int rc = ::connect( m_fd, (struct sockaddr *)&m_remote_addr, sizeof( m_remote_addr ) );
     if ( rc == -1 && errno != EINTR && errno != EINPROGRESS ) { // Ignore EINTR/EINPROGRESS
         close();
@@ -58,18 +59,22 @@ void UdpSocket::close()
 
 int32_t UdpSocket::send( const char * bytes, uint32_t size )
 {
-    if ( random( 0, 100 ) < lost_rate ) return 0;
+    if ( random( 0, 100 ) < lost_rate ) return 0; // lost rate condition test
+    total_udp_snd_pk.fetch_add( 1, std::memory_order_relaxed );
+    total_udp_snd_data.fetch_add( size, std::memory_order_relaxed );
     return sendto( m_fd, bytes, size, 0, (struct sockaddr *)&m_remote_addr, sizeof( m_remote_addr ) );
 }
 
 int32_t UdpSocket::send( const char * bytes, uint32_t size, const char * ip, uint16_t port )
 {
-    if ( random( 0, 100 ) < lost_rate ) return 0;
+    if ( random( 0, 100 ) < lost_rate ) return 0; // lost rate condition test
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr( ip );
     addr.sin_port = htons( port );
+    total_udp_snd_pk.fetch_add( 1, std::memory_order_relaxed );
+    total_udp_snd_pk.fetch_add( 1, std::memory_order_relaxed );
     return sendto( m_fd, bytes, size, 0, (struct sockaddr *)&addr, sizeof( addr ) );
 }
 
@@ -79,6 +84,10 @@ int32_t UdpSocket::recv()
     memset( m_recvBuffer, 0, sizeof( m_recvBuffer ) );
     socklen_t addr_len = sizeof( m_remote_addr );
     m_recvSize = ::recvfrom( m_fd, m_recvBuffer, sizeof( m_recvBuffer ), 0, (struct sockaddr *)&m_remote_addr, &addr_len );
+    if ( m_recvSize > 0 ) {
+        total_udp_rcv_data.fetch_add( m_recvSize, std::memory_order_relaxed );
+        total_udp_rcv_pk.fetch_add( 1, std::memory_order_relaxed );
+    }
     return m_recvSize;
 }
 

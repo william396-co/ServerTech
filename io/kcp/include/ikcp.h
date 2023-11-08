@@ -312,6 +312,7 @@ struct IKCPCB
 	int fastlimit;
 	int nocwnd, stream;
 	int logmask;
+    IUINT32 resend_cnt;// 重传次数(统计丢包率)
 	int (*output)(const char *buf, int len, struct IKCPCB *kcp, void *user);
 	void (*writelog)(const char *log, struct IKCPCB *kcp, void *user);
 };

@@ -1,36 +1,26 @@
 #pragma once
-
 #include "util.h"
-constexpr auto RECV_BUF_SIZE = 1024 * 4;
 
-#include <atomic>
-extern std::atomic<uint32_t> total_udp_snd_pk;
-extern std::atomic<uint64_t> total_udp_snd_data;
-extern std::atomic<uint32_t> total_udp_rcv_pk;
-extern std::atomic<uint64_t> total_udp_rcv_data;
+constexpr auto RECV_BUF_SIZE = 1024 * 8;
 
-
-class UdpSocket
+class Socket
 {
 public:
-    UdpSocket();
-    ~UdpSocket();
+    Socket();
+    ~Socket();
 
-    // server function
-    bool bind( uint16_t port );
-
-    // client function
     bool connect( const char * ip, uint16_t port );
-
     void close();
-    int32_t send( const char * bytes, uint32_t size );
-    int32_t send( const char * bytes, uint32_t size, const char * ip, uint16_t port );
-    int32_t recv();
+
+    void send( const char * data, uint32_t size );
+    void recv();
 
     const char * getRecvBuffer() const { return m_recvBuffer; }
     uint32_t getRecvSize() const { return m_recvSize; }
-    int setNonblocking( bool isNonblocking = true );
+
     void setSocketopt();
+    int setNonblocking( bool isNonblocking = true );
+    int getFd() const { return m_fd; }
 
     const char * getRemoteIp() const { return inet_ntoa( m_remote_addr.sin_addr ); }
     uint16_t getRemotePort() const { return ntohs( m_remote_addr.sin_port ); }
@@ -39,13 +29,12 @@ public:
     uint16_t getLocalPort() const { return ntohs( m_local_addr.sin_port ); }
 
     void setLostrate( int rate ) { lost_rate = rate; }
-    int getFd() const { return m_fd; }
 
 private:
     int m_fd;
     struct sockaddr_in m_local_addr;
     struct sockaddr_in m_remote_addr;
     char m_recvBuffer[RECV_BUF_SIZE];
-    int32_t m_recvSize;
-    int lost_rate; // lost package rate
+    uint32_t m_recvSize;
+    int lost_rate = 0;
 };

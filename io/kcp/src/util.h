@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ikcp.h"
+#include "../include/ikcp.h"
 #include <cstdio>
 
 #if defined( WIN32 ) || defined( _WIN32 ) || defined( WIN64 ) || defined( _WIN64 )
@@ -25,9 +25,12 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 constexpr auto BUFFER_SIZE = 1024 * 8;
 constexpr auto conv = 0x12345;
+constexpr auto MB = 1024 * 1024;
 
 namespace util {
 using namespace std::chrono;
@@ -101,4 +104,11 @@ void ikcp_set_log( ikcpcb * kcp, int mask );
 
 int32_t kcp_output( const char * buf, int len, ikcpcb * kcp, void * user );
 
-} // namespace util
+template<typename T>
+std::string to_string_with_precision( const T a_value, const int n = 2 )
+{
+    std::ostringstream out;
+    out.precision( n );
+    out << std::fixed << a_value;
+    return out.str();
+}} // namespace util

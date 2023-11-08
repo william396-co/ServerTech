@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "util.h"
-#include "udpsocket.h"
-#include "ikcp.h"
+#include "../src/util.h"
+#include "../src/udpsocket.h"
+#include "../include/ikcp.h"
 
 class Connection
 {

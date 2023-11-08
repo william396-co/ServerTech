@@ -1,12 +1,25 @@
 #include <signal.h>
+#include <atomic>
 
-#include "server.h"
-#include "src/joining_thread.h"
+#include "server/server.h"
+#include "include/joining_thread.h"
 
 constexpr auto default_port = 9527;
 constexpr auto default_lost_rate = 0;
 
 bool is_running = true;
+std::atomic<uint32_t> total_kcp_snd_pk {}; // total kcp pack
+std::atomic<uint32_t> total_udp_snd_pk {}; // total upd pack
+std::atomic<uint64_t> total_udp_snd_data {};
+std::atomic<uint64_t> total_snd_data {};   // total data size
+
+std::atomic<uint32_t> total_kcp_rcv_pk {}; // total kcp pack
+std::atomic<uint32_t> total_udp_rcv_pk {}; // total upd pack
+std::atomic<uint64_t> total_udp_rcv_data {};
+std::atomic<uint64_t> total_rcv_data {};   // total data size
+
+std::atomic<uint32_t> finished_cnt {};
+
 
 void signal_handler( int sig )
 {
