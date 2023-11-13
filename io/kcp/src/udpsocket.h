@@ -26,6 +26,7 @@ public:
     int32_t send( const char * bytes, uint32_t size );
     int32_t send( const char * bytes, uint32_t size, const char * ip, uint16_t port );
     int32_t recv();
+    int32_t recv( struct sockaddr_in & addr );
 
     const char * getRecvBuffer() const { return m_recvBuffer; }
     uint32_t getRecvSize() const { return m_recvSize; }

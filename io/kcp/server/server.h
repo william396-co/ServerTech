@@ -7,6 +7,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <vector>
 
 class Connection;
 using ConnID = std::pair<std::string, uint16_t>;
@@ -26,6 +27,10 @@ struct hash<ConnID>
 } // namespace std
 
 using ConnMap = std::unordered_map<ConnID, Connection *>;
+using UdpSocketPtr = std::unique_ptr<UdpSocket>;
+using UdpSocketList = std::vector<UdpSocketPtr>;
+
+constexpr auto FD_PER_THREAD = 4;
 
 extern bool is_running;
 
@@ -35,10 +40,11 @@ public:
     Server( uint16_t port, uint32_t conv );
     ~Server();
 
-    Connection * findConn( const char * ip, uint16_t port );
+    Connection * findConn( const char * ip, uint16_t port ,UdpSocket* user);
 
     void accept();
     void run();
+    void recv();
 
     void setmode( int mode );
     void show_data( bool _show ) { show = _show; }
@@ -46,9 +52,12 @@ public:
     void setlostrate( int lostrate ) { lost_rate = lostrate / 2; }
 
 private:
-    std::unique_ptr<UdpSocket> listen;
+    UdpSocketPtr listen;
     ConnMap connections;
     ikcpcb * kcp;
+    
+    UdpSocketList fds;
+
     int md;
     uint16_t listen_port;
     bool show = false;

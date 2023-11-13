@@ -14,12 +14,12 @@
 
 constexpr auto default_ip = "127.0.0.1";
 constexpr auto default_port = 9527;
-constexpr auto default_max_len = 1000;
+constexpr auto default_max_len = 2000;
 constexpr auto default_test_times = 1000;
 constexpr auto default_lost_rate = 0;
 constexpr auto default_send_interval = 60; // ms
 constexpr auto default_thread_cnt = 1;
-constexpr auto clients_per_thread = 400;
+constexpr auto clients_per_thread = 200;
 
 bool g_running = true;
 std::atomic<uint32_t> total_kcp_snd_pk {};

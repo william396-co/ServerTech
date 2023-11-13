@@ -61,7 +61,8 @@ int main( int argc, char ** argv )
     // server->show_data( true );
     //     util::ikcp_set_log(IKCP_LOG_INPUT|IKCP_LOG_OUTPUT);
 
-    joining_thread accept( &Server::accept, server.get() );
+    //joining_thread accept( &Server::accept, server.get() );
+    joining_thread recv(&Server::recv,server.get());
     joining_thread work( &Server::run, server.get() );
 
     return 0;

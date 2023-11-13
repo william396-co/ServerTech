@@ -3,9 +3,10 @@
 #include <stdexcept>
 #include <cstring>
 
-Connection::Connection( uint16_t local_port, const char * remote_ip, uint16_t remote_port, uint32_t conv )
+Connection::Connection( uint16_t local_port, const char * remote_ip, uint16_t remote_port, uint32_t conv,UdpSocket* user )
     : socket { nullptr }, kcp { nullptr }, md { 0 }
 {
+#ifdef CON_CLIENT
     socket = std::make_unique<UdpSocket>();
     socket->setNonblocking();
     if ( !socket->bind( local_port ) ) {
@@ -16,6 +17,9 @@ Connection::Connection( uint16_t local_port, const char * remote_ip, uint16_t re
     }
 
     kcp = ikcp_create( conv, socket.get() );
+#else
+    kcp = ikcp_create( conv, user);
+#endif
     ikcp_setoutput( kcp, util::kcp_output );
 }
 
@@ -26,15 +30,19 @@ Connection::~Connection()
 
 void Connection::setlostrate( int lostrate )
 {
+#ifdef CON_CLIENT
     socket->setLostrate( lostrate );
+#endif
 }
 
 void Connection::update()
 {
     ikcp_update( kcp, util::iclock() );
+#ifdef CON_CLIENT
     if ( socket->recv() > 0 ) {
         recv_data( socket->getRecvBuffer(), socket->getRecvSize() );
     }
+#endif
 }
 
 void Connection::recv_data( const char * data, size_t len )

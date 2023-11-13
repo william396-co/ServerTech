@@ -9,7 +9,7 @@
 
 constexpr auto default_ip = "127.0.0.1";
 constexpr auto default_port = 9527;
-constexpr auto default_max_len = 2000;
+constexpr auto default_max_len = 5000;
 constexpr auto default_test_times = 1000;
 constexpr auto default_lost_rate = 0;
 constexpr auto default_send_interval = 50; // ms
@@ -94,11 +94,11 @@ int main( int argc, char ** argv )
 
     std::unique_ptr<Client> client = std::make_unique<Client>( ip.c_str(), port, conv );
     client->setmode( mode );
-    client->setauto( true, test_times, max_len );
+    client->setauto( false, test_times, max_len );
     client->setlostrate( lost_rate );
     client->setsendinterval( send_interval );
-    client->set_show_info( true );
-    //  client->set_show_detail(true);
+ //   client->set_show_info( true );
+  //  client->set_show_detail(true);
     //  client->set_delay( true );
 
     joining_thread work( &Client::loop, client.get());

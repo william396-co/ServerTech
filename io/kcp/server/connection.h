@@ -9,7 +9,7 @@
 class Connection
 {
 public:
-    Connection( uint16_t local_port, const char * remote_ip, uint16_t remote_port, uint32_t conv );
+    Connection( uint16_t local_port, const char * remote_ip, uint16_t remote_port, uint32_t conv,UdpSocket* user );
     ~Connection();
 
     void setmode( int mode )
