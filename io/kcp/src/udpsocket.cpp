@@ -91,6 +91,19 @@ int32_t UdpSocket::recv()
     return m_recvSize;
 }
 
+int32_t UdpSocket::recv( struct sockaddr_in & addr )
+{
+    int ret = 0;
+    memset( m_recvBuffer, 0, sizeof( m_recvBuffer ) );
+    socklen_t addr_len = sizeof( addr );
+    ret = ::recvfrom( m_fd, m_recvBuffer, sizeof( m_recvBuffer ), 0,(struct sockaddr*) &addr, &addr_len );
+    if ( ret > 0 ) {
+        total_udp_rcv_data.fetch_add( m_recvSize, std::memory_order_relaxed );
+        total_udp_rcv_pk.fetch_add( 1, std::memory_order_relaxed );
+    }
+    return ret;
+}
+
 void UdpSocket::setSocketopt()
 {
 #ifdef __unix

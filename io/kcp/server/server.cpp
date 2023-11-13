@@ -7,17 +7,30 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <chrono>
+#include <thread>
 
 Server::Server( uint16_t port, uint32_t conv )
     : listen { nullptr }, md { 0 }, listen_port { port }
 {
+#ifdef CON_CLIENT
     listen = std::make_unique<UdpSocket>();
     listen->setNonblocking();
     listen->setSocketopt(); // reuse_addr reuse_port
     if ( !listen->bind( port ) ) {
         throw std::runtime_error( "listen socket bind error" );
     }
-
+#else
+    for ( auto i = 0; i != FD_PER_THREAD; ++i ) {
+        UdpSocketPtr fd = std::make_unique<UdpSocket>();
+        fd->setNonblocking();
+        fd->setSocketopt();
+        if ( !fd->bind( port ) ) {
+            throw std::runtime_error( "listen socket bind error" );
+        }
+        fds.push_back(std::move( fd) );
+    }
+#endif
     kcp = ikcp_create( conv, listen.get() );
     ikcp_setoutput( kcp, util::kcp_output );
 
@@ -40,13 +53,13 @@ void Server::setmode( int mode )
     md = mode;
 }
 
-Connection * Server::findConn( const char * remote_ip, uint16_t remote_port )
+Connection * Server::findConn( const char * remote_ip, uint16_t remote_port, UdpSocket * user )
 {
     auto it = connections.find( std::make_pair( remote_ip, remote_port ) );
     if ( it != connections.end() ) {
         return it->second;
     }
-    Connection * conn = new Connection( listen_port, remote_ip, remote_port, conv );
+    Connection * conn = new Connection( listen_port, remote_ip, remote_port, conv, user );
     conn->setmode( md );
     conn->set_show( show );
     if ( conn ) {
@@ -69,7 +82,7 @@ void Server::accept()
             continue;
         }
 
-        auto conn = findConn( listen->getRemoteIp(), listen->getRemotePort() );
+        auto conn = findConn( listen->getRemoteIp(), listen->getRemotePort(), nullptr);
         if ( conn ) {
             conn->recv_data( listen->getRecvBuffer(), listen->getRecvSize() );
             continue;
@@ -83,6 +96,29 @@ void Server::run()
         util::isleep( 1 );
         for ( auto & it : connections ) {
             it.second->update();
+        }
+    }
+}
+
+void Server::recv()
+{
+    while ( is_running ) {
+        std::this_thread::sleep_for( std::chrono::milliseconds { 1 } );
+
+        for ( auto & fd : fds ) {
+
+            struct sockaddr_in laddr;
+            if ( fd->recv( laddr ) <= 0 ) {
+                continue;
+            }
+
+            char * ip = inet_ntoa( laddr.sin_addr );
+            uint16_t port = ntohs( laddr.sin_port );
+
+            auto conn = findConn( ip, port, fd.get() );
+            if ( conn ) {
+                conn->recv_data( fd->getRecvBuffer(), fd->getRecvSize() );
+            }
         }
     }
 }
