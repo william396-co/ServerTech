@@ -25,8 +25,6 @@ void ikcp_set_mode( ikcpcb * kcp, int mode )
         case 2: // fast start mode
         {
             ikcp_nodelay( kcp, 2, 10, 2, 1 );
-            kcp->rx_minrto = 10;
-            kcp->fastresend = 1;
             break;
         }
 
