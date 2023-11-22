@@ -2,6 +2,6 @@
 
 int main()
 {
-    std::cout << "tutorial 1\n";
+    std::cout << "tutorial example\n";
     return 0;
 }

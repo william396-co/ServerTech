@@ -1,5 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+# TODO 1: Set the minimum required version of CMake to be 3.10
+cmake_minimum_required(VERSION 3.10)
 
-project(tutorial_1 VERSION 1.0.0 LANGUAGES CXX)
+# TODO 2: Create a project named Tutorial
+project(tutorial VERSION 1.0.0 LANGUAGES CXX)
 
-add_executable(tutorial_1 tutorial_1.cpp)
+
+# TODO 3: Add an executable called Tutorial to the project
+add_executable(tutorial tutorial.cpp)
