@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # configure a header file to pass some of the CMake settings
 # to the source code
+configure_file(TutorialConfig.h.in TutorialConfig.h)
 
 # TODO 2: Use add_subdirectory() to add MathFunctions to this project
 
