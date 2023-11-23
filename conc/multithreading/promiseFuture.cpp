@@ -42,13 +42,12 @@ int test_demo()
 
     prodThread.detach();
     divThread.detach();
-
 }
 
 int main()
 {
-
+    //  future.get() /wait() made the asynchronize operations synchronisation
     test_demo();
-    std::cout<<"finished main\n";
+    std::cout << "finished main\n";
     return 0;
 }
