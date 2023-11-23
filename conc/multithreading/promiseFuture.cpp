@@ -16,7 +16,7 @@ struct Div
     }
 };
 
-int main()
+int test_demo()
 {
     int a = 20;
     int b = 10;
@@ -38,9 +38,17 @@ int main()
     // get the result
     std::cout << "20 * 10 = " << prodResult.get() << "\n";
     std::cout << "20 / 10 = " << divResult.get() << "\n";
+    std::cout << " finished get result\n";
 
-    prodThread.join();
-    divThread.join();
+    prodThread.detach();
+    divThread.detach();
 
+}
+
+int main()
+{
+
+    test_demo();
+    std::cout<<"finished main\n";
     return 0;
 }
