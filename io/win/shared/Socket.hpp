@@ -68,7 +68,8 @@ public:
 	}
 
 	inline const sockaddr_in& GetRemoteStruct()const { return m_client; }
-	inline const in_addr& GetRemoteAddress()const { return m_client.sin_addr; }
+	//inline const in_addr& GetRemoteAddress()const { return m_client.sin_addr; }
+	inline const char* GetRemoteAddress()const { return  inet_ntoa(m_client.sin_addr); }
 	inline const SOCKET& GetFd()const { return m_fd; }
 	inline uint32 GetRemotePort()const { return ntohs(m_client.sin_port); }
 	void Delete();

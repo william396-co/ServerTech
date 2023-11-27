@@ -1,5 +1,6 @@
 #include "ServerSocket.hpp"
-#include "OpCode.hpp"
+#include "print.hpp"
+#include "../common/OpCode.hpp"
 
 ServerSocket::ServerSocket(SOCKET fd)
 	:Socket(fd, 1024 * 64, 1024 * 512),
@@ -45,11 +46,11 @@ void ServerSocket::OnRead() {
 }
 
 void ServerSocket::OnDisconnect() {
-
+	println(__FUNCTION__, GetRemoteAddress(), GetRemotePort());
 }
 
 void ServerSocket::OnConnect() {
-
+	println(__FUNCTION__, GetRemoteAddress(), GetRemotePort());
 }
 
 void ServerSocket::SendPacket(PacketBuffer* data) {
@@ -80,4 +81,6 @@ void ServerSocket::HandlePing(PacketBuffer& recvData) {
 
 void ServerSocket::HandleMessage(PacketBuffer& recvData) {
 
+	std::cout << "Recv Data" << (const char*)recvData.contents() << "\n";
+	SendPacket(&recvData);
 }

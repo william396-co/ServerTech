@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{a5fd4527-c968-457c-a00f-b8d38362fedc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -29,11 +32,11 @@
     <ClInclude Include="ServerSocket.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="OpCode.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Master.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\OpCode.hpp">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
