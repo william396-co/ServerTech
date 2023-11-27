@@ -4,8 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iocpSrv", "iocpSrv\iocp.vcxproj", "{ADD36758-86CF-4F79-8E55-154E90FEF336}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84E2FFBE-DDA1-4B05-BAD3-200CA21C7D89} = {84E2FFBE-DDA1-4B05-BAD3-200CA21C7D89}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iocpClt", "iocpClt\iocpClt.vcxproj", "{88C9A59B-96EF-442A-8465-B757E8CBFDBB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84E2FFBE-DDA1-4B05-BAD3-200CA21C7D89} = {84E2FFBE-DDA1-4B05-BAD3-200CA21C7D89}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shared", "shared\shared.vcxproj", "{84E2FFBE-DDA1-4B05-BAD3-200CA21C7D89}"
 EndProject
