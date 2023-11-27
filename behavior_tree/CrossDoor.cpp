@@ -5,13 +5,13 @@ brain::Status CrossDoor::isDoorClose()
 {
     _door_open ? printEx( "Door is Open" ) : printEx( "Door is Closed" );
 
-    return _door_open ? brain::Status::Sucess : brain::Status::Failure;
+    return _door_open ? brain::Status::Success : brain::Status::Failure;
 }
 
 brain::Status CrossDoor::passThroughDoor()
 {
     _door_open ? printEx( __FUNCTION__, " Failure" ) : printEx( __FUNCTION__, " Success" );
-    return _door_open ? brain::Status::Sucess : brain::Status::Failure;
+    return _door_open ? brain::Status::Success : brain::Status::Failure;
 }
 
 brain::Status CrossDoor::pickLock()

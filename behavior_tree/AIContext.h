@@ -2,11 +2,12 @@
 
 #include "brain.h"
 
-class CrossDoor
+class CrossDoor;
+class AIContext : public brain::Context
 {
 public:
-    CrossDoor() {}
-    ~CrossDoor() = default;
+    explicit AIContext( CrossDoor * cd );
+    ~AIContext();
 
     // SUCCESS if _door_open == true
     brain::Status isDoorClosed();
@@ -20,7 +21,5 @@ public:
     brain::Status smashDoor();
 
 private:
-    bool _door_open { false };
-    bool _door_locked { true };
-    int _pick_attemps { 0 };
+    CrossDoor * m_CrossDoor;
 };
