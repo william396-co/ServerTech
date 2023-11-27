@@ -137,8 +137,8 @@
     <ClCompile Include="ServerSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\OpCode.hpp" />
     <ClInclude Include="Master.hpp" />
-    <ClInclude Include="OpCode.hpp" />
     <ClInclude Include="ServerSocket.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

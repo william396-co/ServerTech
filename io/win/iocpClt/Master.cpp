@@ -6,7 +6,7 @@
 #include <memory>
 #include <iostream>
 #include <thread>
-#include "ServerSocket.hpp"
+#include "ClientSocket.hpp"
 #include "SocketMgr.hpp"
 #include "Socket.hpp"
 #include "ListenSocket.hpp"
@@ -18,9 +18,8 @@
 #pragma comment(lib,"ws2_32.lib")
 
 constexpr auto MAX_BUFF_SIZE = 1024;
+constexpr auto hostname = "172.28.10.59";
 constexpr auto port = 9527;
-
-using ListenHandle = ListenSocket<ServerSocket>;
 
 Master::Master() :m_stopEvent{ false } {
 
@@ -35,37 +34,16 @@ bool Master::Run(int argc, char** argv)
 	// Init WSADATA
 	SocketMgr::instance();
 
-	std::unique_ptr<ListenHandle> listenfd
-		= std::make_unique<ListenSocket<ServerSocket>>("0.0.0.0", port);
+	std::unique_ptr<ClientSocket> client = std::make_unique<ClientSocket>();
+	if (!client->Connect(hostname, port)) {
+		std::cerr << "connect[" << hostname << ":" << port << "] failed\n";
+		return 0;
+	}
 
-	// Main Loop for Application
-
-	auto MainLoop = [&]() {
-		time_t start = utils::now();
-		time_t curr = utils::now();
-		while (!m_stopEvent) {
-
-			if (utils::now() - start > 1) {			// print per second
-			//	printlnEx("Server running [", std::this_thread::get_id(), "]");
-				curr = utils::now();
-			}
-
-			if (utils::now() - start > 5) {
-				//m_stopEvent = true;
-			}
-		}
-
-		listenfd->Close();
-		SocketMgr::instance().CloseAll();
-		SocketMgr::instance().ShutdownThreads();
-		printlnEx("finished mainLoop [", std::this_thread::get_id(), "]");
-	};
-
-	// listen thread working
-	joining_thread listenRun(&ListenHandle::run, listenfd.get());
-
-	// Main Loop for Application
-	joining_thread mainRun(MainLoop);
+	std::string buf;
+	while (getline(std::cin, buf)) {
+		client->Send((uint8*)buf.data(), (uint32)buf.size());
+	}
 
 	// IOCP workthread start	
 	SocketMgr::instance().SpawnWorkerThreads();
