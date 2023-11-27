@@ -5,7 +5,7 @@
 class CrossDoor
 {
 public:
-    CrossDoor() {}
+    CrossDoor() = default;
     ~CrossDoor() = default;
 
     // SUCCESS if _door_open == true

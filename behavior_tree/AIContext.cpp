@@ -25,17 +25,17 @@ brain::Status AIContext::passThroughDoor()
     return m_CrossDoor->passThroughDoor();
 }
 // After 3 attempts, will open a locked door
-brain::Status pickLock()
+brain::Status AIContext::pickLock()
 {
     return m_CrossDoor->pickLock();
 }
 // FAILURE if door locked
-brain::Status openDoor()
+brain::Status AIContext::openDoor()
 {
     return m_CrossDoor->openDoor();
 }
 // WILL always open a door
-brain::Status smashDoor()
+brain::Status AIContext::smashDoor()
 {
     return m_CrossDoor->smashDoor();
 }

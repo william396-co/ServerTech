@@ -60,19 +60,20 @@ brain::Tree * make_brain( int num_attemps )
 {
     return brain::Builder()
         .composite<brain::Sequence>()
-        .composite<brain::Selector>()
-        .decorator<brain::Inverter>()
-        .leaf<IsDoorClosed>()
-        .end()
-        .composite<brain::Selector>()
-        .leaf<OpenDoor>()
-        .decorator<brain::Repeater>( num_attemps )
-        .leaf<PickLock>()
-        .end()
-        .leaf<SmashDoor>()
-        .end()
-        .end()
-        .end()
+            .composite<brain::Selector>()
+                .decorator<brain::Inverter>()
+                    .leaf<IsDoorClosed>()
+                .end()
+                .composite<brain::Selector>()
+                    .leaf<OpenDoor>()
+                    .decorator<brain::Repeater>( num_attemps )
+                        .leaf<PickLock>()
+                    .end()
+                    .leaf<SmashDoor>()
+                .end()
+            .end()
+            .leaf<PassThroughDoor>()
+            .end()
         .build( nullptr );
 }
 
@@ -86,7 +87,9 @@ int main()
 
     AIContext * ctx = new AIContext( &cd );
 
-    bt->update( ctx );
+    while ( brain::Status::Failure == cd.isDoorClosed() ) {
+        bt->update( ctx );
+    }
 
     delete ctx;
 
