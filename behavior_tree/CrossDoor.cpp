@@ -37,6 +37,7 @@ bool CrossDoor::openDoor()
 bool CrossDoor::smashDoor()
 {
     _door_locked = false;
+    _door_open = true;
     printlnEx( __FUNCTION__, " Success" );
     return true;
 }

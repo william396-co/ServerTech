@@ -7,9 +7,11 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <utility>
 
 #include "../util/xtime.h"
 #include "../util/utils.h"
+#include "../util/print.hpp"
 
 namespace brain {
 
@@ -218,11 +220,29 @@ public:
           m_Blackboard( board )
     {
     }
+    Tree( Tree const & ) = delete;
+    Tree & operator=( Tree const & ) = delete;
 
+    Tree( Tree && other ) noexcept: m_Root { other.m_Root }, m_Blackboard { other.m_Blackboard }
+    {
+        other.m_Root = nullptr;
+        other.m_Blackboard = nullptr;
+    }
+    Tree & operator=( Tree && other ) noexcept
+    {
+            delete m_Root;
+            delete m_Blackboard;
+
+            m_Root = other.m_Root;
+            m_Blackboard = other.m_Blackboard;
+
+            return *this;
+    }
     virtual ~Tree()
     {
         delete m_Root;
         delete m_Blackboard;
+        println(__FUNCTION__);
     }
 
 public:
