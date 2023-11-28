@@ -1,40 +1,42 @@
 #include "CrossDoor.h"
 #include "../util/print.hpp"
 
-brain::Status CrossDoor::isDoorClosed()
+constexpr auto attemp_limit = 10;
+
+bool CrossDoor::isDoorClosed()
 {
     _door_open ? printlnEx( "Door is Open" ) : printlnEx( "Door is Closed" );
 
-    return _door_open ? brain::Status::Success : brain::Status::Failure;
+    return !_door_open;
 }
 
-brain::Status CrossDoor::passThroughDoor()
+bool CrossDoor::passThroughDoor()
 {
-    _door_open ? printlnEx( __FUNCTION__, " Failure" ) : printlnEx( __FUNCTION__, " Success" );
-    return _door_open ? brain::Status::Success : brain::Status::Failure;
+    !_door_open ? printlnEx( __FUNCTION__, " Failure" ) : printlnEx( __FUNCTION__, " Success" );
+    return _door_open;
 }
 
-brain::Status CrossDoor::pickLock()
+bool CrossDoor::pickLock()
 {
-    if ( ++_pick_attemps > 3 ) {
+    if ( ++_pick_attemps > attemp_limit ) {
         _door_locked = false;
-        _door_open ? printlnEx( "This is Open" ) : printlnEx( "Door is Closed" );
-        return brain::Status::Success;
+        _door_open = true;
+        printlnEx( __FUNCTION__, " Success " );
+        return true;
     }
-    _door_open ? printlnEx( "Door is Open" ) : printlnEx( "Door is Closed" );
-    return brain::Status::Failure;
+    printlnEx( __FUNCTION__, " : ", _pick_attemps, " times" );
+    return false;
 }
 
-brain::Status CrossDoor::openDoor()
+bool CrossDoor::openDoor()
 {
     _door_locked ? printlnEx( __FUNCTION__, " Failure" ) : printlnEx( __FUNCTION__, " Success" );
-    return _door_locked ? brain::Status::Failure : brain::Status::Success;
+    return !_door_locked;
 }
 
-brain::Status CrossDoor::smashDoor()
+bool CrossDoor::smashDoor()
 {
     _door_locked = false;
     printlnEx( __FUNCTION__, " Success" );
-    printlnEx( "Door is Open" );
-    return brain::Status::Success;
+    return true;
 }

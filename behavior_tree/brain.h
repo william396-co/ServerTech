@@ -658,6 +658,32 @@ protected:
     int32_t m_Limit;
 };
 
+// The RetryUtilSuccessful decorator
+class RetryUntilSuccessful : public Decorator
+{
+public:
+    RetryUntilSuccessful( int32_t attemps = 0 )
+        : m_attemps { attemps }
+    {
+        assert( m_attemps > 0 );
+    }
+    virtual Status execute( Context * c )
+    {
+        int num = m_attemps;
+        Status ret = Status::Failure;
+        do{    
+        ret = m_Child->update( c );
+            if ( ret == Status::Success ){
+                break;
+            }
+        }while(--num);
+        return ret;
+    }
+
+protected:
+    int32_t m_attemps;
+};
+
 // The Duration decorator repeats infinitely or to a limit until the child returns success.
 class Duration : public Decorator
 {

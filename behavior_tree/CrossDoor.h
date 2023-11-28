@@ -1,7 +1,5 @@
 #pragma once
 
-#include "brain.h"
-
 class CrossDoor
 {
 public:
@@ -9,15 +7,15 @@ public:
     ~CrossDoor() = default;
 
     // SUCCESS if _door_open == true
-    brain::Status isDoorClosed();
+    bool isDoorClosed();
     // SUCCESS if _door_open == true
-    brain::Status passThroughDoor();
+    bool passThroughDoor();
     // After 3 attempts, will open a locked door
-    brain::Status pickLock();
+    bool pickLock();
     // FAILURE if door locked
-    brain::Status openDoor();
+    bool openDoor();
     // WILL always open a door
-    brain::Status smashDoor();
+    bool smashDoor();
 
 private:
     bool _door_open { false };
