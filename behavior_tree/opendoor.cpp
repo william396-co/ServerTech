@@ -1,6 +1,9 @@
+#include <thread>
+#include <chrono>
 #include <iostream>
-#include "brain.h"
+#include <memory>
 
+#include "brain.h"
 #include "AIContext.h"
 #include "CrossDoor.h"
 
@@ -66,7 +69,7 @@ brain::Tree * make_brain( int num_attemps )
                 .end()
                 .composite<brain::Selector>()
                     .leaf<OpenDoor>()
-                    .decorator<brain::Repeater>( num_attemps )
+                    .decorator<brain::RetryUntilSuccessful>(num_attemps)
                         .leaf<PickLock>()
                     .end()
                     .leaf<SmashDoor>()
@@ -77,21 +80,51 @@ brain::Tree * make_brain( int num_attemps )
         .build( nullptr );
 }
 
+brain::Tree * make_brain2( int num )
+{
+    return brain::Builder()
+        .composite<brain::Selector>()
+            .leaf<OpenDoor>()
+            .decorator<brain::RetryUntilSuccessful>(num)
+                .leaf<PickLock>()
+            .end()
+            .leaf<SmashDoor>()
+        .end()
+        .build( nullptr );
+}
+
+void test_bt1()
+{
+    brain::Tree * bt = make_brain( 7 );
+    CrossDoor cd;
+    std::unique_ptr<Context> ctx = std::make_unique<AIContext>( &cd );
+
+    while ( true ) {
+        bt->update( ctx.get() );
+        std::this_thread::sleep_for( std::chrono::milliseconds { 10 } );
+    }
+    delete bt;
+}
+
+void test_bt2()
+{
+    brain::Tree * bt = make_brain2( 5 );
+    CrossDoor cd;
+    std::unique_ptr<Context> ctx = std::make_unique<AIContext>( &cd );
+
+    while ( true ) {
+        bt->update( ctx.get() );
+        std::this_thread::sleep_for( std::chrono::milliseconds { 10 } );
+    }
+    delete bt;
+}
+
 int main()
 {
     std::cout << "open door\n";
 
-    brain::Tree * bt = make_brain( 5 );
-
-    CrossDoor cd;
-
-    AIContext * ctx = new AIContext( &cd );
-
-    while ( brain::Status::Failure == cd.isDoorClosed() ) {
-        bt->update( ctx );
-    }
-
-    delete ctx;
+    test_bt1();
+ //   test_bt2();
 
     return 0;
 }
