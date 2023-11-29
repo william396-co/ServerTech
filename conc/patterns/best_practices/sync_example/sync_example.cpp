@@ -52,15 +52,21 @@ private:
     FuncList m_funcList;
 };
 
+//#define SYNC_EXEC
+
 int add( int a, int b )
 {
+#ifndef SYNC_EXEC
     std::cout << a << "+" << b << " = " << a + b << std::endl;
+#endif
     return a + b;
 }
 
 int mul( int a, int b )
 {
+#ifndef SYNC_EXEC
     std::cout << a << "*" << b << " = " << a * b << std::endl;
+#endif
     return a * b;
 }
 
@@ -73,16 +79,24 @@ int main()
     std::thread t1( [&s] {
         for ( int i = 0; i != RUN_TIMES; ++i ) {
             std::cout << "threadId: " << std::this_thread::get_id() << " add_func(" << i << ")\n";
-            s.add_func( &add, 10 + i * 12, 20 + i * 23 );
+            auto res = s.add_func( &add, 10 + i * 12, 20 + i * 23 );
+#ifdef SYNC_EXEC
+            std::cout << res.get() << "=(" << 10 + i * 12 << " + " << 20 + i * 23 << ")\n";
+#else
             std::this_thread::sleep_for( std::chrono::milliseconds { 20 } );
+#endif
         }
     } );
 
     std::thread t2( [&s] {
         for ( int i = 0; i != RUN_TIMES; ++i ) {
             std::cout << "threadId: " << std::this_thread::get_id() << " add_func(" << i << ")\n";
-            s.add_func( &mul, 10 + i * 10, 20 + i * 42 );
+            auto res = s.add_func( &mul, 10 + i * 10, 20 + i * 42 );
+#ifdef SYNC_EXEC
+            std::cout << res.get() << "=(" << 10 + i * 10 << " * " << 20 + i * 42 << ")\n";
+#else
             std::this_thread::sleep_for( std::chrono::milliseconds { 50 } );
+#endif
         }
     } );
     s.run();
