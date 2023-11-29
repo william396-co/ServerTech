@@ -10,59 +10,85 @@ using namespace std;
 #include <future>
 #include <thread>
 
-
 using Func = std::function<void()>;
 using FuncList = SafeQueue<Func>;
 
-
-class Server {
+class Server
+{
 public:
-	template<typename F, typename...Args>
-	auto add_func(F&& f, Args&&...args) -> std::future<decltype(f(args...))> {
+    template<typename F, typename... Args>
+    auto add_func( F && f, Args &&... args ) -> std::future<decltype( f( args... ) )>
+    {
 
-		std::function<decltype(f(args)...))() > func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+        std::function<decltype( f( args... ) )()> func = std::bind( std::forward<F>( f ), std::forward<Args>( args )... );
 
-		auto task_ptr = std::make_shared<std::packaged_task<decltype(f(args...))()>>(func);
+        auto task_ptr = std::make_shared<std::packaged_task<decltype( f( args... ) )()>>( func );
 
-		// wrap packaged_task into void function
-		Func wrap_func = [task_ptr]() {
-			(*task_ptr)();
-		};
+        // wrap packaged_task into void function
+        Func wrap_func = [task_ptr]() {
+            ( *task_ptr )();
+        };
 
-		m_funcList.enqueue(wrap_func);
-		return task_ptr->get_future();
-	}
-	void run() {
+        m_funcList.enqueue( wrap_func );
+        return task_ptr->get_future();
+    }
+    void run()
+    {
+        while ( true ) {
+            std::this_thread::sleep_for( std::chrono::milliseconds { 300 } ); // idle time
+            std::cout << "funclist size: " << m_funcList.size() << std::endl;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds{200});
+            Func func;
+            while ( !m_funcList.empty() ) {
+                auto dequeued = m_funcList.dequeue( func );
+                if ( dequeued ) {
+                    func();
+                }
+            }
+        }
+    }
 
-		Func func;
-		while (!m_funcList.empty()) {
-			auto dequeued = m_funcList.dequeue(func);
-			if (dequeued)
-				func();
-		}
-	}
 private:
-	FuncList m_funcList;
+    FuncList m_funcList;
 };
+
+int add( int a, int b )
+{
+    std::cout << a << "+" << b << " = " << a + b << std::endl;
+    return a + b;
+}
+
+int mul( int a, int b )
+{
+    std::cout << a << "*" << b << " = " << a * b << std::endl;
+    return a * b;
+}
+
+constexpr auto RUN_TIMES = 100;
 
 int main()
 {
-	Server s;
+    Server s;
 
-	std::thread t1([&s] {
-		s.add_func([](int a, int b) {return a + b; }, 10, 20);
-		});
+    std::thread t1( [&s] {
+        for ( int i = 0; i != RUN_TIMES; ++i ) {
+            std::cout << "threadId: " << std::this_thread::get_id() << " add_func(" << i << ")\n";
+            s.add_func( &add, 10 + i * 12, 20 + i * 23 );
+            std::this_thread::sleep_for( std::chrono::milliseconds { 20 } );
+        }
+    } );
 
-	std::thread t2([&s] {
-		s.add_func([](int a, int b) {return a * b; }, 10, 20);
-		});
-	s.run();
+    std::thread t2( [&s] {
+        for ( int i = 0; i != RUN_TIMES; ++i ) {
+            std::cout << "threadId: " << std::this_thread::get_id() << " add_func(" << i << ")\n";
+            s.add_func( &mul, 10 + i * 10, 20 + i * 42 );
+            std::this_thread::sleep_for( std::chrono::milliseconds { 50 } );
+        }
+    } );
+    s.run();
 
+    t1.join();
+    t2.join();
 
-	t1.join();
-	t2.join();
-
-	return 0;
+    return 0;
 }
