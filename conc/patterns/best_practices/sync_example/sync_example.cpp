@@ -9,6 +9,7 @@ using namespace std;
 #include <functional>
 #include <future>
 #include <thread>
+#include <string>
 
 using Func = std::function<void()>;
 using FuncList = SafeQueue<Func>;
@@ -52,7 +53,7 @@ private:
     FuncList m_funcList;
 };
 
-//#define SYNC_EXEC
+#define SYNC_EXEC
 
 int add( int a, int b )
 {
@@ -68,6 +69,11 @@ int mul( int a, int b )
     std::cout << a << "*" << b << " = " << a * b << std::endl;
 #endif
     return a * b;
+}
+
+void say( std::string const & msg )
+{
+    std::cout << __FUNCTION__ << ":" << msg << std::endl;
 }
 
 constexpr auto RUN_TIMES = 100;
@@ -99,10 +105,25 @@ int main()
 #endif
         }
     } );
+
+    std::thread t3( [&s] {
+        for ( int i = 0; i != RUN_TIMES; ++i ) {
+            auto res = s.add_func( &say, " hello " + std::to_string( i ) );
+#ifdef SYNC_EXEC
+            res.wait();
+#else
+            std::this_thread::sleep_for( std::chrono::milliseconds { 10 } );
+#endif
+        }
+    }
+
+    );
+
     s.run();
 
     t1.join();
     t2.join();
+    t3.join();
 
     return 0;
 }
