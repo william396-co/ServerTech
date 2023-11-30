@@ -76,6 +76,18 @@ void say( std::string const & msg )
     std::cout << __FUNCTION__ << ":" << msg << std::endl;
 }
 
+class TestCase
+{
+public:
+    void case1( std::string const & msg, int num )
+    {
+        std::cout << __FUNCTION__ << " msg : " << msg << " num: " << num << " times : " << ++m_times << "\n";
+    }
+
+private:
+    int m_times {};
+};
+
 constexpr auto RUN_TIMES = 100;
 
 int main()
@@ -118,6 +130,18 @@ int main()
     }
 
     );
+
+    std::thread t4( [&s] {
+        TestCase tc;
+        for ( int i = 0; i != RUN_TIMES; ++i ) {
+            auto res = s.add_func( std::bind( &TestCase::case1, &tc, std::placeholders::_1, std::placeholders::_2 ), " test-case-1", i );
+#ifdef SYNC_EXEC
+            res.wait();
+#else
+            std::this_thread::sleep_for( std::chrono::milliseconds { 5 } );
+#endif
+        }
+    } );
 
     s.run();
 
