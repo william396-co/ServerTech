@@ -1,0 +1,11 @@
+A Crash Course in C++ and the Standard Library
+
+WHAT’S IN THIS CHAPTER?
+➤➤ A brief overview of the most important parts and syntax of the
+   C++ language and the Standard Library
+➤➤ How to write a basic class
+➤➤ How scope resolution works
+➤➤ What uniform initialization is
+➤➤ The use of const
+➤➤ What pointers, references, exceptions, and type aliases are
+➤➤ Basics of type inference

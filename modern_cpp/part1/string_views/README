@@ -1,0 +1,8 @@
+Working with Strings and String Views
+
+WHAT’S IN THIS CHAPTER?
+➤➤ The differences between C-style strings and C++ strings
+➤➤ Details of the C++ std::string class
+➤➤ Why you should use std::string_view
+➤➤ What raw string literals are
+➤➤ How to format strings
