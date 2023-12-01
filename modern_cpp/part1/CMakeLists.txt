@@ -9,4 +9,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 add_subdirectory(crashcourse)
 add_subdirectory(string_views)
+add_subdirectory(code_style)
 
