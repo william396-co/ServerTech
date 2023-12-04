@@ -1,8 +1,8 @@
-#ifdef WIN32
+//#ifdef WIN32
 #include <experimental/coroutine>
-#else
-#include <coroutine>
-#endif
+//#else
+//include <coroutine>
+//#endif
 #include <iostream>
 #include <string>
 
@@ -220,8 +220,31 @@ struct lazy
     }
 };
 
+lazy<std::string> read_data()
+{
+    Trace t;
+    std::cout << "Reading data...\n";
+    co_return "billion$!";
+}
+lazy<std::string> write_data()
+{
+    Trace t;
+    std::cout << "Write data...\n";
+    co_return "I'am rich!";
+}
+sync<int> reply()
+{
+    std::cout << "Started await_answer\n";
+    auto a = co_await read_data();
+    std::cout << "Done we got is " << a << "\n";
+    auto v = co_await write_data();
+    std::cout << "write result is " << v << "\n";
+    co_return 42;
+}
+
 int main()
 {
     std::cout << "Start main()\n";
-    return 0;
+    auto a = reply();
+    return a.get();
 }

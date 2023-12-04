@@ -1,6 +1,5 @@
 set(USE_LIB_SRC main.cpp)
 
-
 # add link libraries header file folder
 include_directories(/usr/local/include/hello)
 # add link libraries so file folder
