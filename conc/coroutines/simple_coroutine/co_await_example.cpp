@@ -1,8 +1,4 @@
-//#ifdef WIN32
-#include <experimental/coroutine>
-//#else
-//include <coroutine>
-//#endif
+#include <coroutine>
 #include <iostream>
 #include <string>
 

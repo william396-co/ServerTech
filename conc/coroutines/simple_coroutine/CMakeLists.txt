@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.9)
+file(GLOB DIR_SRCS *.h *.cpp)
 
-project(Fibo_test)
+source_group("" FILE ${DIR_SRCS})
 
-
-add_subdirectory(src bin)
+add_executable(co_await_example ${DIR_SRCS})
+#target_compile_options(co_await_example PRIVATE -fcoroutines)
