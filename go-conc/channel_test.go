@@ -1,5 +1,0 @@
-pacakge main
-
-import "fmt"
-
-
