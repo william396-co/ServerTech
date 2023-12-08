@@ -17,10 +17,10 @@ struct HelloCoroutine
     };
 
     using promise_type = HelloPromise;
-    HelloCoroutine( std::coroutine_handle<HelloPromise> h )
+    HelloCoroutine( std::coroutine_handle<promise_type> h )
         : handle( h ) {}
 
-    std::coroutine_handle<HelloPromise> handle;
+    std::coroutine_handle<promise_type> handle;
 };
 
 HelloCoroutine hello()

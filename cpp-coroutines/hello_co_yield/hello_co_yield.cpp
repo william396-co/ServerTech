@@ -30,22 +30,22 @@ struct HelloCoroutine
     };
 
     using promise_type = HelloPromise;
-    HelloCoroutine( std::coroutine_handle<HelloPromise> h )
+    HelloCoroutine( std::coroutine_handle<promise_type> h )
         : handle( h ) {}
 
-    std::coroutine_handle<HelloPromise> handle;
+    std::coroutine_handle<promise_type> handle;
 };
 
 HelloCoroutine hello()
 {
-    std::string_view s ="Hello";
+    std::string_view s = "Hello";
     co_yield s;
     std::cout << "world!\n";
 }
 
 int main()
 {
-    HelloCoroutine co= hello();
+    HelloCoroutine co = hello();
 
     std::cout << "calling resume\n";
     co.handle.resume();
