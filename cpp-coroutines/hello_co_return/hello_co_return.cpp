@@ -1,17 +1,13 @@
 #include <coroutine>
 #include <iostream>
-#include <string_view>
 
 /*
- * co_yield<expression>  equal to co_yield promise.yield_value(<expression>)
+ * co_return <expression>  equal to co_return promise.return_value(<expression>); goto end;
  */
-
 struct HelloCoroutine
 {
     struct HelloPromise
     {
-        std::string_view value_;
-
         HelloCoroutine get_return_object()
         {
             return std::coroutine_handle<HelloPromise>::from_promise( *this );
@@ -21,11 +17,9 @@ struct HelloCoroutine
         std::suspend_always final_suspend() noexcept { return {}; }
         void unhandled_exception() {}
 
-        std::suspend_always yield_value( std::string_view value )
+        void return_value( int value )
         {
-            value_ = value;
-            std::cout << value_ << "\n";
-            return {};
+            std::cout << "got co_return value " << value << "\n";
         }
     };
 
@@ -38,14 +32,15 @@ struct HelloCoroutine
 
 HelloCoroutine hello()
 {
-    std::string_view s ="Hello";
-    co_yield s;
+    std::cout << "hello \n";
+    co_await std::suspend_always {};
     std::cout << "world!\n";
+    co_return 42;
 }
 
 int main()
 {
-    HelloCoroutine co= hello();
+    HelloCoroutine co = hello();
 
     std::cout << "calling resume\n";
     co.handle.resume();

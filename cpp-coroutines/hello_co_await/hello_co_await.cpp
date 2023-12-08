@@ -32,13 +32,13 @@ HelloCoroutine hello()
 
 int main()
 {
-    HelloCoroutine coro = hello();
+    HelloCoroutine co= hello();
 
     std::cout << "calling resume\n";
-    coro.handle.resume();
+    co.handle.resume();
 
     std::cout << "destroy\n";
-    coro.handle.destroy();
+    co.handle.destroy();
 
     return 0;
 }
