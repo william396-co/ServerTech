@@ -53,11 +53,13 @@ struct Generator
     }
     explicit operator bool()
     {
+        // std::cout<<__PRETTY_FUNCTION__<<"\n";
         fill();
         return !h_.done();
     }
     T operator()()
     {
+        // std::cout<<__PRETTY_FUNCTION__<<"\n";
         fill();
         full_ = false;
         return std::move( h_.promise().value_ );
@@ -82,8 +84,8 @@ fibonacci_seq( uint32_t n )
 {
     if ( 0 == n )
         co_return;
-    if ( n > 94 )
-        throw std::runtime_error( "Too big Fibonacci sequence,Elements would overflow." );
+   /* if ( n > 94 )
+        throw std::runtime_error( "Too big Fibonacci sequence,Elements would overflow." );*/
 
     co_yield 0;
 
@@ -96,6 +98,8 @@ fibonacci_seq( uint32_t n )
     uint64_t a = 0, b = 1;
     for ( auto i = 2; i < n; ++i ) {
         uint64_t next = a + b;
+        if( next < b)
+            throw std::runtime_error("Too big Fibonacci sequence, Elements would overflow!");
         co_yield next;
         a = b;
         b = next;
@@ -106,9 +110,9 @@ int main()
 {
 
     try {
-        auto gen = fibonacci_seq( 90 );
-        for ( auto i = 0; gen; ++i ) {
-            std::cout << "fib(" << i << ")=" << gen() << "\n";
+        auto gen = fibonacci_seq( 100 );
+        for ( auto i = 0; gen; ++i ) {                         // gen equal to operator bool()
+            std::cout << "fib(" << i << ")=" << gen() << "\n"; // gen() equal to operator()()
         }
     } catch ( std::exception const & ex ) {
         std::cerr << "Exception:" << ex.what() << "\n";
