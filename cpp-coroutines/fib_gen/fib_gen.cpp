@@ -60,7 +60,7 @@ struct Generator
     {
         fill();
         full_ = false;
-        return std::move( h_.promise_type.value_ );
+        return std::move( h_.promise().value_ );
     }
 
 private:
@@ -106,7 +106,7 @@ int main()
 {
 
     try {
-        auto gen = fibonacci_seq( 10 );
+        auto gen = fibonacci_seq( 90 );
         for ( auto i = 0; gen; ++i ) {
             std::cout << "fib(" << i << ")=" << gen() << "\n";
         }
