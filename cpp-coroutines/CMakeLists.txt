@@ -5,6 +5,14 @@ project(coroutine_example)
 set(CMAKE_CXX_STANDARD 20)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
+set(CXX_FLAGS 
+		-ggdb
+		-Wall 
+		-Wextra
+		-Werror
+		-O0
+	)
+
 add_subdirectory(hello_co_await)
 #add_subdirectory(simple_coroutine)
 add_subdirectory(hello_co_yield)
