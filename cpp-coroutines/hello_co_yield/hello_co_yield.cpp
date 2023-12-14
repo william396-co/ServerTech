@@ -24,7 +24,7 @@ struct HelloCoroutine
         std::suspend_always yield_value( std::string_view value )
         {
             value_ = value;
-            std::cout << value_ << "\n";
+            std::cout << "yeild " << value_ << "\n";
             return {};
         }
     };
@@ -39,7 +39,7 @@ struct HelloCoroutine
 HelloCoroutine hello()
 {
     std::string_view s = "Hello";
-    co_yield s;
+    co_yield s; // equal to co_yield promise.yield_value(<expression>)
     std::cout << "world!\n";
 }
 

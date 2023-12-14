@@ -32,7 +32,7 @@ HelloCoroutine hello()
 
 int main()
 {
-    HelloCoroutine co= hello();
+    HelloCoroutine co = hello();
 
     std::cout << "calling resume\n";
     co.handle.resume();
