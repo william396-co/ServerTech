@@ -4,6 +4,8 @@
 #include "Server.h"
 #include "Socket.h"
 
+#include <cstdio>
+
 Acceptor::Acceptor(EventLoop *loop, const char *ip, uint16_t port) {
   listenSock = new Socket();
   InetAddress addr(ip, port);
