@@ -1,4 +1,5 @@
 #include "ThreadPool.h"
+#include <stdexcept>
 
 ThreadPool::ThreadPool( int size )
     : stop { false }
