@@ -74,9 +74,9 @@ void Server::newConnection( Socket * _s )
     }
 }
 
-void Server::onConnect( ConnectedCallback && fn )
+void Server::onConnect( ConnectCallback && fn )
 {
-    on_connected_callback_ = std::move( fn );
+    on_connect_callback_ = std::move( fn );
 }
 
 void Server::onMessage( MessageCallback && fn )
@@ -84,7 +84,7 @@ void Server::onMessage( MessageCallback && fn )
     on_message_callback_ = std::move( fn );
 }
 
-void Server::onNewConnect( NewConnectCallback && fn )
+void Server::newConnect( NewConnectCallback && fn )
 {
     new_connect_callback_ = std::move( fn );
 }

@@ -9,15 +9,20 @@ class Socket;
 class Channel
 {
 public:
+    constexpr static auto READ_EVENT = 1 << 0;
+    constexpr static auto WRITE_EVENT = 1 << 1;
+    constexpr static auto ET = 1 << 2;
+
+public:
     Channel( EventLoop * loop, Socket * socket );
-    ~Channel() {}
+    ~Channel();
 
     DISALLOW_COPY_AND_MOVE( Channel );
 
-    Socket * getSocket() { return socket_; }
+    Socket * getSocket();
     int getListenEvents() { return listen_events_; }
     int getReadyEvents() { return ready_events_; }
-    void getExist() const { return exist_; }
+    bool getExist() const { return exist_; }
     void setExist( bool in = true ) { exist_ = in; }
     void useET();
 

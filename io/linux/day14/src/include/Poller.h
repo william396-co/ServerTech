@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Macros.h"
+
 #ifdef OS_LINUX
 #include <sys/epoll.h>
 #endif
@@ -9,7 +11,6 @@
 #endif
 
 #include <vector>
-#include "Macros.h"
 
 class Channel;
 class Poller

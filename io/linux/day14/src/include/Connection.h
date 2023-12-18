@@ -48,7 +48,7 @@ public:
     Socket * getSocket();
 
     void onConnect( ConnectCallback && fn );
-    void onMessage( MesssageCallback && fn );
+    void onMessage( MessageCallback && fn );
 
 private:
     EventLoop * loop_;

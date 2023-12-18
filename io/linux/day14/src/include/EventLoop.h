@@ -22,6 +22,6 @@ public:
     //    void addThread( Task task );
 
 private:
-    Pooler * poller_ { nullptr };
-    bool quit { false };
+    Poller * poller_ { nullptr };
+    bool quit_ { false };
 };

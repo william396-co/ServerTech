@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <unordered_map>
 #include <vector>
 #include "Macros.h"
@@ -23,7 +24,7 @@ public:
 
     void newConnection( Socket * _s );
     void deleteConnection( int fd );
-    void onConnect( ConnectedCallback && fn );
+    void onConnect( ConnectCallback && fn );
     void onMessage( MessageCallback && fn );
     void newConnect( NewConnectCallback && fn );
 
@@ -33,7 +34,7 @@ private:
     ConnectionList connections_;
     std::vector<EventLoop *> subReactors_;
     ThreadPool * thpool_;
-    ConnectCallback on_connected_callback_;
+    ConnectCallback on_connect_callback_;
     MessageCallback on_message_callback_;
     NewConnectCallback new_connect_callback_;
 };
