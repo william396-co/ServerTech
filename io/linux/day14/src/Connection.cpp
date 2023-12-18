@@ -16,7 +16,7 @@ Connection::Connection( EventLoop * loop, Socket * s )
     : loop_ { loop }, sock_ { s }, channel_ { nullptr }
 {
     if ( loop_ ) {
-        channel_ = new Channel( loop, s->getFd() );
+        channel_ = new Channel( loop, s );
         channel_->enableRead();
         channel_->useET();
     }
@@ -54,10 +54,10 @@ void Connection::getLineSendBuffer()
     return send_buffer_->getline();
 }
 
-void Connection::setOnConnectedCallback( ConnectedCallback const & cb )
+void Connection::setOnConnectCallback( ConnectCallback const & cb )
 {
-    on_connected_callback_ = cb;
-    channel_->setReadCallback( [this] { on_connected_callback_( this ); } );
+    on_connect_callback_ = cb;
+    channel_->setReadCallback( [this] { on_connect_callback_( this ); } );
 }
 
 void Connection::read()
@@ -100,7 +100,7 @@ void Connection::readNonBlocking()
             continue;
         } else if ( bytes_read == -1 && ( ( errno == EAGAIN ) || ( errno = EWOULDBLOCK ) ) ) { // NonBloc IO
             break;
-        } else if ( bytes_read == 0 ) {                                                        // EOF,client disconnected
+        } else if ( bytes_read == 0 ) { // EOF,client disconnected
             printf( "read EOF, client fd: %d disconnected\n", fd );
             state_ = State::Closed;
             break;

@@ -12,7 +12,7 @@ Acceptor::Acceptor( EventLoop * loop, const char * ip, uint16_t port )
     listenSock->listen();
     //  listenSock->setnonblocking(); //Acceptor use blocking IO is better
 
-    acceptChannel = new Channel( loop, listenSock->getFd() );
+    acceptChannel = new Channel( loop, listenSock );
     ChannelReadCallback cb = std::bind( &Acceptor::acceptConnection, this );
     acceptChannel->setReadCallback( cb );
     acceptChannel->enableRead();

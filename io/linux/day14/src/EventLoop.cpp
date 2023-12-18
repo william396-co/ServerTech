@@ -6,7 +6,7 @@
 #include <vector>
 
 EventLoop::EventLoop()
-    : poller_ { nullptr }, quit { false }
+    : poller_ { nullptr }, quit_ { false }
 {
     poller_ = new Poller();
 }
@@ -19,7 +19,7 @@ EventLoop::~EventLoop()
 
 void EventLoop::loop()
 {
-    while ( !quit ) {
+    while ( !quit_ ) {
         std::vector<Channel *> chs;
         chs = poller_->poll();
         for ( auto & it : chs ) {

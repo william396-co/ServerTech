@@ -1,9 +1,6 @@
 #include "Channel.h"
 #include "EventLoop.h"
-
-constexpr auto READ_EVENT = 1;
-constexpr auto WRITE_EVENT = 2;
-constexpr auto ET = 4;
+#include "Socket.h"
 
 Channel::Channel( EventLoop * loop, Socket * socket )
     : loop_ { loop }, socket_ { socket }
@@ -15,6 +12,11 @@ Channel::~Channel()
     loop_->deleteChannel( this );
 }
 
+Socket * Channel::getSocket()
+{
+    return socket_;
+}
+
 void Channel::enableWrite()
 {
     listen_events_ |= WRITE_EVENT;
@@ -23,7 +25,7 @@ void Channel::enableWrite()
 void Channel::enableRead()
 {
     listen_events_ |= READ_EVENT;
-    loop->updateChannel( this );
+    loop_->updateChannel( this );
 }
 
 void Channel::useET()
@@ -35,21 +37,21 @@ void Channel::useET()
 void Channel::handleEvent()
 {
     if ( ready_events_ & READ_EVENT ) {
-        readCallback();
+        read_callback_();
     }
 
     if ( ready_events_ & WRITE_EVENT ) {
-        writeCallback();
+        write_callback_();
     }
 }
 
-void Channel::setReadyEvent( int ev )
+void Channel::setReadyEvents( int ev )
 {
     if ( ev & READ_EVENT ) {
         ready_events_ |= READ_EVENT;
     }
     if ( ev & WRITE_EVENT ) {
-        ready_event_ |= WRITE_EVENT;
+        ready_events_ |= WRITE_EVENT;
     }
     if ( ev & ET ) {
         ready_events_ |= ET;
