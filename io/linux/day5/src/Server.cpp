@@ -7,6 +7,8 @@
 #include <functional>
 #include <cstring>
 #include <unistd.h>
+#include <cstdio>
+#include <cerrno>
 
 constexpr auto READ_BUFFER = 1024;
 

@@ -11,6 +11,8 @@
 #include <cstring>
 #include <unistd.h>
 #include <cassert>
+#include <cstdio>
+#include <cerrno>
 
 constexpr auto READ_BUFFER = 1024;
 
