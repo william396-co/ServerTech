@@ -4,6 +4,8 @@
 #include "Channel.h"
 #include <unistd.h>
 #include <cstring>
+#include <cstdio>
+#include <cerrno>
 
 constexpr auto READ_BUFFER = 1024;
 

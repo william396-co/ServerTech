@@ -5,6 +5,8 @@
 #include "Server.h"
 #include "EventLoop.h"
 
+#include <cstdio>
+
 Acceptor::Acceptor( EventLoop * loop, const char * ip, uint16_t port )
 {
     listenSock = new Socket();
