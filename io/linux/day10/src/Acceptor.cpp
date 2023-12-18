@@ -1,4 +1,6 @@
 #include "Acceptor.h"
+
+#include <cstdio>
 #include "Socket.h"
 #include "InetAddress.h"
 #include "Channel.h"
