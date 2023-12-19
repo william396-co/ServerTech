@@ -57,11 +57,11 @@ int main()
         }
     }
 
-    std::vector<int> vi( 1000000 );
+    std::vector<int> vi( 10000 );
     for ( auto i = 0; i != vi.size(); ++i ) {
-        vi[i] = i * 3;
+        vi.emplace_back( i * 3 );
     }
-    std::cout << parallel_accumulate( vi.begin(), vi.end(), 100 ) << "\n";
-
+    auto result = parallel_accumulate( vi.begin(), vi.end(), 10 );
+    std::cout << "result= " << result << "\n";
     return 0;
 }
