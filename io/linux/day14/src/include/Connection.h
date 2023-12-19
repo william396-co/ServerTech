@@ -36,6 +36,7 @@ public:
     }
     void setOnConnectCallback( ConnectCallback const & cb );
     void setOnMessageCallback( MessageCallback const & cb );
+    void Business();
 
     State getState() const { return state_; }
     void close();

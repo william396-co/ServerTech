@@ -27,8 +27,10 @@ Acceptor::~Acceptor()
 void Acceptor::acceptConnection()
 {
     InetAddress cAddr {};
-    Socket * clientfd = new Socket( listenSock->accept( cAddr ) );
-    printf( "new client fd %d! Ip:%s Port: %d\n", clientfd->getFd(), cAddr.getIp(), cAddr.getPort() );
-    clientfd->setNonBlocking();
-    newConnectionCallback( clientfd );
+    Socket * client = new Socket( listenSock->accept( cAddr ) );
+    printf( "new client fd %d! Ip:%s Port: %d\n", client->getFd(), cAddr.getIp(), cAddr.getPort() );
+    client->setNonBlocking();
+    if ( new_connection_callback_ ) {
+        new_connection_callback_( client );
+    }
 }

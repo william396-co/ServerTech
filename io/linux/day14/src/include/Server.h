@@ -23,17 +23,17 @@ public:
     DISALLOW_COPY_AND_MOVE( Server );
 
     void newConnection( Socket * _s );
-    void deleteConnection( int fd );
+    void deleteConnection( Socket * _s );
     void onConnect( ConnectCallback && fn );
     void onMessage( MessageCallback && fn );
     void newConnect( NewConnectCallback && fn );
 
 private:
-    EventLoop * mainReactor_;
+    EventLoop * main_reactor_;
     Acceptor * acceptor_;
     ConnectionList connections_;
-    std::vector<EventLoop *> subReactors_;
-    ThreadPool * thpool_;
+    std::vector<EventLoop *> sub_reactors_;
+    ThreadPool * thread_pool_;
     ConnectCallback on_connect_callback_;
     MessageCallback on_message_callback_;
     NewConnectCallback new_connect_callback_;

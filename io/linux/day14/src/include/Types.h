@@ -6,7 +6,7 @@
 class Socket;
 using NewConnectionCallback = std::function<void( Socket * )>;
 
-using DeleteConnectionCallback = std::function<void( int )>;
+using DeleteConnectionCallback = std::function<void( Socket * )>;
 
 class Connection;
 using ConnectCallback = std::function<void( Connection * )>;

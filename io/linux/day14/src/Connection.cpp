@@ -82,9 +82,21 @@ void Connection::write()
     send_buffer_->clear();
 }
 
+void Connection::send( std::string const & data )
+{
+    setSendBuffer( data.c_str() );
+    write();
+}
+
+void Connection::Business()
+{
+    read();
+    on_message_callback_( this );
+}
+
 void Connection::close()
 {
-    delete_connection_callback_( sock_->getFd() );
+    delete_connection_callback_( sock_ );
 }
 
 void Connection::readNonBlocking()

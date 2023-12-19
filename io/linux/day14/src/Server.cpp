@@ -7,6 +7,7 @@
 #include "Socket.h"
 #include "ThreadPool.h"
 #include "util.h"
+#include "Exception.h"
 
 #include <unistd.h>
 #include <cassert>
@@ -17,21 +18,25 @@
 constexpr auto READ_BUFFER = 1024;
 
 Server::Server( EventLoop * _loop, const char * ip, uint16_t port )
-    : mainReactor_ { _loop }, acceptor_ { nullptr }
+    : main_reactor_ { _loop }, acceptor_ { nullptr }
 {
-    acceptor_ = new Acceptor { mainReactor_, ip, port };
+    if ( !main_reactor_ ) {
+        throw Exception( ExceptionType::INVALID, "main reactor can't be nullptr!" );
+    }
+
+    acceptor_ = new Acceptor { main_reactor_, ip, port };
     NewConnectionCallback cb = std::bind( &Server::newConnection, this, std::placeholders::_1 );
     acceptor_->setNewConnectionCallback( cb );
 
     int size = std::thread::hardware_concurrency();
-    thpool_ = new ThreadPool( size );
+    thread_pool_ = new ThreadPool( size );
     for ( int i = 0; i < size; ++i ) {
-        subReactors_.emplace_back( new EventLoop() );
+        sub_reactors_.emplace_back( new EventLoop() );
     }
 
     for ( int i = 0; i < size; ++i ) {
-        std::function<void()> sub_loop = std::bind( &EventLoop::loop, subReactors_[i] );
-        thpool_->add( sub_loop );
+        std::function<void()> sub_loop = std::bind( &EventLoop::loop, sub_reactors_[i] );
+        thread_pool_->add( std::move( sub_loop ) );
     }
 }
 
@@ -42,15 +47,16 @@ Server::~Server()
     }
 
     delete acceptor_;
-    delete thpool_;
+    delete thread_pool_;
 
-    for ( auto & it : subReactors_ ) {
+    for ( auto & it : sub_reactors_ ) {
         delete it;
     }
 }
 
-void Server::deleteConnection( int fd )
+void Server::deleteConnection( Socket * _s )
 {
+    auto fd = _s->getFd();
     auto it = connections_.find( fd );
     if ( it != connections_.end() ) {
         delete it->second;
@@ -60,17 +66,18 @@ void Server::deleteConnection( int fd )
 
 void Server::newConnection( Socket * _s )
 {
-    if ( _s->getFd() != -1 ) {
-        int random = _s->getFd() % subReactors_.size();
-        Connection * conn = new Connection( subReactors_[random], _s );
-        DeleteConnectionCallback cb = std::bind( &Server::deleteConnection, this, std::placeholders::_1 );
-        conn->setDeleteConnectionCallback( cb );
-        // conn->setOnConnectedCallback( on_connected_callback_ );
-        conn->setOnMessageCallback( on_message_callback_ );
-        connections_.emplace( _s->getFd(), conn );
-        if ( new_connect_callback_ ) {
-            new_connect_callback_( conn );
-        }
+    if ( _s->getFd() == -1 ) {
+        throw Exception( ExceptionType::INVALID_SOCKET, "New Connection error, invalid client socket!" );
+    }
+    int random = _s->getFd() % sub_reactors_.size();
+    Connection * conn = new Connection( sub_reactors_[random], _s );
+    DeleteConnectionCallback cb = std::bind( &Server::deleteConnection, this, std::placeholders::_1 );
+    conn->setDeleteConnectionCallback( cb );
+    // conn->setOnConnectedCallback( on_connected_callback_ );
+    conn->setOnMessageCallback( on_message_callback_ );
+    connections_.emplace( _s->getFd(), conn );
+    if ( new_connect_callback_ ) {
+        new_connect_callback_( conn );
     }
 }
 

@@ -14,7 +14,7 @@ class Exception : public std::runtime_error
 {
 public:
     explicit Exception( std::string const & msg )
-        : std::runtime_erro( msg ), type_ { ExceptionType::INVALID }
+        : std::runtime_error( msg ), type_ { ExceptionType::INVALID }
     {
         std::string except_msg = "Message ::" + msg + "\n";
         std::cerr << except_msg;
