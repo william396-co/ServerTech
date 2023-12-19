@@ -10,5 +10,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 
 add_subdirectory(1-hello-thread)
-
-
+add_subdirectory(2-managing-threads)
