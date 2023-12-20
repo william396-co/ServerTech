@@ -42,7 +42,7 @@ void threadsafe_stack_test()
 int main()
 {
 
-    //    threadsafe_stack_test();
+    threadsafe_stack_test();
 
     return 0;
 }
