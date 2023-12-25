@@ -15,6 +15,7 @@ public:
     dispatcher( dispatcher && other ) noexcept
         : q { other.q }, chained { other.chained }
     {
+        other.q = nullptr;
         other.chained = true;
     }
 
@@ -22,8 +23,7 @@ public:
         : q { q_ }, chained { false } {}
 
     template<typename Message, typename Func>
-    TemplateDispatcher<dispatcher, Message, Func>
-    handle( Func && f )
+    TemplateDispatcher<dispatcher, Message, Func> handle( Func && f )
     {
         return TemplateDispatcher<dispatcher, Message, Func>( q, this, std::forward<Func>( f ) );
     }

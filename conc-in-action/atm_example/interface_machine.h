@@ -6,6 +6,7 @@
 
 #include "queue.h"
 #include "message.h"
+#include "sender.h"
 #include "receiver.h"
 #include "print.h"
 
@@ -17,7 +18,7 @@ public:
         get_sender().send( messaging::close_queue {} );
     }
 
-    messaging::receiver get_sender()
+    messaging::sender get_sender()
     {
         return incoming;
     }
@@ -62,7 +63,6 @@ public:
                             printlnEx( "PIN incorrect" );
                         } )
                     .handle<eject_card>(
-
                         [&]( eject_card const & msg ) {
                             printlnEx( "Ejecting card" );
                         } );

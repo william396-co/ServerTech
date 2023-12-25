@@ -9,7 +9,7 @@ namespace messaging {
 template<typename PreviousDispatcher, typename Msg, typename Func>
 class TemplateDispatcher
 {
-public:
+private:
     TemplateDispatcher( TemplateDispatcher const & ) = delete;
     TemplateDispatcher & operator=( TemplateDispatcher const & ) = delete;
 
@@ -35,6 +35,7 @@ public:
         }
     }
 
+public:
     TemplateDispatcher( TemplateDispatcher && other ) noexcept
         : q { other.q }, prev { other.prev },
           f( std::move( other.f ) )
@@ -47,6 +48,13 @@ public:
     {
         prev->chained = true;
     }
+    template<typename OtherMsg, typename OtherFunc>
+    TemplateDispatcher<TemplateDispatcher, OtherMsg, OtherFunc>
+    handle( OtherFunc && of )
+    {
+        return TemplateDispatcher<TemplateDispatcher, OtherMsg, OtherFunc>( q, this, std::forward<OtherFunc>( of ) );
+    }
+
     ~TemplateDispatcher() noexcept( false )
     {
         if ( !chained ) {

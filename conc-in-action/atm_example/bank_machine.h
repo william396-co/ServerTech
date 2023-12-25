@@ -2,6 +2,7 @@
 
 #include "queue.h"
 #include "receiver.h"
+#include "sender.h"
 #include "message.h"
 #include "dispatcher.h"
 #include "templateDispatcher.h"
@@ -31,14 +32,15 @@ public:
                                 msg.atm_queue.send( pin_incorrect {} );
                             }
                         } )
-                    .handle<withdraw>( [&]( withdraw const & msg ) {
-                        if ( balance >= msg.amount ) {
-                            msg.atm_queue.send( withdraw_ok {} );
-                            balance -= msg.amount;
-                        } else {
-                            msg.atm_queue.send( withdraw_denied {} );
-                        }
-                    } )
+                    .handle<withdraw>(
+                        [&]( withdraw const & msg ) {
+                            if ( balance >= msg.amount ) {
+                                msg.atm_queue.send( withdraw_ok {} );
+                                balance -= msg.amount;
+                            } else {
+                                msg.atm_queue.send( withdraw_denied {} );
+                            }
+                        } )
                     .handle<get_balance>(
                         [&]( get_balance const & msg ) {
                             msg.atm_queue.send( ::balance( balance ) );
