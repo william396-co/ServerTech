@@ -83,7 +83,7 @@ struct verify_pin
     mutable messaging::sender atm_queue;
     verify_pin( std::string const & account_, std::string const & pin_, messaging::sender atm_queue_ )
         : account { account_ }, pin { pin_ },
-          atm_queue { atm_queue_ } {}
+          atm_queue ( atm_queue_ ) {}
 };
 
 struct pin_verified
@@ -96,7 +96,7 @@ struct display_enter_card
 {};
 struct display_insufficient_funds
 {};
-struct display_withdrawal_canceled
+struct display_withdrawal_cancelled
 {};
 struct display_pin_incorrect_message
 {};

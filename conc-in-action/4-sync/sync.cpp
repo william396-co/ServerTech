@@ -67,13 +67,13 @@ void condition_variable_test()
 
 int main()
 {
-    future_then_example();
+    //   future_then_example();
     fp_with_futures();
     duration_example();
     future_wait_for_example();
     chrono_example();
-//    shared_future_example();
-//    future_exception_example();
+    //    shared_future_example();
+    //    future_exception_example();
     async_example();
     async_example2();
     return_value_from_async_task();
