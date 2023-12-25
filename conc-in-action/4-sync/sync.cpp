@@ -11,6 +11,7 @@
 #include "future_promise.h"
 #include "time_limit.h"
 #include "using_sync_op_example.h"
+#include "future_then.h"
 
 int find_the_answer_to_ltuae()
 {
@@ -66,6 +67,7 @@ void condition_variable_test()
 
 int main()
 {
+    future_then_example();
     fp_with_futures();
     duration_example();
     future_wait_for_example();

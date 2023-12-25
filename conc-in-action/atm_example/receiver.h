@@ -3,6 +3,7 @@
 #include "queue.h"
 #include "sender.h"
 #include "dispatcher.h"
+#include "templateDispatcher.h"
 
 namespace messaging {
 
