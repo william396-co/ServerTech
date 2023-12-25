@@ -10,7 +10,7 @@ template<typename PreviousDispatcher, typename Msg, typename Func>
 class TemplateDispatcher
 {
 public:
-    TemplateDispatcher( TemplateDispacther const & ) = deleter;
+    TemplateDispatcher( TemplateDispatcher const & ) = delete;
     TemplateDispatcher & operator=( TemplateDispatcher const & ) = delete;
 
     template<typename Dispatcher, typename OtherMsg, typename OtherFunc>
@@ -35,14 +35,15 @@ public:
         }
     }
 
-    TemplateDispatcher( TemplateDispatcher && other ) noexcept q { other.q }, prev { other.prev },
-        f( std::move( other.f ) )
+    TemplateDispatcher( TemplateDispatcher && other ) noexcept
+        : q { other.q }, prev { other.prev },
+          f( std::move( other.f ) )
     {
         prev->chained = true;
     }
 
     TemplateDispatcher( queue * q_, PreviousDispatcher * prev_, Func && f_ )
-        : q { q_ }, prev { prev_ }, f( std::forward<F>( f_ ) ), chained { false }
+        : q { q_ }, prev { prev_ }, f( std::forward<Func>( f_ ) ), chained { false }
     {
         prev->chained = true;
     }
@@ -55,7 +56,7 @@ public:
 
 private:
     queue * q;
-    PreviousDispacher * prev;
+    PreviousDispatcher * prev;
     Func f;
     bool chained;
 };

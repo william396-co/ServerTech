@@ -1,6 +1,7 @@
 #pragma once
 
 #include "queue.h"
+#include "templateDispatcher.h"
 #include <memory>
 
 namespace messaging {
@@ -21,13 +22,13 @@ public:
         : q { q_ }, chained { false } {}
 
     template<typename Message, typename Func>
-    TemplateDipatcher<dispatcher, Message, Func>
+    TemplateDispatcher<dispatcher, Message, Func>
     handle( Func && f )
     {
         return TemplateDispatcher<dispatcher, Message, Func>( q, this, std::forward<Func>( f ) );
     }
 
-    ~dispatcher() noexcept { false }
+    ~dispatcher() noexcept( false )
     {
         if ( !chained ) {
             wait_and_dispatch();
