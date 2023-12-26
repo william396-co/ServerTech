@@ -67,7 +67,9 @@ void condition_variable_test()
 
 int main()
 {
-    //   future_then_example();
+
+    process_login( "jack", "123456" );
+    future_then_example();
     fp_with_futures();
     duration_example();
     future_wait_for_example();
