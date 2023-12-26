@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 
-//#define CONTINUES_OP
+// #define CONTINUES_OP
 
 #ifdef CONTINUES_OP
 #include <experimental/future>
@@ -63,6 +63,16 @@ public:
         return { 10011 };
     }
     user_data request_current_info( user_id id )
+    {
+        std::cout << __PRETTY_FUNCTION__ << " userid:" << id << "\n";
+        return { id };
+    }
+    user_id async_authenticate_user( std::string const & username, std::string const & password )
+    {
+        std::cout << __PRETTY_FUNCTION__ << " username:" << username << " pwd:" << password << "\n";
+        return { 10011 };
+    }
+    user_data async_request_current_info( user_id id )
     {
         std::cout << __PRETTY_FUNCTION__ << " userid:" << id << "\n";
         return { id };

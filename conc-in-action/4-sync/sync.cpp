@@ -12,6 +12,8 @@
 #include "time_limit.h"
 #include "using_sync_op_example.h"
 #include "future_then.h"
+#include "latch_example.h"
+#include "barrier_example.h"
 
 int find_the_answer_to_ltuae()
 {
@@ -67,7 +69,8 @@ void condition_variable_test()
 
 int main()
 {
-
+    barrier_example();
+    latch_example();
     process_login( "jack", "123456" );
     future_then_example();
     fp_with_futures();
