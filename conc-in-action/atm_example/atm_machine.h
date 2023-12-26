@@ -101,7 +101,7 @@ private:
                     state = &atm::done_processing;
                 } );
     }
-    void verify_pin()
+    void verifing_pin()
     {
         incoming.wait()
             .handle<pin_verified>(
@@ -126,9 +126,8 @@ private:
                     constexpr auto pin_len = 4;
                     pin += msg.digit;
                     if ( pin.length() == pin_len ) {
-                      //  bank.send( verify_pin( account, pin, incoming ) );
-                      bank.send( verify_pin ( account, pin, incoming ) );
-                      state = &atm::verify_pin;
+                        bank.send( verify_pin( account, pin, incoming ) );
+                        state = &atm::verifing_pin;
                     }
                 } )
             .handle<clear_last_pressed>(
