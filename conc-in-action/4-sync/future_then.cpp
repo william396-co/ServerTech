@@ -84,6 +84,31 @@ std::experimental::future<void> process_login( std::string const & username, std
         } );
 }
 
+sd::experimental::future<void> process_login( std::string const & username, std::string const & password )
+{
+    return backend.async_authenticate_user( username, password ).then( []( std::experimental::future<user_id> id ) {
+                                                                    return backend.async_request_current_info( id.get() );
+                                                                } )
+        .then( []( std::experimenta::future<user_data> info_to_display ) {
+            try {
+                update_display( info_to_display.get() );
+            } catch ( std::exception & e ) {
+                display_error( e );
+            }
+        } );
+}
+
+void shared_future_continue_demo()
+{
+    auto fut = spawn_async( some_function ).share();
+    auto fut2 = fut.then( []( std::experimental::shared_future<some_data> data ) {
+        do_stuff( data );
+    } );
+    auto fut3 = fut.then( []( std::experimenta::shared_future<some_data> data ) {
+        return do_other_stuff( data );
+    } );
+}
+
 #endif
 
 #endif
