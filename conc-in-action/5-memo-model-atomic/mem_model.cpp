@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "spinlock.h"
+#include "atomic_example.h"
 
 struct my_data
 {
@@ -19,9 +20,9 @@ struct my_data
     //    std::string s;
 };
 
+#pragma pack(8)
 struct S
 {
-
     unsigned int b : 3; // three-bit unsigned field, allowed values are 0...7
 };
 
@@ -31,6 +32,8 @@ void bit_fields_example()
     S s { 6 };
     std::cout << ++s.b << "\n"; // 7
     std::cout << ++s.b << "\n"; // 0
+
+    std::cout << "sizeof(S)=" << sizeof( S ) << "\n";
 }
 
 void lock_free_test()
@@ -47,6 +50,7 @@ void lock_free_test()
 
 int main()
 {
+    atomic_example();
     spinlock_example();
     lock_free_test();
     bit_fields_example();
