@@ -6,7 +6,8 @@
 #include <iostream>
 
 
-
 void barrier_example(){
+
+
 
 }
