@@ -13,7 +13,7 @@ void spinlock_example()
     spinlock mtx {};
 
     std::vector<std::thread> threads;
-    for ( size_t i = 0; i != 100; ++i ) {
+    for ( size_t i = 0; i != 10; ++i ) {
         threads.emplace_back(
             [&]( auto idx ) {
                 std::lock_guard lock( mtx );

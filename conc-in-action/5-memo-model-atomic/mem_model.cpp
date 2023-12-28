@@ -6,6 +6,7 @@
 
 #include "spinlock.h"
 #include "atomic_example.h"
+#include "read_write_example.h"
 
 struct my_data
 {
@@ -20,7 +21,7 @@ struct my_data
     //    std::string s;
 };
 
-#pragma pack(8)
+#pragma pack( 8 )
 struct S
 {
     unsigned int b : 3; // three-bit unsigned field, allowed values are 0...7
@@ -50,6 +51,8 @@ void lock_free_test()
 
 int main()
 {
+    read_write_example();
+    atomic_ptr_example();
     atomic_example();
     spinlock_example();
     lock_free_test();
