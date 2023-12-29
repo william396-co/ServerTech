@@ -7,6 +7,10 @@
 #include "spinlock.h"
 #include "atomic_example.h"
 #include "read_write_example.h"
+#include "seq_cst.h"
+#include "relaxed.h"
+#include "multi_relaxed.h"
+#include "acquire_release.h"
 
 struct my_data
 {
@@ -51,6 +55,11 @@ void lock_free_test()
 
 int main()
 {
+    acquire_release::example();
+    multi_relaxed::example();
+    relaxed::example();
+    seq_cst::example();
+    foo_example();
     read_write_example();
     atomic_ptr_example();
     atomic_example();

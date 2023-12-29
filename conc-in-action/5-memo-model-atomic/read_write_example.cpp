@@ -33,3 +33,21 @@ void read_write_example()
     f1.wait();
     f2.wait();
 }
+
+void foo( int a, int b )
+{
+    println( "a = ", a, " b = ", b );
+}
+
+int get_num()
+{
+    static int i = 0;
+    return ++i;
+}
+
+void foo_example()
+{
+    for ( int i = 0; i != 10; ++i ) {
+        foo( get_num(), get_num() );
+    }
+}
