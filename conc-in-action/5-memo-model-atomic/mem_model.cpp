@@ -14,6 +14,9 @@
 #include "consume.h"
 #include "release_sequence.h"
 #include "fence.h"
+#include "acquire_release_opt.h"
+#include "transitive.h"
+#include "transitive_opt.h"
 
 struct my_data
 {
@@ -61,6 +64,9 @@ int main()
     fence::example();
     release_sequence::example();
     consume::example();
+    transitive_opt::example();
+    transitive::example();
+    acquire_release_opt::example();
     acquire_release::example();
     multi_relaxed::example();
     relaxed::example();
