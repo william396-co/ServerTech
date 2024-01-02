@@ -11,6 +11,9 @@
 #include "relaxed.h"
 #include "multi_relaxed.h"
 #include "acquire_release.h"
+#include "consume.h"
+#include "release_sequence.h"
+#include "fence.h"
 
 struct my_data
 {
@@ -55,6 +58,9 @@ void lock_free_test()
 
 int main()
 {
+    fence::example();
+    release_sequence::example();
+    consume::example();
     acquire_release::example();
     multi_relaxed::example();
     relaxed::example();
