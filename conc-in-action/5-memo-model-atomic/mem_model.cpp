@@ -14,6 +14,7 @@
 #include "consume.h"
 #include "release_sequence.h"
 #include "fence.h"
+#include "fence_2.h"
 #include "acquire_release_opt.h"
 #include "transitive.h"
 #include "transitive_opt.h"
@@ -61,6 +62,7 @@ void lock_free_test()
 
 int main()
 {
+    fence_2::example();
     fence::example();
     release_sequence::example();
     consume::example();
