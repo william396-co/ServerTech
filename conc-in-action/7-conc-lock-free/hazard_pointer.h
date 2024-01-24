@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <thread>
 #include <atomic>
 #include <stdexcept>
@@ -46,13 +47,13 @@ private:
     hazard_pointer * hp;
 };
 
-std::atomic<void *> & get_hazard_pointer_for_current_thread()
+inline std::atomic<void *> & get_hazard_pointer_for_current_thread()
 {
     thread_local static hp_owner hazard;
     return hazard.get_pointer();
 }
 
-bool outstanding_hazard_pointers_for( void * p )
+inline bool outstanding_hazard_pointers_for( void * p )
 {
     for ( auto i = 0; i != max_hazard_pointers; ++i ) {
         if ( hazard_pointers[i].pointer.load() == p ) {
@@ -75,7 +76,7 @@ struct data_to_reclaim
     data_to_reclaim * next;
     template<typename T>
     data_to_reclaim( T * p )
-        : data { p }, deleter { &do_deleter<T> }, next { nullptr }
+        : data { p }, deleter { &do_delete<T> }, next { nullptr }
     {
     }
     ~data_to_reclaim()
