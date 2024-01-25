@@ -19,7 +19,7 @@ struct Generator
         std::exception_ptr exception_;
         Generator get_return_object()
         {
-            return Generator( handle_type::from_promise( *this ) );
+            return Generator( handle_type::from_promise( *this ) ); // equal to  new handle_type
         }
         auto initial_suspend()
         {
@@ -47,8 +47,9 @@ struct Generator
     }
     ~Generator()
     {
-        if ( h_ ) {
-            h_.destroy();
+        if ( h_ ) { // RAII semantic (user defined)
+            std::cout << "handle destroy\n";
+            h_.destroy(); // equal to  delete handle_type
         }
     }
     explicit operator bool()
@@ -84,8 +85,8 @@ fibonacci_seq( uint32_t n )
 {
     if ( 0 == n )
         co_return;
-   /* if ( n > 94 )
-        throw std::runtime_error( "Too big Fibonacci sequence,Elements would overflow." );*/
+    /* if ( n > 94 )
+         throw std::runtime_error( "Too big Fibonacci sequence,Elements would overflow." );*/
 
     co_yield 0;
 
@@ -98,8 +99,8 @@ fibonacci_seq( uint32_t n )
     uint64_t a = 0, b = 1;
     for ( auto i = 2; i < n; ++i ) {
         uint64_t next = a + b;
-        if( next < b)
-            throw std::runtime_error("Too big Fibonacci sequence, Elements would overflow!");
+        if ( next < b )
+            throw std::runtime_error( "Too big Fibonacci sequence, Elements would overflow!" );
         co_yield next;
         a = b;
         b = next;

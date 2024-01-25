@@ -35,7 +35,7 @@ HelloCoroutine hello()
     std::cout << "hello \n";
     co_await std::suspend_always {};
     std::cout << "world!\n";
-    co_return 42; // equal to co_return promise.return_value(<expression>); goto end;
+    co_return 42; // equal to co_await promise.return_value(<expression>); goto end;
 }
 
 int main()
