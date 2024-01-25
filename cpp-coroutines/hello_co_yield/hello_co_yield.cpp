@@ -39,7 +39,7 @@ struct HelloCoroutine
 HelloCoroutine hello()
 {
     std::string_view s = "Hello";
-    co_yield s; // equal to co_yield promise.yield_value(<expression>)
+    co_yield s; // equal to co_await promise.yield_value(<expression>)
     std::cout << "world!\n";
 }
 
@@ -49,6 +49,9 @@ int main()
 
     std::cout << "calling resume\n";
     co.handle.resume();
+
+    std::cout << " resuming again\n";
+    co.handle.resume(); // undefined behavior to resume() a coroutine that is suspend at the final_suspend point
 
     std::cout << "destroy\n";
     co.handle.destroy();
