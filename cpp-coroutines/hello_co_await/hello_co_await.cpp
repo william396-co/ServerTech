@@ -37,8 +37,10 @@ int main()
     std::cout << "calling resume\n";
     co.handle.resume();
 
-    std::cout << "destroy\n";
-    co.handle.destroy();
+    if ( co.handle.done() ) {
+        std::cout << "destroy\n";
+        co.handle.destroy();
+    }
 
     return 0;
 }
