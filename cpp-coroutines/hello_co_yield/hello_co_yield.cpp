@@ -45,16 +45,38 @@ HelloCoroutine hello()
 
 int main()
 {
-    HelloCoroutine co = hello();
+    {
+        HelloCoroutine co = hello();
 
-    std::cout << "calling resume\n";
-    co.handle.resume();
+        std::cout << "calling resume\n";
+        co.handle.resume();
 
-    std::cout << " resuming again\n";
-    co.handle.resume(); // undefined behavior to resume() a coroutine that is suspend at the final_suspend point
+        if ( !co.handle.done() ) {
+            std::cout << " resuming again\n";
+            co.handle.resume(); // undefined behavior to resume() a coroutine that is suspend at the final_suspend point
+        }
 
-    std::cout << "destroy\n";
-    co.handle.destroy();
+        if ( co.handle.done() ) {
+            std::cout << "destroy\n";
+            co.handle.destroy();
+        }
+    }
+    {
+        std::cout << "=======================================\n";
+        auto co = hello();
+        std::cout << "calling resume\n";
+        co.handle.resume();
+
+        // coroutine_handle::done() means coroutine_handle at final suspend-point, can't resume(), only destroy(), the resume() function
+        // pointer as an nullptr
+        if ( co.handle.done() ) {
+            std::cout << "co is done, then destroy\n";
+            co.handle.destroy();
+        } else {
+            std::cout << "resuming again\n";
+            co.handle.resume();
+        }
+    }
 
     return 0;
 }
