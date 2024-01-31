@@ -9,26 +9,26 @@
 
 struct __coroutine_state
 {
-    using __resume_fn = __coroutine_state( __coroutine_state * );
+    using __resume_fn = __coroutine_state *( __coroutine_state * );
     using __destroy_fn = void( __coroutine_state * );
 
     __resume_fn * __resume;
     __destroy_fn * __destroy;
-    /*
-        static __coroutine_state * __noop_resume( __coroutine_state * __state ) noexcept
-        {
-            return __state;
-        }
-        static void __noop_destroy( __coroutine_state * ) noexcept
-        {
-        }
 
-        static const __coroutine_state __noop_coroutine;*/
+    static __coroutine_state * __noop_resume( __coroutine_state * __state ) noexcept
+    {
+        return __state;
+    }
+    static void __noop_destroy( __coroutine_state * ) noexcept
+    {
+    }
+
+    static const __coroutine_state __noop_coroutine;
 };
-/*
+
 inline const __coroutine_state __coroutine_state::__noop_coroutine {
     &__coroutine_state::__noop_resume, &__coroutine_state::__noop_destroy
-};*/
+};
 
 template<typename Promise>
 struct __coroutine_state_with_promise : __coroutine_state
@@ -83,12 +83,17 @@ public:
 
     void resume() const
     {
-        state_->__resume( state_ );
+        __coroutine_state * s = state_;
+        do {
+            s = s->__resume( s );
+        } while ( s != &__coroutine_state::__noop_coroutine );
     }
+
     void destroy() const
     {
         state_->__destroy( state_ );
     }
+
     bool done() const
     {
         return state_->__resume == nullptr;
@@ -165,6 +170,51 @@ public:
 
 private:
     state_t * state_;
+};
+
+struct noop_coroutine_promise
+{};
+using noop_coroutine_handle = coroutine_handle<noop_coroutine_promise>;
+noop_coroutine_handle noop_coroutine() noexcept;
+
+template<>
+class coroutine_handle<noop_coroutine_promise>
+{
+public:
+    constexpr coroutine_handle( coroutine_handle const & ) noexcept = default;
+    constexpr coroutine_handle & operator=( coroutine_handle const & ) noexcept = default;
+
+    constexpr explicit operator bool() noexcept { return true; }
+
+    constexpr friend bool operator==( coroutine_handle const &, coroutine_handle const & ) noexcept { return true; }
+
+    operator coroutine_handle<void>() const noexcept
+    {
+        return coroutine_handle<void>::from_address( address() );
+    }
+
+    noop_coroutine_promise & promise() const noexcept
+    {
+        static noop_coroutine_promise promise;
+        return promise;
+    }
+
+    constexpr void resume() const noexcept {}
+    constexpr void destroy() const noexcept {}
+    constexpr bool done() const noexcept { return false; }
+
+    constexpr void * address() const noexcept
+    {
+        return const_cast<__coroutine_state *>( &__coroutine_state::__noop_coroutine );
+    }
+
+private:
+    constexpr coroutine_handle() noexcept = default;
+
+    friend noop_coroutine_handle noop_coroutine() noexcept
+    {
+        return {};
+    }
 };
 
 struct suspend_always
@@ -361,6 +411,52 @@ private:
     alignas( T ) std::byte storage[sizeof( T )];
 };
 
+template<typename T>
+struct destructor_guard
+{
+    explicit destructor_guard( manual_lifetime<T> & obj ) noexcept
+        : ptr_( std::addressof( obj ) ) {}
+
+    // non-movable
+    destructor_guard( destructor_guard && ) = delete;
+    destructor_guard & operator=( destructor_guard && ) = delete;
+
+    ~destructor_guard() noexcept( std::is_nothrow_destructible_v<T> )
+    {
+        if ( ptr_ ) {
+            ptr_->destroy();
+        }
+    }
+
+    void cancel() noexcept { ptr_ = nullptr; }
+
+private:
+    manual_lifetime<T> * ptr_;
+};
+
+// Partial specialisation for types that don't need their destructors called
+template<typename T>
+    requires std::is_trivially_destructible_v<T>
+struct destructor_guard<T>
+{
+    explicit destructor_guard( manual_lifetime<T> & ) noexcept {}
+    void cancel() noexcept {}
+};
+
+// Class-template argument deduction to simplify usage
+template<typename T>
+destructor_guard( manual_lifetime<T> & obj ) -> destructor_guard<T>;
+
+template<typename Promise, typename... Args>
+Promise construct_promise( [[maybe_unused]] Args &&... args )
+{
+    if constexpr ( std::constructible_from<Promise, Args &...> ) {
+        return Promise( std::forward<Args &&>( args )... );
+    } else {
+        return Promise();
+    }
+}
+
 using __g_promise_t = std::coroutine_traits<task, int>::promise_type;
 __coroutine_state * __g_resume( __coroutine_state * s );
 void __g_destroy( __coroutine_state * s );
@@ -384,9 +480,17 @@ struct __g_state : __coroutine_state_with_promise<__g_promise_t>
 
     int __suspend_point = 0;
     int x;
-    manual_lifetime<std::suspend_always> __tmp1;
-    manual_lifetime<task> __tmp2;
-    manual_lifetime<task::awaiter> __tmp3;
+    struct __scope1
+    {
+        manual_lifetime<task> __tmp2;
+        manual_lifetime<task::awaiter> __tmp3;
+    };
+    union
+    {
+        manual_lifetime<std::suspend_always> __tmp1;
+        __scope1 __s1;
+        manual_lifetime<task::promise_type::final_awaiter> __tmp4;
+    };
 };
 
 task g( int x )
@@ -411,48 +515,98 @@ task g( int x )
     return return_value;
 }
 
-__coroutine_state __g_resume( __coroutine_state * s )
+__coroutine_state * __g_resume( __coroutine_state * s )
 {
     // we know that's' points to a __g_state
     auto * state = static_cast<__g_state *>( s );
 
-    // generate a jump-table to jump to the correct place in the code based
-    // on the value of the suspend-point index
-    switch ( state->__suspend_point ) {
-        case 0: goto suspend_point_0;
-        case 1: goto suspend_point_1;
-        default: std::unreachable();
+    try {
+
+        // generate a jump-table to jump to the correct place in the code based
+        // on the value of the suspend-point index
+        switch ( state->__suspend_point ) {
+            case 0: goto suspend_point_0;
+            case 1: goto suspend_point_1;
+            default: // std::unreachable();
+                goto final_suspend;
+        }
+
+    suspend_point_0: {
+        destructor_guard tmp1_dtor { state->__tmp1 };
+        state->__tmp1.get().await_resume();
     }
 
-suspend_point_0:
-    state->__tmp1.get().await_resume();
-    state->__tmp1.get().destroy();
+        {
+            // int fx = co_await f(x);
+            state->__s1.__tmp2.construct_from( [&] {
+                return f( state->x );
+            } );
+            destructor_guard tmp2_dtor { state->__s1.__tmp2 };
 
-    // int fx = co_await f(x);
-    state->__tmp2.construct_from( [&] {
-        return f( state->x );
+            state->__s1.__tmp3.construct_from( [&] {
+                return static_cast<task &&>( state->__s1.__tmp2.get() ).operator co_await();
+            } );
+            destructor_guard tmp3_dtor { state->__s1.__tmp3 };
+
+            if ( !state->__s1.__tmp3.get().await_ready() ) {
+                // mark the suspend-point
+                state->__suspend_point = 1;
+
+                auto h = state->__s1.__tmp3.get().await_suspend(
+                    std::coroutine_handle<__g_promise_t>::from_promise( state->__promise ) );
+
+                // A coroutine suspends without exiting scopes
+                // So cancel the destructor-gurads
+                tmp3_dtor.cancel();
+                tmp2_dtor.cancel();
+
+                return static_cast<__coroutine_state *>( h.address() );
+            }
+
+            // Don't exit the scope here
+            // We can't 'goto' a label that enters the scope of a variable with a
+            // non-trivial destructor, So we have to exit the scope of the destructor
+            // guards here without calling the destructors and then recreate them after
+            // the 'suspend_point_1' label.
+            tmp3_dtor.cancel();
+            tmp2_dtor.cancel();
+        }
+
+    suspend_point_1:
+        int fx = [&]() -> decltype( auto ) {
+            destructor_guard tmp2_dtor { state->__s1.__tmp2 };
+            destructor_guard tmp3_dtor { state->__s1.__tmp3 };
+            return state->__s1.__tmp3.get().await_resume();
+        }();
+        // co_return fx * fx
+        state->__promise.return_value( fx * fx );
+        goto final_suspend;
+    } catch ( ... ) {
+        state->__promise.unhandled_exception();
+        goto final_suspend;
+    }
+final_suspend: {
+    state->__tmp4.construct_from( [&]() noexcept {
+        return state->__promise.final_suspend();
     } );
+    destructor_guard tmp4_dtor { state->__tmp4 };
 
-    state->__tmp3.construct_from( [&] {
-        return static_cast<task &&>( state->__tmp2.get() ).operator co_await();
-    } );
+    if ( !state->__tmp4.get().await_ready() ) {
+        state->__suspend_point = 2;
+        state->__resume = nullptr; // mark as final suspend-point(can not resume again)
 
-    if ( !state->__tmp3.get().await_ready() ) {
-        // mark the suspend-point
-        state->__suspend_point = 1;
+        auto h = state->__tmp4.get().await_suspend(
+            std::coroutine_handle<__g_promise_t>::from_promise( state->__promise ) );
 
-        auto h = state->__tmp3.get().await_suspend(
-            std::coroutine_handle<__g_promise_t>::from_proimse( state->__promise ) );
-
-        // resume the returned coroutine-handle before returning
-        h.resume();
-        return;
+        tmp4_dtor.cancel();
+        return static_cast<__coroutine_state *>( h.address() );
     }
 
-suspend_point_1:
-    int fx = state->__tmp3.get().await_resume();
-    state->__tmp3.destroy();
-    state->__tmp2.destroy();
+    state->__tmp4.get().await_resume();
+}
+    // destrory coroutine_state if execution flows off end of coroutine
+    delete state;
+    return static_cast<__coroutine_state *>( std::noop_coroutine().address() );
 }
 
 void __g_destroy( __coroutine_state * s )
@@ -461,15 +615,22 @@ void __g_destroy( __coroutine_state * s )
     switch ( state->__suspend_point ) {
         case 0: goto suspend_point_0;
         case 1: goto suspend_point_1;
-        default: std::unreachable();
+        case 2: goto suspend_point_2;
+        default: // std::unreachable(); C++23
+            goto destroy_state;
     }
 
 suspend_point_0:
     state->__tmp1.destroy();
     goto destroy_state;
+
 suspend_point_1:
-    state->__tmp3.destroy();
-    state->__tmp2.destroy();
+    state->__s1.__tmp3.destroy();
+    state->__s1.__tmp2.destroy();
+    goto destroy_state;
+
+suspend_point_2:
+    state->__tmp4.destroy();
     goto destroy_state;
 
 destroy_state:
