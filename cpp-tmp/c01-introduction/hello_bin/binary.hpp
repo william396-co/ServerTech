@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef USE_META
+
 template<unsigned long N>
 struct binary
 {
@@ -19,3 +21,14 @@ unsigned const five = binary<101>::value;
 unsigned const seven = binary<111>::value;
 unsigned const nine = binary<1001>::value;
 
+#else
+unsigned binary( unsigned long N )
+{
+    unsigned result = 0;
+    for ( unsigned bit = 0x1; N; N /= 10, bit <<= 1 ) {
+        if ( N % 10 )
+            result += bit;
+    }
+    return result;
+}
+#endif
