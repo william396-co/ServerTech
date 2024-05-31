@@ -15,3 +15,4 @@ set(CXX_FLAGS
 
 add_subdirectory(meta_basic)
 #add_subdirectory(meta_tpl)
+add_subdirectory(meta_control)
