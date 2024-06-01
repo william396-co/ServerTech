@@ -187,6 +187,46 @@ struct Wrap_
 #endif
 } // namespace example9
 
+namespace example10 {
+
+template<size_t N>
+constexpr bool is_odd = ( ( N % 2 ) == 1 );
+
+template<bool cur, typename TNext>
+constexpr static bool AndValue = false;
+
+template<typename TNext>
+constexpr static bool AndValue<true, TNext> = TNext::value;
+
+#define SHORT_EVAL
+
+#ifndef SHORT_EVAL
+
+template<size_t N>
+struct AllOdd_
+{
+    constexpr static bool is_cur_odd = is_odd<N>;
+    constexpr static bool is_per_odd = AllOdd_<N - 1>::value;
+    constexpr static bool value = is_cur_odd && is_per_odd;
+};
+
+#else
+template<size_t N>
+struct AllOdd_
+{
+    constexpr static bool is_cur_odd = is_odd<N>;
+    constexpr static bool value = AndValue<is_cur_odd, AllOdd_<N - 1>>;
+};
+
+#endif
+template<>
+struct AllOdd_<0>
+{
+    constexpr static bool value = is_odd<0>;
+};
+
+} // namespace example10
+
 int main()
 {
 
@@ -249,6 +289,12 @@ int main()
         using namespace example9;
         std::cerr << Wrap_<3>::value<2> << "\n";
         std::cerr << Wrap_<10>::value<2> << "\n";
+    }
+
+    {
+        using namespace example10;
+
+        std::cerr << AllOdd_<1>::value << "\n";
     }
     return 0;
 }
