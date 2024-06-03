@@ -9,6 +9,10 @@ struct Base
         D * ptr = static_cast<D *>( this );
         ptr->Imp( input );
     }
+    static void Fun2()
+    {
+        D::Imp2();
+    }
 };
 
 struct Derive : public Base<Derive>
@@ -18,6 +22,11 @@ struct Derive : public Base<Derive>
     {
         std::cout << input << std::endl;
     }
+
+    static void Imp2()
+    {
+        std::cout << "Static Implemenation from derive class\n";
+    }
 };
 
 int main()
@@ -25,6 +34,7 @@ int main()
     Derive d;
     d.Fun( "Implemantation from derive class" );
 
+    Derive::Fun2();
     return 0;
 }
 
