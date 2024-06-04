@@ -16,3 +16,4 @@ set(CXX_FLAGS
 add_subdirectory(type_associations)
 add_subdirectory(metafunctions)
 add_subdirectory(numerical_metafunctions)
+add_subdirectory(make_choice)
