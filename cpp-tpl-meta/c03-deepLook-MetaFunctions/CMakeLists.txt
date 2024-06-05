@@ -13,9 +13,5 @@ set(CXX_FLAGS
 		-O0
 		)
 
-add_subdirectory(type_associations)
-add_subdirectory(metafunctions)
-add_subdirectory(numerical_metafunctions)
-add_subdirectory(make_choice)
-add_subdirectory(nullary_metafunctions)
+#add_subdirectory(type_associations)
 add_subdirectory(exercise)
