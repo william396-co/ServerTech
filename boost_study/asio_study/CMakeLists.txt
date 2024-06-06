@@ -13,6 +13,13 @@ set(CXX_FLAGS
 		-O0
 		)
 
-#add_subdirectory(timer_sync)
+add_subdirectory(timer_sync)
 add_subdirectory(hello_boost)
-#add_subdirectory(timer_async)
+add_subdirectory(timer_async)
+add_subdirectory(binding_arg_completion_handler)
+add_subdirectory(memfn_completion_handler)
+add_subdirectory(sync_completion_handler_in_multithread)
+
+add_subdirectory(sync_tcp_client)
+add_subdirectory(sync_tcp_server)
+add_subdirectory(async_tcp_server)
