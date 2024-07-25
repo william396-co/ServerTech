@@ -3,8 +3,8 @@
 #include <vector>
 #include <thread>
 
-std::atomic<int> x;
-std::atomic<int> y;
+std::atomic<int> x {};
+std::atomic<int> y {};
 
 void th1()
 {
