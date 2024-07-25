@@ -1,7 +1,9 @@
+
 #include <iostream>
 #include <thread>
 #include <vector>
 #include <condition_variable>
+
 
 std::vector<int> mySharedWork;
 std::mutex mutex_;
@@ -9,8 +11,7 @@ std::condition_variable condVar;
 
 bool dataReady { false };
 
-void waitingForWork()
-{
+void waitingForWork(){
     std::cout << "waiting \n";
     std::unique_lock lck( mutex_ );
     condVar.wait( lck, [] { return dataReady; } );
@@ -18,21 +19,19 @@ void waitingForWork()
     std::cout << "work done\n";
 }
 
-void setDataRead()
-{
+void setDataRead(){
     mySharedWork = { 1, 0, 3 };
     {
         std::lock_guard lock( mutex_ );
         dataReady = true;
     }
-
     std::cout << "Data prepared\n";
     condVar.notify_one();
 }
 
-int main()
-{
-    //    std::cout << std::endl;
+int main(){
+
+   std::cout << std::endl;
 
     std::thread t1( waitingForWork );
     std::thread t2( setDataRead );
@@ -43,5 +42,8 @@ int main()
     for ( auto const & v : mySharedWork ) {
         std::cout << v << "\n";
     }
+
+
+
     return 0;
 }
