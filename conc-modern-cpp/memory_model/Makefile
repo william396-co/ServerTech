@@ -1,14 +1,17 @@
-
 all: spinlockAcquireRelease atomicCondition spinLockSleep hello_thread spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer transitivity acquireReleaseWithWaiting releaseSequence acquireRelease acquireConsume relaxed acquireReleaseFences atomicSignal
 
 clean:
-	rm -rf spinlockAcquireRelease atomicCondtion spinLockSleep hello_thread spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer transitivity acquireReleaseWithWaiting releaseSequence acquireRelease acquireConsume relaxed acquireReleaseFences atomicSignal
+	rm -rf spinlockAcquireRelease atomicCondition spinLockSleep hello_thread spinlock condition_variable atomic_condition fetch_mult atomic_shared_ptr atomic_shared_ptr_ref producerConsumer transitivity acquireReleaseWithWaiting releaseSequence acquireRelease acquireConsume relaxed acquireReleaseFences atomicSignal
 
+
+spinlockAcquireRelease:
+	g++ -std=c++17 -o spinlockAcquireRelease spinlockAcquireRelease.cpp -lpthread -g
 
 atomicCondition:
 	g++ -std=c++17 -o atomicCondition atomicCondition.cpp -Wall -lpthread -g
 
-spinLockSleep:	g++ -std=c++17 -o spinLockSleep spinLockSleep.cpp -Wall -lpthread -g
+spinLockSleep:
+	g++ -std=c++17 -o spinLockSleep spinLockSleep.cpp -Wall -lpthread -g
 
 hello_thread:
 	g++ -std=c++17 -o hello_thread hello_thread.cpp -Wall -lpthread -g
