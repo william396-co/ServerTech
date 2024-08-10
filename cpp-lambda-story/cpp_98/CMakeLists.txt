@@ -17,4 +17,5 @@ add_subdirectory(func)
 add_subdirectory(functor)
 add_subdirectory(functor_with_member)
 add_subdirectory(functor_capture)
+add_subdirectory(functor_helper)
 
