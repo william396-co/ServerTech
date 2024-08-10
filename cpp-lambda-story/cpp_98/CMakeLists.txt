@@ -13,7 +13,8 @@ set(CXX_FLAGS
 		-O0
 	)
 
-add_subdirectory(hello_func)
-add_subdirectory(hello_functor)
-add_subdirectory(hello_functor_with_member)
+add_subdirectory(func)
+add_subdirectory(functor)
+add_subdirectory(functor_with_member)
+add_subdirectory(functor_capture)
 
