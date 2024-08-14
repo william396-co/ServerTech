@@ -21,4 +21,6 @@ add_subdirectory(capture-initialiser)
 add_subdirectory(capture-moveable-only)
 add_subdirectory(optimisation)
 add_subdirectory(capture-mem-var)
+add_subdirectory(generic-lambda)
+add_subdirectory(generic-variadic-lambda)
 
