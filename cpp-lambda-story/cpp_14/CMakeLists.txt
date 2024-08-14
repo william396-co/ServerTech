@@ -23,4 +23,7 @@ add_subdirectory(optimisation)
 add_subdirectory(capture-mem-var)
 add_subdirectory(generic-lambda)
 add_subdirectory(generic-variadic-lambda)
-
+add_subdirectory(perfect-forwarding-generic-lambda)
+add_subdirectory(deducing-correct-type)
+add_subdirectory(replacing-with-stdbind)
+add_subdirectory(function-composition)
