@@ -18,4 +18,5 @@ add_subdirectory(exception-specification-in-type-system)
 add_subdirectory(factorial-lambda)
 add_subdirectory(capture-this)
 add_subdirectory(capture-variable)
-
+add_subdirectory(invoke-lambda)
+add_subdirectory(fold-express-lambda)
