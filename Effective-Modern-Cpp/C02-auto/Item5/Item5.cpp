@@ -1,13 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <vector>
+#include <memory>
 
 /*
  *  Item5: Prefer auto to explicit type declarations
  */
 
 class Widget
-{};
+{
+public:
+    bool operator<( Widget const & other ) const
+    {
+        return true;
+    }
+};
 
 int main()
 {
@@ -17,7 +24,7 @@ int main()
                  // auto x2;     // error! initializer required
     auto x3 = 0; // fine, x's value is well-defined
 
-    // use auto to replace std::function<> 
+    // use auto to replace std::function<>
     // std::function<> uses more memory than auto-declared object
     // std::function<> approach
     auto derefUpLess = []( std::unique_ptr<Widget> const & p1, std::unique_ptr<Widget> const & p2 ) { return *p1 < *p2; };
