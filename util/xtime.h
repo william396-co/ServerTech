@@ -63,7 +63,7 @@ inline time_t getZeroTimeStamp( time_t timestamp, int offset )
 }
 
 // 是否跨天(offset 逻辑偏移 5: 凌晨5点)
-bool isOverDay( time_t timestamp, int offset )
+inline bool isOverDay( time_t timestamp, int offset )
 {
     if ( timestamp == 0 ) return true;
     auto timestamp_zero = getZeroTimeStamp( timestamp, offset );
@@ -77,6 +77,12 @@ bool isOverDay( time_t timestamp, int offset )
     }
 
     return false;
+}
+
+inline isLeapYear( int year )
+{
+    return ( year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0;
+}
 }
 
 } // namespace utils
