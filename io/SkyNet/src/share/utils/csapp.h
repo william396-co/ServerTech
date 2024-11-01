@@ -5,10 +5,7 @@
 #ifndef __CSAPP_H__
 #define __CSAPP_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +30,11 @@ extern "C"
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
 /* $begin createmasks */
@@ -70,7 +72,7 @@ extern char ** environ; /* Defined by libc */
 void unix_error( char * msg );
 void posix_error( int code, char * msg );
 void dns_error( char * msg );
-void gai_error( int code, char * msg );
+void gai_error_ex( int code, char * msg );
 void app_error( char * msg );
 
 /* Process control wrappers */
