@@ -27,8 +27,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/archive)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake; ${CMAKE_MODULE_PATH}")
 
 
-# include 
-include_directories(sr)
+include_directories(src) 
 include_directories(src/share)
 
 # link
@@ -36,6 +35,7 @@ link_directories(${PROJECT_SOURCE_DIR}/lib)
 
 # public lib
 add_subdirectory(src/share/utils)
+add_subdirectory(src/share/io)
 
 # sub project
 add_subdirectory(src/client)

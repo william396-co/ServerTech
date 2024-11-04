@@ -13,7 +13,7 @@ source_group("" FILE ${DIR_SRCS})
 
 add_executable(server ${DIR_SRCS})
 
-target_link_libraries(server utils)
+target_link_libraries(server io utils)
 target_link_libraries(server pthread m)
 
 
