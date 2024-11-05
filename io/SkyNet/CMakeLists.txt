@@ -40,4 +40,5 @@ add_subdirectory(src/share/io)
 # sub project
 add_subdirectory(src/client)
 add_subdirectory(src/server)
+add_subdirectory(src/ThreadPoolTest)
 
