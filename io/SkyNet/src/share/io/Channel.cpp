@@ -1,16 +1,23 @@
 #include "Channel.h"
-#include "Epoll.h"
+#include "EventLoop.h"
 
 #include <sys/epoll.h>
 
-Channel::Channel( Epoll * ep, int fd )
-    : ep_ { ep }, fd_ { fd }
+Channel::Channel( EventLoop * loop, int fd )
+    : loop_ { loop }, fd_ { fd }
 {
+}
+
+void Channel::handleEvent()
+{
+    if ( callback_ ) {
+        callback_();
+    }
 }
 
 void Channel::enableReading()
 {
     events_ = EPOLLIN | EPOLLET;
-    ep_->updateChannel( this );
+    loop_->updateChannel( this );
 }
 
