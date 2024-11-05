@@ -16,6 +16,7 @@ int main( int argc, char ** argv )
     Server server( loop, argv[1] );
     loop->loop();
 
+    delete loop;
     return 0;
 }
 

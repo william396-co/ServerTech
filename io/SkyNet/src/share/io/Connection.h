@@ -1,10 +1,12 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 class EventLoop;
 class Socket;
 class Channel;
+class Buffer;
 
 using DeleteConnectionCallback = std::function<void( Socket * )>;
 class Connection
@@ -21,4 +23,6 @@ private:
     Socket * s_;
     Channel * ch_;
     DeleteConnectionCallback deleteConnectionCallback_ {};
+    Buffer * writeBuffer_ {};
+    Buffer * readBuffer_ {};
 };
