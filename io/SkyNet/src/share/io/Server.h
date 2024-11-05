@@ -4,6 +4,7 @@
 class EventLoop;
 class Socket;
 class Channel;
+class Acceptor;
 class Server
 {
     using SocketChannelMap = std::unordered_map<int, std::pair<Socket *, Channel *>>;
@@ -23,5 +24,6 @@ private:
 
 private:
     EventLoop * loop_ {};
+    Acceptor * acceptor_ {};
     SocketChannelMap socketList_;
 };

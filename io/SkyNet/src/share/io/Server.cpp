@@ -2,6 +2,7 @@
 
 #include "Socket.h"
 #include "Channel.h"
+#include "Acceptor.h"
 
 #include <functional>
 #include <cstring>
@@ -12,19 +13,15 @@ Server::Server( EventLoop * loop, char * port )
     : loop_ { loop }
 {
 
-    Socket * listenSocket = new Socket();
-    listenSocket->listen( port );
-    listenSocket->setnonblocking();
-
-    Channel * sCh = new Channel( loop, listenSocket->getFd() );
-    std::function<void()> cb = std::bind( &Server::newConnection, this, listenSocket );
-    sCh->setCallback( cb );
-    sCh->enableReading();
+    acceptor_ = new Acceptor( loop, port );
+    NewConnCallback cb = std::bind( &Server::newConnection, this, std::placeholders::_1 );
+    acceptor_->setNewConnectionCallback( cb );
 }
 
 Server::~Server()
 {
     clear();
+    delete acceptor_;
 }
 
 constexpr auto READ_BUFFER = 1024;
