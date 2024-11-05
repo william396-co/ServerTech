@@ -2,28 +2,26 @@
 #include <unordered_map>
 
 class EventLoop;
-class Socket;
-class Channel;
 class Acceptor;
+class Socket;
+class Connection;
 class Server
 {
-    using SocketChannelMap = std::unordered_map<int, std::pair<Socket *, Channel *>>;
+    using ConnectionMap = std::unordered_map<int, Connection *>;
 
 public:
     Server( EventLoop * loop, char * port );
     ~Server();
 
     void handleReadEvent( int fd );
-    void newConnection( Socket * listenSocket );
+    void newConnection( Socket * s );
+    void deleteConnection( Socket * s );
 
 private:
-    void addSocketChannel( int fd, Socket * s, Channel * ch );
-    void delSocketChannel( int fd );
-
     void clear();
 
 private:
     EventLoop * loop_ {};
     Acceptor * acceptor_ {};
-    SocketChannelMap socketList_;
+    ConnectionMap connections_;
 };

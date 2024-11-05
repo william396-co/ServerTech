@@ -4,6 +4,8 @@
 #include "Socket.h"
 #include "Channel.h"
 
+#include <iostream>
+
 Acceptor::Acceptor( EventLoop * loop, char * port )
     : loop_ { loop }
 {
@@ -26,7 +28,14 @@ Acceptor::~Acceptor()
 
 void Acceptor::acceptConnection()
 {
+    // Accept new Socket
+    sockaddr_in addr {};
+    Socket * clientSocket = new Socket( listenSocket_->accept( addr ) );
+    clientSocket->setRemote( addr );
+    std::cout << "new client fd:" << clientSocket->getFd() << " Ip:" << clientSocket->remoteIp() << " Port:" << clientSocket->remotePort() << "\n";
+    clientSocket->setnonblocking();
+
     if ( newConnCallback_ ) {
-        newConnCallback_( listenSocket_ );
+        newConnCallback_( clientSocket );
     }
 }
