@@ -16,7 +16,7 @@ Acceptor::Acceptor( EventLoop * loop, char * port )
 
     acceptChannel_ = new Channel( loop, listenSocket_->getFd() );
     std::function<void()> cb = std::bind( &Acceptor::acceptConnection, this );
-    acceptChannel_->setCallback( cb );
+    acceptChannel_->setReadCallback( cb );
     acceptChannel_->enableReading();
 }
 

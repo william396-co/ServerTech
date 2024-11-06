@@ -3,19 +3,22 @@
 #include "Socket.h"
 #include "Channel.h"
 #include "EventLoop.h"
-#include "Buffer.h"
+#include "utils/Buffer.h"
 
 #include <unistd.h>
 #include <iostream>
+#include <cstring>
 
 Connection::Connection( EventLoop * loop, Socket * s )
     : loop_ { loop }, s_ { s }
 {
     ch_ = new Channel( loop_, s->getFd() );
+    ch_->useET();
+    ch_->enableReading();
 
     std::function<void()> cb = std::bind( &Connection::echo, this, s_->getFd() );
-    ch_->setCallback( cb );
-    ch_->enableReading();
+    ch_->setReadCallback( cb );
+    // ch_->setUseThreadPool( true );
 
     readBuffer_ = new Buffer();
     writeBuffer_ = new Buffer();
@@ -39,22 +42,42 @@ void Connection::echo( int fd )
         if ( read_bytes > 0 ) {
             readBuffer_->append( buf, read_bytes );
             // std::cout << "message from client fd:" << fd << "[" << buf << "]\n";
-            write( fd, buf, sizeof( buf ) );
         } else if ( read_bytes == -1 && errno == EINTR ) {
             std::cout << "continue reading\n";
             continue;
         } else if ( read_bytes == -1 && ( errno == EAGAIN || errno == EWOULDBLOCK ) ) {
-            std::cout << "finish reading once\n";
             std::cout << "message from client fd:" << fd << " [" << readBuffer_->c_str() << "]\n";
+            send( fd );
             readBuffer_->clear();
             break;
-        } else if ( read_bytes == 0 ) {
+        } else if ( read_bytes == 0 ) { // EOF, client disconnect
             std::cout << "client fd: " << fd << " disconnected\n";
             if ( deleteConnectionCallback_ ) {
                 deleteConnectionCallback_( s_ );
             }
             break;
+        } else {
+            std::cout << "Client reset by peer\n";
+            if ( deleteConnectionCallback_ ) {
+                deleteConnectionCallback_( s_ );
+            }
+
+            break;
         }
     }
 }
 
+void Connection::send( int fd )
+{
+    char buf[readBuffer_->size()];
+    strcpy( buf, readBuffer_->c_str() );
+    int data_size = readBuffer_->size();
+    int data_left = data_size;
+    while ( data_left > 0 ) {
+        ssize_t bytes_write = write( fd, buf + data_size - data_left, data_left );
+        if ( bytes_write == -1 && errno == EAGAIN ) {
+            break;
+        }
+        data_left -= bytes_write;
+    }
+}
