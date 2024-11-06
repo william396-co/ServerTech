@@ -41,4 +41,5 @@ add_subdirectory(src/share/io)
 add_subdirectory(src/client)
 add_subdirectory(src/server)
 add_subdirectory(src/ThreadPoolTest)
+add_subdirectory(src/test)
 
