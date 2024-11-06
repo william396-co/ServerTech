@@ -4,6 +4,7 @@
 
 class Epoll;
 class Channel;
+class ThreadPool;
 class EventLoop
 {
 public:
@@ -13,7 +14,10 @@ public:
     void loop();
     void updateChannel( Channel * ch );
 
+    void addThread( std::function<void()> task );
+
 private:
     Epoll * ep_ {};
+    ThreadPool * pool_ {};
     bool quit {};
 };
