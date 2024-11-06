@@ -13,7 +13,7 @@ ThreadPool::ThreadPool( int size )
                     std::unique_lock lock( tasks_mtx );
                     cv.wait( lock, [this]() { return stop || !tasks.empty(); } );
                     if ( stop && tasks.empty() ) return;
-                    task = tasks.front();
+                    task = std::move( tasks.front() );
                     tasks.pop();
                 }
                 task();
@@ -35,6 +35,7 @@ ThreadPool::~ThreadPool()
     } );
 }
 
+/*
 void ThreadPool::add( Task const & task )
 {
     {
@@ -44,4 +45,4 @@ void ThreadPool::add( Task const & task )
         tasks.emplace( task );
     }
     cv.notify_one();
-}
+}*/

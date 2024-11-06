@@ -17,6 +17,7 @@ public:
 
     void echo( int fd );
     void setDeleteConnectionCallback( DeleteConnectionCallback const & cb ) { deleteConnectionCallback_ = cb; }
+    void send( int fd );
 
 private:
     EventLoop * loop_ {};
