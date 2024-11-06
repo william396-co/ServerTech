@@ -24,7 +24,6 @@ int main()
         pool->add( task );
 
         task = std::bind( test, i );
-        ;
         pool->add( task );
     }
 
