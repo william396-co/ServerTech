@@ -1,13 +1,16 @@
 #pragma once
 #include <unordered_map>
+#include <vector>
 
 class EventLoop;
 class Acceptor;
 class Socket;
+class ThreadPool;
 class Connection;
 class Server
 {
     using ConnectionMap = std::unordered_map<int, Connection *>;
+    using ReactorList = std::vector<EventLoop *>;
 
 public:
     Server( EventLoop * loop, char * port );
@@ -21,7 +24,9 @@ private:
     void clear();
 
 private:
-    EventLoop * loop_ {};
+    EventLoop * mainReactor_ {};
     Acceptor * acceptor_ {};
+    ReactorList subReactors_ {};
     ConnectionMap connections_;
+    ThreadPool * thpool_ {};
 };

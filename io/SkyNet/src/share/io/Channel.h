@@ -24,7 +24,6 @@ public:
     void setInEpoll( bool in = true ) { inEpoll_ = in; }
 
     void useET();
-    void setUseThreadPool( bool use = true ) { useThreadPool_ = use; }
 
     void setReadCallback( Callback cb ) { readCallback_ = cb; }
     void setWriteCallback( Callback cb ) { readCallback_ = cb; }
@@ -35,7 +34,6 @@ private:
     uint32_t events_ {};
     uint32_t ready_ {};
     bool inEpoll_ {};
-    bool useThreadPool_ {};
     Callback readCallback_ {};
     Callback writeCallback_ {};
 };

@@ -11,17 +11,11 @@ Channel::Channel( EventLoop * loop, int fd )
 void Channel::handleEvent()
 {
     if ( ready_ & ( EPOLLIN | EPOLLPRI ) ) {
-        if ( useThreadPool_ )
-            loop_->addThread( readCallback_ );
-        else
-            readCallback_();
+        readCallback_();
     }
 
     if ( ready_ & EPOLLOUT ) {
-        if ( useThreadPool_ )
-            loop_->addThread( writeCallback_ );
-        else
-            writeCallback_();
+        writeCallback_();
     }
 }
 
