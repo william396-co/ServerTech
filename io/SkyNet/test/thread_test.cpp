@@ -14,12 +14,11 @@ int main() {
     ThreadPool* pool = new ThreadPool();
 
     for (int i = 0; i != 30; ++i) {
-        Task task =
-            std::bind(print, i, 3.14, "hello", std::string("what's up"));
-        pool->add(task);
+        Task task = std::bind(print, i, 3.14, "hello", std::string("what's up"));
+        pool->Add(task);
 
         task = std::bind(test, i);
-        pool->add(task);
+        pool->Add(task);
     }
 
     delete pool;

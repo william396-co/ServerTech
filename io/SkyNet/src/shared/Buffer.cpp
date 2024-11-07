@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void Buffer::append(const char* str, size_t sz) {
+void Buffer::Append(const char* str, size_t sz) {
     for (size_t i = 0; i != sz; ++i) {
         if (str[i] == '\0') break;
 
@@ -10,12 +10,12 @@ void Buffer::append(const char* str, size_t sz) {
     }
 }
 
-void Buffer::getline() {
+void Buffer::Getline() {
     buf_.clear();
     std::getline(std::cin, buf_);
 }
 
-void Buffer::setBuf(const char* buf) {
+void Buffer::SetBuf(const char* buf) {
     buf_.clear();
     buf_.append(buf);
 }

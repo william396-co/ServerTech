@@ -6,22 +6,22 @@
 
 Channel::Channel(EventLoop* loop, int fd) : loop_{loop}, fd_{fd} {}
 
-void Channel::handleEvent() {
-    if (ready_ & (EPOLLIN | EPOLLPRI)) {
+void Channel::HandleEvent() {
+    if (ready_events_ & (EPOLLIN | EPOLLPRI)) {
         readCallback_();
     }
 
-    if (ready_ & EPOLLOUT) {
+    if (ready_events_ & EPOLLOUT) {
         writeCallback_();
     }
 }
 
-void Channel::enableReading() {
-    events_ = EPOLLIN | EPOLLPRI;
-    loop_->updateChannel(this);
+void Channel::EnableReading() {
+    listen_events_ = EPOLLIN | EPOLLPRI;
+    loop_->UpdateChannel(this);
 }
 
-void Channel::useET() {
-    events_ |= EPOLLET;
-    loop_->updateChannel(this);
+void Channel::UseET() {
+    listen_events_ |= EPOLLET;
+    loop_->UpdateChannel(this);
 }

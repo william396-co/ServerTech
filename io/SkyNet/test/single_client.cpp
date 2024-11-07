@@ -15,19 +15,18 @@ int main(int argc, char** argv) {
     }
 
     std::unique_ptr<Socket> clientSocket = std::make_unique<Socket>();
-    clientSocket->connect(argv[1], argv[2]);
-    errif(clientSocket->getFd() == -1, "socket connect error");
+    clientSocket->Connect(argv[1], argv[2]);
+    ErrorIf(clientSocket->GetFd() == -1, "socket Conect error");
 
     std::unique_ptr<Buffer> sendBuffer = std::make_unique<Buffer>();
     std::unique_ptr<Buffer> readBuffer = std::make_unique<Buffer>();
-    auto clientfd = clientSocket->getFd();
+    auto clientfd = clientSocket->GetFd();
 
     while (true) {
-        sendBuffer->getline();
-        ssize_t write_bytes =
-            write(clientfd, sendBuffer->c_str(), sendBuffer->size());
+        sendBuffer->Getline();
+        ssize_t write_bytes = write(clientfd, sendBuffer->ToStr(), sendBuffer->Size());
         if (write_bytes == -1) {
-            std::cout << "socket already disconnected,can't write any more!\n";
+            std::cout << "socket already disConected,can't write any more!\n";
             break;
         }
 
@@ -36,24 +35,23 @@ int main(int argc, char** argv) {
         while (true) {
             ssize_t read_bytes = read(clientfd, buf, sizeof(buf));
             if (read_bytes) {
-                readBuffer->append(buf, read_bytes);
+                readBuffer->Append(buf, read_bytes);
                 already_read += read_bytes;
                 //                std::cout << "message from server:" << buf <<
                 //                "\n";
             } else if (read_bytes == 0) {
-                std::cout << "server socketd disconnected!\n";
+                std::cout << "server socketd disConected!\n";
                 exit(EXIT_FAILURE);
             } else if (read_bytes == -1) {
-                errif(true, "socket read error");
+                ErrorIf(true, "socket read error");
             }
 
-            if (already_read >= sendBuffer->size()) {
-                std::cout << "message from server: [" << readBuffer->c_str()
-                          << "]\n";
+            if (already_read >= sendBuffer->Size()) {
+                std::cout << "message from server: [" << readBuffer->ToStr() << "]\n";
                 break;
             }
         }
-        readBuffer->clear();
+        readBuffer->Clear();
     }
 
     return 0;

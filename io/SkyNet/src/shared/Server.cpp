@@ -11,11 +11,10 @@
 #include "EventLoop.h"
 #include "Socket.h"
 
-Server::Server(EventLoop* loop, char* port) : mainReactor_{loop} {
-    acceptor_ = new Acceptor(loop, port);
-    NewConnCallback cb =
-        std::bind(&Server::newConnection, this, std::placeholders::_1);
-    acceptor_->setNewConnectionCallback(cb);
+Server::Server(EventLoop* Loop, char* port) : mainReactor_{Loop} {
+    acceptor_ = new Acceptor(Loop, port);
+    NewConnCallback cb = std::bind(&Server::NewConnection, this, std::placeholders::_1);
+    acceptor_->SetNewConnectionCallback(cb);
 
     auto size = std::thread::hardware_concurrency();
     for (size_t i = 0; i != size; ++i) {
@@ -23,12 +22,11 @@ Server::Server(EventLoop* loop, char* port) : mainReactor_{loop} {
     }
 
     for (size_t i = 0; i != size; ++i) {
-        thpool_.emplace_back(std::thread(&EventLoop::loop, subReactors_[i]));
+        thpool_.emplace_back(std::thread(&EventLoop::Loop, subReactors_[i]));
     }
 }
 
 Server::~Server() {
-    delete acceptor_;
     for (size_t i = 0; i != thpool_.size(); ++i) {
         if (thpool_[i].joinable()) {
             thpool_[i].join();
@@ -37,21 +35,21 @@ Server::~Server() {
     for (auto& it : subReactors_) {
         delete it;
     }
+    delete acceptor_;
 }
 
-void Server::newConnection(Socket* s) {
-    if (s->getFd() != -1) {
-        int rand = s->getFd() % subReactors_.size();
+void Server::NewConnection(Socket* s) {
+    if (s->GetFd() != -1) {
+        int rand = s->GetFd() % subReactors_.size();
         Connection* conn = new Connection(subReactors_[rand], s);
-        DeleteConnectionCallback cb =
-            std::bind(&Server::deleteConnection, this, std::placeholders::_1);
-        conn->setDeleteConnectionCallback(cb);
-        connections_[s->getFd()] = conn;
+        DeleteConnectionCallback cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
+        conn->SetDeleteConnectionCallback(cb);
+        connections_[s->GetFd()] = conn;
     }
 }
 
-void Server::deleteConnection(Socket* s) {
-    auto it = connections_.find(s->getFd());
+void Server::DeleteConnection(Socket* s) {
+    auto it = connections_.find(s->GetFd());
     if (it != connections_.end()) {
         delete it->second;
         connections_.erase(it);
