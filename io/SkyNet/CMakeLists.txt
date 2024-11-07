@@ -115,6 +115,7 @@ add_subdirectory(test)
 # "make check-format"
 ##########################################
 string(CONCAT SKYNET_FORMAT_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/include,"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/shared,"
         "${CMAKE_CURRENT_SOURCE_DIR}/test,"
         )
@@ -145,8 +146,8 @@ add_custom_target(check-format ${SKYNET_BUILD_SUPPORT_DIR}/run_clang_format.py
 ##########################################
 
 file(GLOB_RECURSE SKYNET_LINT_FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/include/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/shared/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/test/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp"
         )

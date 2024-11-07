@@ -20,9 +20,7 @@ class Connection {
     DISALLOW_COPY_AND_MOVE(Connection);
 
     void Echo(int fd);
-    void SetDeleteConnectionCallback(DeleteConnectionCallback const& cb) {
-        deleteConnectionCallback_ = cb;
-    }
+    void SetDeleteConnectionCallback(DeleteConnectionCallback const& cb) { deleteConnectionCallback_ = cb; }
     void Send(int fd);
 
    private:
