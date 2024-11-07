@@ -101,7 +101,7 @@ set(SKYNET_SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/include)
 set(SKYNET_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/test/include)
 include_directories(${SKYNET_SRC_INCLUDE_DIR} ${SKYNET_TEST_INCLUDE_DIR})
 
-add_subdirectory(src)
+add_subdirectory(src/shared)
 add_subdirectory(test)
 
 ######################################################################################################################
@@ -115,7 +115,7 @@ add_subdirectory(test)
 # "make check-format"
 ##########################################
 string(CONCAT SKYNET_FORMAT_DIRS
-        "${CMAKE_CURRENT_SOURCE_DIR}/src,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/shared,"
         "${CMAKE_CURRENT_SOURCE_DIR}/test,"
         )
 
