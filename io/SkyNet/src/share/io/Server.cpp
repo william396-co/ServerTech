@@ -4,13 +4,11 @@
 #include "Acceptor.h"
 #include "Connection.h"
 #include "EventLoop.h"
-#include "utils/ThreadPool.h"
 
 #include <functional>
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
-#include <thread>
 
 Server::Server( EventLoop * loop, char * port )
     : mainReactor_ { loop }
@@ -20,21 +18,23 @@ Server::Server( EventLoop * loop, char * port )
     acceptor_->setNewConnectionCallback( cb );
 
     auto size = std::thread::hardware_concurrency();
-    thpool_ = new ThreadPool( size );
     for ( int i = 0; i != size; ++i ) {
         subReactors_.emplace_back( new EventLoop() );
     }
 
     for ( int i = 0; i != size; ++i ) {
-        std::function<void()> sub_loop = std::bind( &EventLoop::loop, subReactors_[i] );
-        thpool_->add( sub_loop );
+        thpool_.emplace_back( std::thread( &EventLoop::loop, subReactors_[i] ) );
     }
 }
 
 Server::~Server()
 {
     delete acceptor_;
-    delete thpool_;
+    for ( int i = 0; i != thpool_.size(); ++i ) {
+        if ( thpool_[i].joinable() ) {
+            thpool_[i].join();
+        }
+    }
     for ( auto & it : subReactors_ ) {
         delete it;
     }
