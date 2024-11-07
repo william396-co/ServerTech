@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -Wall -Wextra -std=c++17 -pthread -Wno-unused-parameter -Wno-attributes CMakeFiles/server.dir/server.cpp.o -o ../bin/server  -Wl,-rpath,/home/william/ServerTech/io/SkyNet/build/lib ../lib/libskynet_shared.so 
