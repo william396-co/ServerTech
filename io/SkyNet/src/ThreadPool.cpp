@@ -4,32 +4,32 @@
 #include <stdexcept>
 
 ThreadPool::ThreadPool(int size) {
-  for (auto i = 0; i != size; ++i) {
-    threads.emplace_back(std::thread([this]() {
-      while (true) {
-        Task task{};
-        {
-          std::unique_lock lock(tasks_mtx);
-          cv.wait(lock, [this]() { return stop || !tasks.empty(); });
-          if (stop && tasks.empty()) return;
-          task = std::move(tasks.front());
-          tasks.pop();
-        }
-        task();
-      }
-    }));
-  }
+    for (auto i = 0; i != size; ++i) {
+        threads.emplace_back(std::thread([this]() {
+            while (true) {
+                Task task{};
+                {
+                    std::unique_lock lock(tasks_mtx);
+                    cv.wait(lock, [this]() { return stop || !tasks.empty(); });
+                    if (stop && tasks.empty()) return;
+                    task = std::move(tasks.front());
+                    tasks.pop();
+                }
+                task();
+            }
+        }));
+    }
 }
 
 ThreadPool::~ThreadPool() {
-  {
-    std::unique_lock lock(tasks_mtx);
-    stop = true;
-  }
-  cv.notify_one();
-  std::for_each(threads.begin(), threads.end(), [](auto&& t) {
-    if (t.joinable()) t.join();
-  });
+    {
+        std::unique_lock lock(tasks_mtx);
+        stop = true;
+    }
+    cv.notify_one();
+    std::for_each(threads.begin(), threads.end(), [](auto&& t) {
+        if (t.joinable()) t.join();
+    });
 }
 
 /*

@@ -6,18 +6,18 @@
 
 class Channel;
 class Epoll {
- public:
-  Epoll();
-  ~Epoll();
+   public:
+    Epoll();
+    ~Epoll();
 
-  int getFd() const { return epfd; }
+    int getFd() const { return epfd; }
 
-  void updateChannel(Channel* ch);
-  void deleteChannel(Channel* ch);
+    void updateChannel(Channel* ch);
+    void deleteChannel(Channel* ch);
 
-  std::vector<Channel*> poll(int timeout = -1);
+    std::vector<Channel*> poll(int timeout = -1);
 
- private:
-  int epfd;
-  struct epoll_event* events;
+   private:
+    int epfd;
+    struct epoll_event* events;
 };

@@ -7,22 +7,22 @@
 #include "ThreadPool.h"
 
 EventLoop::EventLoop() {
-  ep_ = new Epoll();
-  pool_ = new ThreadPool();
+    ep_ = new Epoll();
+    pool_ = new ThreadPool();
 }
 
 EventLoop::~EventLoop() {
-  delete ep_;
-  delete pool_;
+    delete ep_;
+    delete pool_;
 }
 
 void EventLoop::loop() {
-  while (!quit) {
-    std::vector<Channel*> chs = ep_->poll();
-    for (auto& it : chs) {
-      it->handleEvent();
+    while (!quit) {
+        std::vector<Channel*> chs = ep_->poll();
+        for (auto& it : chs) {
+            it->handleEvent();
+        }
     }
-  }
 }
 
 void EventLoop::updateChannel(Channel* ch) { ep_->updateChannel(ch); }
