@@ -1,45 +1,176 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.18)
 
-project(Skynet C CXX)
-
-if(NOT CMAKE_BUILD_TYPE)
-		set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
-if(NOT PROJECT_OUTPUT_PATH)
-		set(PROJECT_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
-endif()
-
-# CXX FLAGS
-set(CXX_FLAGS
-	-ggdb
-	-Wall
-	-Wextra
-	-Werror
-	)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(BUILD_SHARED_LIBS ON)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(SkyNet
+		VERSION 0.1
+		DESCRIPTION "SkyNet"
+		LANGUAGES C CXX
+		)
+
+# People keep running CMake in the wrong folder, completely nuking their project or creating weird bugs.
+# This checks if you're running CMake from a folder that already has CMakeLists.txt.
+# Importantly, this catches the common case of running it from the root directory.
+file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" PATH_TO_CMAKELISTS_TXT)
+if (EXISTS "${PATH_TO_CMAKELISTS_TXT}")
+    message(FATAL_ERROR "Run CMake from a build subdirectory! \"mkdir build ; cd build ; cmake .. \" \
+    Some junk files were created in this folder (CMakeCache.txt, CMakeFiles); you should delete those.")
+endif ()
 
 
-#path
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_OUTPUT_PATH})
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/archive)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake; ${CMAKE_MODULE_PATH}")
+# Excepted directory structure
+set(SKYNET_BUILD_SUPPORT_DIR "${CMAKE_SOURCE_DIR}/build_support")
+set(SKYNET_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin"  "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@8/bin" "/usr/local/william/llvm/8.0.1/bin")
+
+######################################################################################################################
+# DEPENDENCIES
+######################################################################################################################
+
+# CTest
+# enable_testing()
+
+# clang-format
+if (NOT DEFINED CLANG_FORMAT_BIN)
+    # attempt to find the binary if user did not specify
+    find_program(CLANG_FORMAT_BIN
+            NAMES clang-format clang-format-8
+            HINTS ${SKYNET_CLANG_SEARCH_PATH})
+endif ()
+if ("${CLANG_FORMAT_BIN}" STREQUAL "CLANG_FORMAT_BIN-NOTFOUND")
+    message(WARNING "SkyNet/main couldn't find clang-format.")
+else ()
+    message(STATUS "SkyNet/main found clang-format at ${CLANG_FORMAT_BIN}")
+endif ()
+
+# clang-tidy
+if (NOT DEFINED CLANG_TIDY_BIN)
+    # attempt to find the binary if user did not specify
+    find_program(CLANG_TIDY_BIN
+            NAMES clang-tidy clang-fidy-8
+            HINTS ${SKYNET_CLANG_SEARCH_PATH})
+endif ()
+if ("${CLANG_TIDY_BIN}" STREQUAL "CLANG_TIDY_BIN-NOTFOUND")
+    message(WARNING "SkyNet/main couldn't find clang-tidy.")
+else ()
+    # Output compile_commands.json
+    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+    message(STATUS "SkyNet/main found clang-fidy at ${CLANG_TIDY_BIN}")
+endif ()
+
+# cpplint
+find_program(CPPLINT_BIN
+        NAMES cpplint cpplint.py
+        HINTS ${SKYNET_BUILD_SUPPORT_DIR})
+if ("${CPPLINT_BIN}" STREQUAL "CPPLINT_BIN-NOTFOUND")
+    message(WARNING "SkyNet/main couldn't find cpplint.")
+else ()
+    message(STATUS "SkyNet/main found cpplint at ${CPPLINT_BIN}")
+endif ()
 
 
-include_directories(src) 
-include_directories(src/share)
+######################################################################################################################
+# COMPILER SETUP
+######################################################################################################################
 
-# link
-link_directories(${PROJECT_SOURCE_DIR}/lib)
+# Compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -Wextra -std=c++17 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-attributes") # TODO remove
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+set(CMAKE_EXE_LINKER_FLAGES "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
+set(CMAKE_SHAREAD_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fPIC")
+set(CMAKE_STATIC_LINKE_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -fPIC")
 
-# public lib
-add_subdirectory(src/share/utils)
-add_subdirectory(src/share/io)
 
-# sub project
-add_subdirectory(src/client)
-add_subdirectory(src/server)
-add_subdirectory(src/ThreadPoolTest)
-add_subdirectory(src/test)
+set(GCC_COVERAGE_LINK_FLAGS "-fPIC")
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS_DBUEG: ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
+message(STATUS "CMAKE_SHARED_LINKER_FLAGS:${CMAKE_SHARED_LINKER_FLAGS}")
+
+
+# Output directory
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Includes
+set(SKYNET_SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/include)
+set(SKYNET_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/test/include)
+include_directories(${SKYNET_SRC_INCLUDE_DIR} ${SKYNET_TEST_INCLUDE_DIR})
+
+add_subdirectory(src)
+add_subdirectory(test)
+
+######################################################################################################################
+# MAKE TARGETS
+######################################################################################################################
+
+
+
+##########################################
+# "make format"
+# "make check-format"
+##########################################
+string(CONCAT SKYNET_FORMAT_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test,"
+        )
+
+# runs clang format and updates files in place.
+add_custom_target(format ${SKYNET_BUILD_SUPPORT_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${SKYNET_BUILD_SUPPORT_DIR}/clang_format_exclusions.txt
+        --source_dirs
+		${SKYNET_FORMAT_DIRS}
+        --fix
+        --quiet
+        )
+    
+# runs clang format and exits with a non-zero exit code if any files need to be reformatted
+add_custom_target(check-format ${SKYNET_BUILD_SUPPORT_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${SKYNET_BUILD_SUPPORT_DIR}/clang_format_exclusions.txt
+        --source_dirs
+		${SKYNET_FORMAT_DIRS}
+        --quiet
+        )
+
+
+
+##########################################
+# "make cpplint"
+##########################################
+
+file(GLOB_RECURSE SKYNET_LINT_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp"
+        )
+
+# Balancing act: cpplint.py takes a non-trivial time to launch,
+# so process 12 files per invocation, while still ensuring parallelism
+add_custom_target(cpplint echo '${SKYNET_LINT_FILES}' | xargs -n12 -P8
+        ${CPPLINT_BIN}
+        --verbose=2 --quiet
+        --linelength=120
+        --filter=-legal/copyright,-build/include_subdir,-readability/casting
+        )
+
+
+
+###########################################################
+# "make clang-tidy" target
+###########################################################
+# runs clang-tidy and exits with a non-zero exit code if any errors are found.
+# note that clang-tidy automatically looks for a .clang-tidy file in parent directories
+add_custom_target(clang-tidy
+        ${SKYNET_BUILD_SUPPORT_DIR}/run_clang_tidy.py                     # run LLVM's clang-tidy script
+        -clang-tidy-binary ${CLANG_TIDY_BIN}                              # using our clang-tidy binary
+        -p ${CMAKE_BINARY_DIR}                                            # using cmake's generated compile commands
+        )
+# add_dependencies(check-clang-tidy pine_shared)                    # needs gtest headers, compile_commands.json
 
