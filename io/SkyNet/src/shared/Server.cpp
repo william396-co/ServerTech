@@ -10,6 +10,7 @@
 #include "Connection.h"
 #include "EventLoop.h"
 #include "Socket.h"
+#include "Util.h"
 
 Server::Server(EventLoop* Loop, char* port) : mainReactor_{Loop} {
     acceptor_ = new Acceptor(Loop, port);
@@ -39,11 +40,13 @@ Server::~Server() {
 }
 
 void Server::NewConnection(Socket* s) {
+    ErrorIf(s->GetFd() == -1, "new connection error");
     if (s->GetFd() != -1) {
         int rand = s->GetFd() % subReactors_.size();
         Connection* conn = new Connection(subReactors_[rand], s);
         DeleteConnectionCallback cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
         conn->SetDeleteConnectionCallback(cb);
+        conn->SetOnConnectCallback(on_connect_callback_);
         connections_[s->GetFd()] = conn;
     }
 }

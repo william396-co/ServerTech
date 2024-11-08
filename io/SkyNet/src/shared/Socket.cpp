@@ -7,7 +7,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "util.h"
+#include "Util.h"
 
 Socket::Socket() : fd_{-1}, r_addr_{} {}
 
@@ -31,6 +31,8 @@ bool Socket::Listen(const char* port) {
     ErrorIf(fd_ == -1, "socket listen error");
     return fd_ > 0;
 }
+
+bool Socket::IsNonBlocking() const { return (fcntl(fd_, F_GETFL) & O_NONBLOCK) != 0; }
 
 void Socket::SetNonBlocking() { fcntl(fd_, F_SETFL, fcntl(fd_, F_GETFL) | O_NONBLOCK); }
 

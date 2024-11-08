@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "Channel.h"
-#include "util.h"
+#include "Util.h"
 
 constexpr auto MAX_EVENTS = 1000;
 

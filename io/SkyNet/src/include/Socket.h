@@ -20,6 +20,7 @@ class Socket {
     SOCKET GetFd() const { return fd_; }
 #endif
     void SetNonBlocking();
+    bool IsNonBlocking() const;
 
    public:
     ////////////////////////////////////////////////
