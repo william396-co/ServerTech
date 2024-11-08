@@ -1,7 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <functional>
+
+#include "Macros.h"
 
 class EventLoop;
 class Channel {
@@ -11,27 +12,30 @@ class Channel {
     Channel(EventLoop* loop, int fd);
     ~Channel() {}
 
-    void handleEvent();
-    void enableReading();
-    int getFd() const { return fd_; }
+    DISALLOW_COPY_AND_MOVE(Channel);
 
-    uint32_t getEvents() const { return events_; }
-    void setReady(uint32_t events) { ready_ = events; }
-    uint32_t getReady() const { return ready_; }
+    void HandleEvent();
+    void EnableReading();
+    int GetFd() const { return fd_; }
 
-    bool isInEpoll() const { return inEpoll_; }
-    void setInEpoll(bool in = true) { inEpoll_ = in; }
+    uint32_t GetReadyEvents() const { return ready_events_; }
+    uint32_t GetListenEvents() const { return listen_events_; }
 
-    void useET();
+    bool IsInEpoll() const { return inEpoll_; }
+    void SetInEpoll(bool in = true) { inEpoll_ = in; }
 
-    void setReadCallback(Callback cb) { readCallback_ = cb; }
-    void setWriteCallback(Callback cb) { readCallback_ = cb; }
+    void UseET();
+
+    void SetReadyEvents(uint32_t events) { ready_events_ = events; }
+
+    void SetReadCallback(Callback cb) { readCallback_ = cb; }
+    void SetWriteCallback(Callback cb) { readCallback_ = cb; }
 
    private:
     EventLoop* loop_{};
     int fd_{};
-    uint32_t events_{};
-    uint32_t ready_{};
+    uint32_t listen_events_{};
+    uint32_t ready_events_{};
     bool inEpoll_{};
     Callback readCallback_{};
     Callback writeCallback_{};

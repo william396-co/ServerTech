@@ -5,15 +5,15 @@
 
 ThreadPool::ThreadPool(int size) {
     for (auto i = 0; i != size; ++i) {
-        threads.emplace_back(std::thread([this]() {
+        workers_.emplace_back(std::thread([this]() {
             while (true) {
                 Task task{};
                 {
-                    std::unique_lock lock(tasks_mtx);
-                    cv.wait(lock, [this]() { return stop || !tasks.empty(); });
-                    if (stop && tasks.empty()) return;
-                    task = std::move(tasks.front());
-                    tasks.pop();
+                    std::unique_lock lock(tasks_mtx_);
+                    cv_.wait(lock, [this]() { return stop_ || !tasks_.empty(); });
+                    if (stop_ && tasks_.empty()) return;
+                    task = std::move(tasks_.front());
+                    tasks_.pop();
                 }
                 task();
             }
@@ -23,23 +23,11 @@ ThreadPool::ThreadPool(int size) {
 
 ThreadPool::~ThreadPool() {
     {
-        std::unique_lock lock(tasks_mtx);
-        stop = true;
+        std::unique_lock lock(tasks_mtx_);
+        stop_ = true;
     }
-    cv.notify_one();
-    std::for_each(threads.begin(), threads.end(), [](auto&& t) {
+    cv_.notify_one();
+    std::for_each(workers_.begin(), workers_.end(), [](auto&& t) {
         if (t.joinable()) t.join();
     });
 }
-
-/*
-void ThreadPool::add( Task const & task )
-{
-    {
-        std::unique_lock lock( tasks_mtx );
-        if ( stop )
-            throw std::runtime_error( "ThreadPool already stop, can't add task
-any more!" ); tasks.emplace( task );
-    }
-    cv.notify_one();
-}*/

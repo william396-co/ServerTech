@@ -1,6 +1,7 @@
 #pragma once
-
 #include <functional>
+
+#include "Macros.h"
 
 class EventLoop;
 class Channel;
@@ -12,8 +13,10 @@ class Acceptor {
     Acceptor(EventLoop* loop_, char* port);
     ~Acceptor();
 
-    void acceptConnection();
-    void setNewConnectionCallback(NewConnCallback cb) { newConnCallback_ = cb; }
+    DISALLOW_COPY_AND_MOVE(Acceptor);
+
+    void AcceptConnection();
+    void SetNewConnectionCallback(NewConnCallback cb) { newConnCallback_ = cb; }
 
    private:
     EventLoop* loop_{};

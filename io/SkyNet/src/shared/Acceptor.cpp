@@ -8,13 +8,13 @@
 
 Acceptor::Acceptor(EventLoop* loop, char* port) : loop_{loop} {
     listenSocket_ = new Socket();
-    listenSocket_->listen(port);
-    listenSocket_->setnonblocking();
+    listenSocket_->Listen(port);
+    // listenSocket_->Setnonblocking(); acceptor use blocking is better
 
-    acceptChannel_ = new Channel(loop, listenSocket_->getFd());
-    std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
-    acceptChannel_->setReadCallback(cb);
-    acceptChannel_->enableReading();
+    acceptChannel_ = new Channel(loop, listenSocket_->GetFd());
+    std::function<void()> cb = std::bind(&Acceptor::AcceptConnection, this);
+    acceptChannel_->SetReadCallback(cb);
+    acceptChannel_->EnableReading();
 }
 
 Acceptor::~Acceptor() {
@@ -22,15 +22,14 @@ Acceptor::~Acceptor() {
     delete acceptChannel_;
 }
 
-void Acceptor::acceptConnection() {
+void Acceptor::AcceptConnection() {
     // Accept new Socket
     sockaddr_in addr{};
-    Socket* clientSocket = new Socket(listenSocket_->accept(addr));
-    clientSocket->setRemote(addr);
-    std::cout << "new client fd:" << clientSocket->getFd()
-              << " Ip:" << clientSocket->remoteIp()
-              << " Port:" << clientSocket->remotePort() << "\n";
-    clientSocket->setnonblocking();
+    Socket* clientSocket = new Socket(listenSocket_->Accept(addr));
+    clientSocket->SetRemote(addr);
+    std::cout << "new client fd:" << clientSocket->GetFd() << " Ip:" << clientSocket->RemoteIp()
+              << " Port:" << clientSocket->RemotePort() << "\n";
+    clientSocket->SetNonBlocking();
 
     if (newConnCallback_) {
         newConnCallback_(clientSocket);

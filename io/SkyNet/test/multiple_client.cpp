@@ -15,10 +15,10 @@ using namespace std;
 
 void oneClient(int msgs, int wait) {
     Socket* clientSocket = new Socket();
-    clientSocket->connect("127.0.0.1", "9527");
-    errif(clientSocket->getFd() == -1, "clientSocketet connect error");
+    clientSocket->Connect("127.0.0.1", "9527");
+    ErrorIf(clientSocket->GetFd() == -1, "clientSocketet Connect error");
 
-    int clientSocketfd = clientSocket->getFd();
+    int clientSocketfd = clientSocket->GetFd();
 
     Buffer* sendBuffer = new Buffer();
     Buffer* readBuffer = new Buffer();
@@ -26,12 +26,10 @@ void oneClient(int msgs, int wait) {
     sleep(wait);
     int count = 0;
     while (count < msgs) {
-        sendBuffer->setBuf("I'm client!");
-        ssize_t write_bytes =
-            write(clientSocketfd, sendBuffer->c_str(), sendBuffer->size());
+        sendBuffer->SetBuf("I'm client!");
+        ssize_t write_bytes = write(clientSocketfd, sendBuffer->ToStr(), sendBuffer->Size());
         if (write_bytes == -1) {
-            printf(
-                "clientSocketet already disconnected, can't write any more!\n");
+            printf("clientSocketet already disConnected, can't write any more!\n");
             break;
         }
         int already_read = 0;
@@ -40,19 +38,18 @@ void oneClient(int msgs, int wait) {
             bzero(&buf, sizeof(buf));
             ssize_t read_bytes = read(clientSocketfd, buf, sizeof(buf));
             if (read_bytes > 0) {
-                readBuffer->append(buf, read_bytes);
+                readBuffer->Append(buf, read_bytes);
                 already_read += read_bytes;
             } else if (read_bytes == 0) {  // EOF
-                printf("server disconnected!\n");
+                printf("server disConnected!\n");
                 exit(EXIT_SUCCESS);
             }
-            if ((size_t)already_read >= sendBuffer->size()) {
-                printf("count: %d, message from server: %s\n", count++,
-                       readBuffer->c_str());
+            if ((size_t)already_read >= sendBuffer->Size()) {
+                printf("count: %d, message from server: %s\n", count++, readBuffer->ToStr());
                 break;
             }
         }
-        readBuffer->clear();
+        readBuffer->Clear();
     }
     delete clientSocket;
 }
@@ -83,7 +80,7 @@ int main(int argc, char** argv) {
     ThreadPool* poll = new ThreadPool(threads);
     std::function<void()> func = std::bind(oneClient, msgs, wait);
     for (int i = 0; i < threads; ++i) {
-        poll->add(func);
+        poll->Add(func);
     }
     delete poll;
 }

@@ -1,36 +1,43 @@
 #pragma once
 
+#include "Macros.h"
+
+#ifdef OS_LINUX
 #include <arpa/inet.h>
+#endif
 
 class Socket {
    public:
     explicit Socket(int fd);
     Socket();
     ~Socket();
+
+    DISALLOW_COPY_AND_MOVE(Socket);
+
 #ifndef WIN32
-    int getFd() const { return fd_; }
+    int GetFd() const { return fd_; }
 #else
-    SOCKET getFd() const { return fd_; }
+    SOCKET GetFd() const { return fd_; }
 #endif
-    void setnonblocking();
+    void SetNonBlocking();
 
    public:
     ////////////////////////////////////////////////
     // Only Client Use
     // //////////////////////////////////////////////
-    bool connect(const char* ip, const char* port);
+    bool Connect(const char* ip, const char* port);
 
    public:
     //////////////////////////////////////////////////
     // Only Server Use
     //////////////////////////////////////////////////
-    bool listen(const char* port);
-    int accept(sockaddr_in& addr);
+    bool Listen(const char* port);
+    int Accept(sockaddr_in& addr);
 
     /* remote address ip port */
-    const char* remoteIp() const { return inet_ntoa(r_addr_.sin_addr); }
-    uint16_t remotePort() const { return ntohs(r_addr_.sin_port); }
-    void setRemote(sockaddr_in& addr) { r_addr_ = addr; }
+    const char* RemoteIp() const { return inet_ntoa(r_addr_.sin_addr); }
+    uint16_t RemotePort() const { return ntohs(r_addr_.sin_port); }
+    void SetRemote(sockaddr_in& addr) { r_addr_ = addr; }
 
    private:
 #ifdef WIN32
@@ -38,6 +45,6 @@ class Socket {
 #else
     int fd_;
 #endif
-    sockaddr_in
-        r_addr_;  // remote address(for server record client address info)
+    // remote address(for server record client address info)
+    sockaddr_in r_addr_;
 };

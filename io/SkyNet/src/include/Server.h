@@ -1,7 +1,10 @@
 #pragma once
+
 #include <thread>
 #include <unordered_map>
 #include <vector>
+
+#include "Macros.h"
 
 class EventLoop;
 class Acceptor;
@@ -16,12 +19,10 @@ class Server {
     Server(EventLoop* loop, char* port);
     ~Server();
 
-    void handleReadEvent(int fd);
-    void newConnection(Socket* s);
-    void deleteConnection(Socket* s);
+    DISALLOW_COPY_AND_MOVE(Server);
 
-   private:
-    void clear();
+    void NewConnection(Socket* s);
+    void DeleteConnection(Socket* s);
 
    private:
     EventLoop* mainReactor_{};

@@ -11,10 +11,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    EventLoop* loop = new EventLoop();
-    Server server(loop, argv[1]);
-    loop->loop();
+    EventLoop* Loop = new EventLoop();
+    Server server(Loop, argv[1]);
+    Loop->Loop();
 
-    delete loop;
+    delete Loop;
     return 0;
 }
