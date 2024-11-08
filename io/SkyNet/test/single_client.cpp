@@ -5,8 +5,9 @@
 #include <memory>
 
 #include "Buffer.h"
+#include "Connection.h"
 #include "Socket.h"
-#include "util.h"
+#include "Util.h"
 
 int main(int argc, char** argv) {
     if (argc != 3) {
@@ -18,40 +19,16 @@ int main(int argc, char** argv) {
     clientSocket->Connect(argv[1], argv[2]);
     ErrorIf(clientSocket->GetFd() == -1, "socket Conect error");
 
-    std::unique_ptr<Buffer> sendBuffer = std::make_unique<Buffer>();
-    std::unique_ptr<Buffer> readBuffer = std::make_unique<Buffer>();
-    auto clientfd = clientSocket->GetFd();
-
+    std::unique_ptr<Connection> conn = std::make_unique<Connection>(nullptr, clientSocket.get());
     while (true) {
-        sendBuffer->Getline();
-        ssize_t write_bytes = write(clientfd, sendBuffer->ToStr(), sendBuffer->Size());
-        if (write_bytes == -1) {
-            std::cout << "socket already disConected,can't write any more!\n";
+        conn->GetlineSendBuffer();
+        conn->Write();
+        if (conn->GetState() == Connection::State::Closed) {
+            conn->Close();
             break;
         }
-
-        size_t already_read = 0;
-        char buf[1024];
-        while (true) {
-            ssize_t read_bytes = read(clientfd, buf, sizeof(buf));
-            if (read_bytes) {
-                readBuffer->Append(buf, read_bytes);
-                already_read += read_bytes;
-                //                std::cout << "message from server:" << buf <<
-                //                "\n";
-            } else if (read_bytes == 0) {
-                std::cout << "server socketd disConected!\n";
-                exit(EXIT_FAILURE);
-            } else if (read_bytes == -1) {
-                ErrorIf(true, "socket read error");
-            }
-
-            if (already_read >= sendBuffer->Size()) {
-                std::cout << "message from server: [" << readBuffer->ToStr() << "]\n";
-                break;
-            }
-        }
-        readBuffer->Clear();
+        conn->Read();
+        std::cout << "Message from server:" << conn->ReadBuffer() << "\n";
     }
 
     return 0;

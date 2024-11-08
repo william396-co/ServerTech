@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 
 #define OS_LINUX
 
@@ -15,3 +16,5 @@
 #define DISALLOW_COPY_AND_MOVE(cname) \
     DISALLOW_COPY(cname);             \
     DISALLOW_MOVE(cname);
+
+#define ASSERT(expr, message) assert((expr) && (message))

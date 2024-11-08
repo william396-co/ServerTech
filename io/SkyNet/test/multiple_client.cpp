@@ -5,11 +5,14 @@
 #include <cstring>
 #include <functional>
 #include <iostream>
+#include <memory>
+#include <thread>
 
 #include "Buffer.h"
+#include "Connection.h"
 #include "Socket.h"
 #include "ThreadPool.h"
-#include "util.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -18,41 +21,22 @@ void oneClient(int msgs, int wait) {
     clientSocket->Connect("127.0.0.1", "9527");
     ErrorIf(clientSocket->GetFd() == -1, "clientSocketet Connect error");
 
-    int clientSocketfd = clientSocket->GetFd();
+    std::unique_ptr<Connection> conn = std::make_unique<Connection>(nullptr, clientSocket);
 
-    Buffer* sendBuffer = new Buffer();
-    Buffer* readBuffer = new Buffer();
+    int count{};
 
-    sleep(wait);
-    int count = 0;
     while (count < msgs) {
-        sendBuffer->SetBuf("I'm client!");
-        ssize_t write_bytes = write(clientSocketfd, sendBuffer->ToStr(), sendBuffer->Size());
-        if (write_bytes == -1) {
-            printf("clientSocketet already disConnected, can't write any more!\n");
+        conn->SetSendBuffer("I'm client!");
+        conn->Write();
+        if (conn->GetState() == Connection::State::Closed) {
+            conn->Close();
             break;
         }
-        int already_read = 0;
-        char buf[1024];  // 这个buf大小无所谓
-        while (true) {
-            bzero(&buf, sizeof(buf));
-            ssize_t read_bytes = read(clientSocketfd, buf, sizeof(buf));
-            if (read_bytes > 0) {
-                readBuffer->Append(buf, read_bytes);
-                already_read += read_bytes;
-            } else if (read_bytes == 0) {  // EOF
-                printf("server disConnected!\n");
-                exit(EXIT_SUCCESS);
-            }
-            if ((size_t)already_read >= sendBuffer->Size()) {
-                printf("count: %d, message from server: %s\n", count++, readBuffer->ToStr());
-                break;
-            }
-        }
-        readBuffer->Clear();
+        conn->Read();
+        std::cout << "msg count" << count++ << ": " << conn->ReadBuffer() << "\n";
     }
-    delete clientSocket;
 }
+
 int main(int argc, char** argv) {
     int threads = 100;
     int msgs = 100;

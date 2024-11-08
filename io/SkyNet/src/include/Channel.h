@@ -28,7 +28,7 @@ class Channel {
 
     void SetReadyEvents(uint32_t events) { ready_events_ = events; }
 
-    void SetReadCallback(Callback cb) { readCallback_ = cb; }
+    void SetReadCallback(Callback const& cb) { readCallback_ = cb; }
     void SetWriteCallback(Callback cb) { readCallback_ = cb; }
 
    private:
