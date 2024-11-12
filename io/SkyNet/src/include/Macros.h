@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
+#include <stdexcept>
 
-#define OS_LINUX
 
 // Macros to disable copying and moving
 
@@ -18,3 +18,5 @@
     DISALLOW_MOVE(cname);
 
 #define ASSERT(expr, message) assert((expr) && (message))
+
+#define UNREACHABLE(message) throw std::logic_error(message)

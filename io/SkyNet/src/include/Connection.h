@@ -4,15 +4,13 @@
 #include <string>
 
 #include "Macros.h"
+#include "Types.h"
 
 class EventLoop;
 class Socket;
 class Channel;
 class Buffer;
 class Connection;
-
-using DeleteConnectionCallback = std::function<void(Socket*)>;
-using ConnectCallback = std::function<void(Connection*)>;
 
 class Connection {
    public:
@@ -25,11 +23,12 @@ class Connection {
 
     void Read();
     void Write();
+    void Send(std::string const& msg);
+    void Business();
 
-    void OnConnect(std::function<void()> fn);
-
-    void SetDeleteConnectionCallback(DeleteConnectionCallback const& cb) { deleteConnectionCallback_ = cb; }
-    void SetOnConnectCallback(ConnectCallback const& cb);
+    void SetDeleteConnectionCallback(ConnectionCallback const& cb) { delete_connection_callback_ = cb; }
+    void SetOnConnectCallback(ConnectionMessageCallback const& cb);
+    void SetOnMessageCallback(ConnectionMessageCallback const& cb);
     void Close();
 
     Socket* GetSocket() const { return s_; }
@@ -44,6 +43,9 @@ class Connection {
     const char* SendBuffer() const;
     void GetlineSendBuffer();
 
+    void OnConnect(OnConnectFunction fn);
+    void OnMessage(OnMessageFunction fn);
+
    private:
     void ReadNonBlocking();
     void WriteNonBlocking();
@@ -57,8 +59,10 @@ class Connection {
     Channel* ch_{};
     State state_{State::Invalid};
 
-    DeleteConnectionCallback deleteConnectionCallback_{};
-    ConnectCallback connectCallback_{};
+    ConnectionCallback delete_connection_callback_{};
+
+    ConnectionMessageCallback on_connect_callback_{};
+    ConnectionMessageCallback on_message_callback_{};
 
     Buffer* writeBuffer_{};
     Buffer* readBuffer_{};

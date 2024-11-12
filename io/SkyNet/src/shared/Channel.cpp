@@ -1,27 +1,45 @@
 #include "Channel.h"
 
-#include <sys/epoll.h>
-
 #include "EventLoop.h"
+#include "Socket.h"
 
-Channel::Channel(EventLoop* loop, int fd) : loop_{loop}, fd_{fd} {}
+Channel::Channel(EventLoop* loop, Socket* s) : loop_{loop}, s_{s} {}
+
+Channel::~Channel() { loop_->DeleteChannel(this); }
 
 void Channel::HandleEvent() {
-    if (ready_events_ & (EPOLLIN | EPOLLPRI)) {
-        readCallback_();
+    if (ready_events_ & READ_EVENT) {
+        read_callback_();
     }
 
-    if (ready_events_ & EPOLLOUT) {
-        writeCallback_();
+    if (ready_events_ & WRITE_EVENT) {
+        write_callback_();
     }
 }
 
-void Channel::EnableReading() {
-    listen_events_ = EPOLLIN | EPOLLPRI;
+void Channel::EnableWrite() {
+    listen_events_ |= WRITE_EVENT;
+    loop_->UpdateChannel(this);
+}
+
+void Channel::EnableRead() {
+    listen_events_ = READ_EVENT;
     loop_->UpdateChannel(this);
 }
 
 void Channel::UseET() {
-    listen_events_ |= EPOLLET;
+    listen_events_ |= ET;
     loop_->UpdateChannel(this);
+}
+
+void Channel::SetReadyEvents(int ev) {
+    if (ev & READ_EVENT) {
+        ready_events_ |= READ_EVENT;
+    }
+    if (ev & WRITE_EVENT) {
+        ready_events_ |= WRITE_EVENT;
+    }
+    if (ev & ET) {
+        ready_events_ |= ET;
+    }
 }

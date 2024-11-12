@@ -11,10 +11,10 @@ Acceptor::Acceptor(EventLoop* loop, char* port) : loop_{loop} {
     listenSocket_->Listen(port);
     // listenSocket_->Setnonblocking(); acceptor use blocking is better
 
-    acceptChannel_ = new Channel(loop, listenSocket_->GetFd());
-    std::function<void()> cb = std::bind(&Acceptor::AcceptConnection, this);
+    acceptChannel_ = new Channel(loop, listenSocket_);
+    ReadCallback cb = std::bind(&Acceptor::AcceptConnection, this);
     acceptChannel_->SetReadCallback(cb);
-    acceptChannel_->EnableReading();
+    acceptChannel_->EnableRead();
 }
 
 Acceptor::~Acceptor() {
@@ -31,7 +31,7 @@ void Acceptor::AcceptConnection() {
               << " Port:" << clientSocket->RemotePort() << "\n";
     clientSocket->SetNonBlocking();
 
-    if (newConnCallback_) {
-        newConnCallback_(clientSocket);
+    if (new_connection_callback_) {
+        new_connection_callback_(clientSocket);
     }
 }
