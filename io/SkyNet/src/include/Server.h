@@ -8,10 +8,15 @@
 #include "Macros.h"
 #include "Types.h"
 
+#define USE_THREADPOOL
+
 class EventLoop;
 class Acceptor;
 class Socket;
 class Connection;
+#ifdef USE_THREADPOOL
+class ThreadPool;
+#endif
 class Server {
     using ConnectionMap = std::unordered_map<int, Connection*>;
     using ReactorList = std::vector<EventLoop*>;
@@ -34,7 +39,11 @@ class Server {
     EventLoop* mainReactor_{};
     Acceptor* acceptor_{};
     ReactorList subReactors_{};
+#ifndef USE_THREADPOOL
     ThreadList thpool_;
+#else
+    ThreadPool* thread_pool_;
+#endif
 
     ConnectionMap connections_;
 

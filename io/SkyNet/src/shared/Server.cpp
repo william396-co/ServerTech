@@ -12,13 +12,16 @@
 #include "Exception.h"
 #include "Socket.h"
 #include "Util.h"
+#ifdef USE_THREADPOOL
+#include "ThreadPool.h"
+#endif
 
-Server::Server(EventLoop* Loop, char* port) : mainReactor_{Loop} {
+Server::Server(EventLoop* loop, char* port) : mainReactor_{loop} {
     if (!mainReactor_) {
         throw Exception(ExceptionType::INVALID, "main reactor can't be nullptr");
     }
 
-    acceptor_ = new Acceptor(Loop, port);
+    acceptor_ = new Acceptor(mainReactor_, port);
     ConnectionCallback cb = std::bind(&Server::NewConnection, this, std::placeholders::_1);
     acceptor_->SetNewConnectionCallback(cb);
 
@@ -27,17 +30,30 @@ Server::Server(EventLoop* Loop, char* port) : mainReactor_{Loop} {
         subReactors_.emplace_back(new EventLoop());
     }
 
+#ifndef USE_THREADPOOL
     for (size_t i = 0; i != size; ++i) {
         thpool_.emplace_back(std::thread(&EventLoop::Loop, subReactors_[i]));
     }
+#else
+    thread_pool_ = new ThreadPool(size);
+    for (size_t i = 0; i != size; ++i) {
+        std::function<void()> sub_loop = std::bind(&EventLoop::Loop, subReactors_[i]);
+        thread_pool_->Add(std::move(sub_loop));
+    }
+
+#endif
 }
 
 Server::~Server() {
+#ifndef USE_THREADPOOL
     for (size_t i = 0; i != thpool_.size(); ++i) {
         if (thpool_[i].joinable()) {
             thpool_[i].join();
         }
     }
+#else
+    delete thread_pool_;
+#endif
     for (auto& it : subReactors_) {
         delete it;
     }
