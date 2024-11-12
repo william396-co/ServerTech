@@ -9,12 +9,17 @@
 #include "Acceptor.h"
 #include "Connection.h"
 #include "EventLoop.h"
+#include "Exception.h"
 #include "Socket.h"
 #include "Util.h"
 
 Server::Server(EventLoop* Loop, char* port) : mainReactor_{Loop} {
+    if (!mainReactor_) {
+        throw Exception(ExceptionType::INVALID, "main reactor can't be nullptr");
+    }
+
     acceptor_ = new Acceptor(Loop, port);
-    NewConnCallback cb = std::bind(&Server::NewConnection, this, std::placeholders::_1);
+    ConnectionCallback cb = std::bind(&Server::NewConnection, this, std::placeholders::_1);
     acceptor_->SetNewConnectionCallback(cb);
 
     auto size = std::thread::hardware_concurrency();
@@ -40,14 +45,20 @@ Server::~Server() {
 }
 
 void Server::NewConnection(Socket* s) {
-    ErrorIf(s->GetFd() == -1, "new connection error");
+    //  ErrorIf(s->GetFd() == -1, "new connection error");
+    if (s->GetFd() == -1) {
+        throw Exception(ExceptionType::INVALID_SOCKET, "New Connection error, invalid client socket!");
+    }
     if (s->GetFd() != -1) {
         int rand = s->GetFd() % subReactors_.size();
         Connection* conn = new Connection(subReactors_[rand], s);
-        DeleteConnectionCallback cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
+        ConnectionCallback cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
         conn->SetDeleteConnectionCallback(cb);
-        conn->SetOnConnectCallback(on_connect_callback_);
+        conn->SetOnMessageCallback(on_message_callback_);
         connections_[s->GetFd()] = conn;
+        if (new_connect_callback_) {
+            new_connect_callback_(conn);
+        }
     }
 }
 

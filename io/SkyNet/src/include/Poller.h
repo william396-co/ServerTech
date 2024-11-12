@@ -1,20 +1,24 @@
 #pragma once
 
+#include <vector>
+
 #include "Macros.h"
 
 #ifdef OS_LINUX
 #include <sys/epoll.h>
 #endif
 
-#include <vector>
+#ifdef OS_MACOS
+#include <sys/event.h>
+#endif
 
 class Channel;
-class Epoll {
+class Poller {
    public:
-    Epoll();
-    ~Epoll();
+    Poller();
+    ~Poller();
 
-    DISALLOW_COPY_AND_MOVE(Epoll);
+    DISALLOW_COPY_AND_MOVE(Poller);
 
     int GetFd() const { return epfd_; }
 
@@ -25,5 +29,10 @@ class Epoll {
 
    private:
     int epfd_{};
+#ifdef OS_LINUX
     struct epoll_event* events_{};
+#endif
+#ifdef OS_MACOS
+    struct kevent* events_{};
+#endif
 };

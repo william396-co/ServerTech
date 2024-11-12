@@ -3,40 +3,48 @@
 #include <functional>
 
 #include "Macros.h"
+#include "Types.h"
 
+class Socket;
 class EventLoop;
 class Channel {
-    using Callback = std::function<void()>;
-
    public:
-    Channel(EventLoop* loop, int fd);
-    ~Channel() {}
+    Channel(EventLoop* loop, Socket* s);
+    ~Channel();
+
+    enum {
+        READ_EVENT = 1,
+        WRITE_EVENT = 2,
+        ET = 4,
+    };
 
     DISALLOW_COPY_AND_MOVE(Channel);
 
     void HandleEvent();
-    void EnableReading();
-    int GetFd() const { return fd_; }
+    void EnableRead();
+    void EnableWrite();
 
-    uint32_t GetReadyEvents() const { return ready_events_; }
-    uint32_t GetListenEvents() const { return listen_events_; }
+    Socket* GetSocket() const { return s_; }
 
-    bool IsInEpoll() const { return inEpoll_; }
-    void SetInEpoll(bool in = true) { inEpoll_ = in; }
+    int GetReadyEvents() const { return ready_events_; }
+    int GetListenEvents() const { return listen_events_; }
+
+    bool GetExist() const { return exist_; }
+    void SetExist(bool in = true) { exist_ = in; }
 
     void UseET();
 
-    void SetReadyEvents(uint32_t events) { ready_events_ = events; }
+    void SetReadyEvents(int events);
 
-    void SetReadCallback(Callback const& cb) { readCallback_ = cb; }
-    void SetWriteCallback(Callback cb) { readCallback_ = cb; }
+    void SetReadCallback(ReadCallback const& cb) { read_callback_ = cb; }
+    void SetWriteCallback(WriteCallback const& cb) { write_callback_ = cb; }
 
    private:
     EventLoop* loop_{};
-    int fd_{};
-    uint32_t listen_events_{};
-    uint32_t ready_events_{};
-    bool inEpoll_{};
-    Callback readCallback_{};
-    Callback writeCallback_{};
+    Socket* s_{};
+    int listen_events_{};
+    int ready_events_{};
+    bool exist_{};
+    ReadCallback read_callback_{};
+    WriteCallback write_callback_{};
 };

@@ -74,10 +74,19 @@ endif ()
 ######################################################################################################################
 # COMPILER SETUP
 ######################################################################################################################
+# OS
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+		message(STATUS "Platform: macOS")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOS_MACOS")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+		message(STATUS "Platform: Linux")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOS_LINUX")
+endif()
 
 # Compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall -Wextra -std=c++17 -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-attributes") # TODO remove
+# cmake -DCMAKE_DEBUG_TYPE=DEBUG...
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls")
 set(CMAKE_EXE_LINKER_FLAGES "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
 set(CMAKE_SHAREAD_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fPIC")

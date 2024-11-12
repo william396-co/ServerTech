@@ -3,7 +3,7 @@
 
 #include "Macros.h"
 
-class Epoll;
+class Poller;
 class Channel;
 class ThreadPool;
 class EventLoop {
@@ -15,8 +15,10 @@ class EventLoop {
 
     void Loop();
     void UpdateChannel(Channel* ch);
+    void DeleteChannel(Channel* ch);
+    void Quit() { quit_ = true; }
 
    private:
-    Epoll* ep_{};
+    Poller* poller_{};
     bool quit_{};
 };
