@@ -8,31 +8,29 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    EventLoop* loop = new EventLoop();
-    Server* server = new Server(loop, argv[1]);
+    TcpServer* server = new TcpServer(argv[1]);
 
     Signal::signal(SIGINT, [&] {
-        delete loop;
         delete server;
-        std::cout << "\nServer exit!\n";
+        std::cout << "\nTcpServer exit!\n";
         exit(0);
     });
 
-    server->NewConnect(
-        [](Connection* conn) { std::cout << "New Connection fd:" << conn->GetSocket()->GetFd() << "\n"; });
+    server->onConnect([](Connection* conn) { std::cout << "New Connection fd:" << conn->socket()->fd() << "\n"; });
 
-    server->OnMessage([](Connection* conn) {
+    server->onRecv([](Connection* conn) {
         if (conn->IsClosed()) {
             conn->Close();
             return;
         }
 
-        std::cout << "Message from client[" << conn->GetSocket()->GetFd() << "] :" << conn->ReadBuffer() << "\n ";
+        std::cout << "Message from client[" << conn->socket()->fd() << "] :" << conn->recv_buf()->c_str() << "\n ";
         if (conn->GetState() == Connection::State::Connected) {
-            conn->Send(conn->ReadBuffer());
+            conn->Send(conn->recv_buf()->c_str());
         }
     });
 
-    loop->Loop();
+    server->Start();
+
     return 0;
 }

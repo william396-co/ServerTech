@@ -3,7 +3,7 @@
 #include "EventLoop.h"
 #include "Socket.h"
 
-Channel::Channel(int fd, EventLoop* loop, Socket* s) : fd_{fd}, loop_{loop} {}
+Channel::Channel(int fd, EventLoop* loop) : loop_{loop}, fd_{fd} {}
 
 Channel::~Channel() { loop_->DeleteChannel(this); }
 
@@ -27,7 +27,7 @@ void Channel::EnableRead() {
     loop_->UpdateChannel(this);
 }
 
-void Channel::EnabelET() {
+void Channel::EnableET() {
     listen_events_ |= ET;
     loop_->UpdateChannel(this);
 }

@@ -11,7 +11,7 @@
 
 #include "Util.h"
 
-Socket::Socket() : fd_{-1}, r_addr_{} {}
+Socket::Socket() : fd_{-1} {}
 
 Socket::~Socket() {
     if (fd_ != -1) {
@@ -21,18 +21,20 @@ Socket::~Socket() {
 }
 
 RC Socket::Connect(const char* ip, const char* port) {
-    if (fd_ = open_clientfd(ip, port))==-1){
-            perror("Failed to connect socket");
-            return RC_SOCKET_ERROR;
-        }
+    fd_ = open_clientfd(ip, port);
+    if (fd_ == -1) {
+        perror("Failed to connect socket");
+        return RC_SOCKET_ERROR;
+    }
     return RC_SUCCESS;
 }
 
 RC Socket::Listen(const char* port) {
-    if (fd_ = open_listenfd(port))==-1){
-            perror("Failed to listen socket");
-            return RC_SOCKET_ERROR;
-        }
+    fd_ = open_listenfd(port);
+    if (fd_ == -1) {
+        perror("Failed to listen socket");
+        return RC_SOCKET_ERROR;
+    }
     return RC_SUCCESS;
 }
 
@@ -46,11 +48,15 @@ RC Socket::SetNonBlocking() {
     return RC_SUCCESS;
 }
 
-RC Socket::Accept(sockaddr_in& addr) {
+RC Socket::Accept(int& client_fd) {
+    struct sockaddr_in addr {};
     socklen_t addr_len = sizeof(sockaddr_in);
-    int clientfd = ::accept(fd_, (sockaddr*)&addr, &addr_len);
-    ErrorIf(clientfd == -1, "socket accept error");
-    return clientfd;
+    client_fd = ::accept(fd_, (sockaddr*)&addr, &addr_len);
+    if (client_fd == -1) {
+        perror("Failed to connect socket");
+        return RC_SOCKET_ERROR;
+    }
+    return RC_SUCCESS;
 }
 
 size_t Socket::RecvBufSize() const {
@@ -61,3 +67,15 @@ size_t Socket::RecvBufSize() const {
     return size;
 }
 
+std::string Socket::get_addr() const {
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    socklen_t len = sizeof(addr);
+    if (getpeername(fd_, (struct sockaddr*)&addr, &len) == -1) {
+        return "";
+    }
+    std::string ret(inet_ntoa(addr.sin_addr));
+    ret += ":";
+    ret += std::to_string(htons(addr.sin_port));
+    return ret;
+}

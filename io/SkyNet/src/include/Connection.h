@@ -2,13 +2,16 @@
 
 #include <memory>
 
+#include "Buffer.h"
+#include "Channel.h"
 #include "Common.h"
+#include "Socket.h"
 
 class Connection {
    public:
     enum class State { Invalid = 1, Connecting, Connected, Closed };
 
-    Connection(int fd, Socket* s);
+    Connection(int fd, EventLoop* loop);
     ~Connection();
 
     DISALLOW_COPY_AND_MOVE(Connection);
@@ -18,11 +21,10 @@ class Connection {
     RC Send(std::string const& msg);
     void Close();
 
-    void set_delete_connection(ConnectionCallback&& cb) { delete_connection_callback_ = cb; }
-    void set_on_connect(ConnectionMessageCallback&& cb);
+    void set_delete_connection(ConnectionCallback&& cb) { delete_connection_ = std::move(cb); }
     void set_on_recv(ConnectionMessageCallback const& cb);
 
-    Socket* GetSocket() const { return s_; }
+    Socket* socket() const { return socket_.get(); }
     State GetState() const { return state_; }
     bool IsClosed() const { return state_ == State::Closed; }
 
@@ -42,7 +44,7 @@ class Connection {
 
    private:
     std::unique_ptr<Socket> socket_{};
-    std::unique_ptr<Channel> ch_{};
+    std::unique_ptr<Channel> channel_{};
     State state_{State::Invalid};
 
     std::unique_ptr<Buffer> send_buf_{};

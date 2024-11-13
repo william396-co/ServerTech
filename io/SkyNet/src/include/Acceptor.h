@@ -6,7 +6,7 @@
 
 class Acceptor {
    public:
-    explicit Acceptor(char* port);
+    Acceptor(EventLoop* loop, const char* port);
     ~Acceptor();
 
     DISALLOW_COPY_AND_MOVE(Acceptor);
@@ -15,7 +15,7 @@ class Acceptor {
     void set_new_connection_callback(ConnectionCallback&& cb) { new_connection_callback_ = std::move(cb); }
 
    private:
-    std::unique_ptr<Socket> listenSocket_{};
-    std::unique_ptr<Channel> acceptChannel_{};
+    std::unique_ptr<Socket> socket_{};
+    std::unique_ptr<Channel> channel_{};
     ConnectionCallback new_connection_callback_{};
 };
