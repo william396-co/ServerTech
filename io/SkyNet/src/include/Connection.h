@@ -45,6 +45,7 @@ class Connection {
 
     void OnConnect(OnConnectFunction fn);
     void OnMessage(OnMessageFunction fn);
+    bool IsClosed() const { return state_ == State::Closed; }
 
    private:
     void ReadNonBlocking();

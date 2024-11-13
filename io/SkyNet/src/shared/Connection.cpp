@@ -115,12 +115,10 @@ void Connection::ReadNonBlocking() {
         } else if (read_bytes == 0) {  // EOF, client disconnect
             printf("read EOF, client fd:%d disconnected\n", fd);
             state_ = State::Closed;
-            Close();
             break;
         } else {
             printf("Other error on client fd:%d\n", fd);
             state_ = State::Closed;
-            Close();
             break;
         }
     }
@@ -151,12 +149,7 @@ void Connection::WriteNonBlocking() {
     }
 }
 
-void Connection::SetOnConnectCallback(ConnectionMessageCallback const& cb) {
-    on_connect_callback_ = cb;
-    /* if (ch_) {
-         ch_->SetReadCallback([this]() {  connectCallback_(this); });
-     }*/
-}
+void Connection::SetOnConnectCallback(ConnectionMessageCallback const& cb) { on_connect_callback_ = cb; }
 
 void Connection::SetOnMessageCallback(ConnectionMessageCallback const& cb) {
     on_message_callback_ = cb;

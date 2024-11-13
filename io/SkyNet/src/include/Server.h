@@ -8,8 +8,6 @@
 #include "Macros.h"
 #include "Types.h"
 
-#define USE_THREADPOOL
-
 class EventLoop;
 class Acceptor;
 class Socket;
