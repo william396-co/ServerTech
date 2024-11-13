@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 
@@ -10,87 +11,94 @@
 #include "EventLoop.h"
 #include "Socket.h"
 
-Connection::Connection(EventLoop* loop, Socket* s) : loop_{loop}, s_{s} {
+Connection::Connection(int fd, EventLoop* loop) {
+    socket_ = std::make_unique<Socket>();
+    socket_->set_fd(fd);
     if (loop_) {
-        ch_ = new Channel(loop_, s);
-        ch_->UseET();
+        socket_->SetNonBlocking();  // server connection socket use blocking mode
+        ch_ = std::make_unique<Channel>(fd,(loop );
+        ch_->EnableET();
         ch_->EnableRead();
     }
 
-    readBuffer_ = new Buffer();
-    writeBuffer_ = new Buffer();
+    recv_buf_ = std::make_unique<Buffer>();
+    send_buf_ = std::make_unique<Buffer>();
     state_ = State::Connected;
 }
 
-Connection::~Connection() {
-    if (loop_) {
-        delete ch_;
-    }
-    delete s_;
-
-    delete readBuffer_;
-    delete writeBuffer_;
-}
+Connection::~Connection() {}
 
 void Connection::Close() {
     if (delete_connection_callback_) {
-        delete_connection_callback_(s_);
+        delete_connection_callback_(socket_);
     }
 }
 
-void Connection::Send(std::string const& msg) {
-    SetSendBuffer(msg.c_str());
-    Write();
-}
 void Connection::Business() {
     Read();
     on_message_callback_(this);
 }
 
-void Connection::Read() {
-    ASSERT(state_ == State::Connected, "Connection state is disconnected!");
+RC Connection::Recv() {
+    if (state_ != State::Connected) {
+        perror("Connection is not connected, cant not recv!");
+        return RC_CONNECTION_ERROR;
+    }
+    assert(state_ == State::Connected && "Connection state is disconnected!");
 
-    readBuffer_->Clear();
-    if (s_->IsNonBlocking()) {
-        ReadNonBlocking();
+    recv_buf_->Clear();
+    if (socket_->IsNonBlocking()) {
+        return ReadNonBlocking();
     } else {
-        ReadBlocking();
+        return ReadBlocking();
     }
 }
 
-void Connection::Write() {
-    ASSERT(state_ == State::Connected, "connecion state is disconnected!");
-    if (s_->IsNonBlocking())
-        WriteNonBlocking();
-    else {
-        WriteBlocking();
+RC Connection::Send(std::string const& msg) {
+    set_send_buf(msg.c_str());
+    Send();
+    return RC_SUCCESS;
+}
+
+RC Connection::Send() {
+    if (state_ != State::Connected) {
+        perror("Connection is no connected, can not read");
+        return RC_CONNECTION_ERROR;
     }
-    writeBuffer_->Clear();
+    RC rc = RC_UNDEFINED;
+    if (socket_->IsNonBlocking())
+        rc = WriteNonBlocking();
+    else {
+        rc = WriteBlocking();
+    }
+    send_buf_->Clear();
+    return rc;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-void Connection::WriteBlocking() {
-    int fd = s_->GetFd();
-    ssize_t bytes_write = write(fd, writeBuffer_->ToStr(), writeBuffer_->Size());
-    if (bytes_write == -1) {
+RC Connection::WriteBlocking() {
+    int fd = socket_->fd();
+    ssize_t bytesocket_write = write(fd, writeBuffer_->ToStr(), writeBuffer_->Size());
+    if (bytesocket_write == -1) {
         printf("Other error on blocking client fd:%d\n", fd);
         state_ = State::Closed;
     }
+    return RC_SUCCESS;
 }
 
-void Connection::ReadBlocking() {
-    int fd = s_->GetFd();
+RC Connection::ReadBlocking() {
+    int fd = socket_->fd();
     unsigned int rcv_size = 0;
     socklen_t len = sizeof(rcv_size);
     getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &rcv_size, &len);
     char buf[rcv_size];
-    ssize_t bytes_read = read(fd, buf, sizeof(buf));
-    if (bytes_read > 0) {
-        readBuffer_->Append(buf, bytes_read);
-    } else if (bytes_read == 0) {
+    ssize_t bytesocket_read = read(fd, buf, sizeof(buf));
+    if (bytesocket_read > 0) {
+        readBuffer_->Append(buf, bytesocket_read);
+    } else if (bytesocket_read == 0) {
         printf("read EOF, blocking client fd:%d disconnected\n", fd);
         state_ = State::Closed;
-    } else if (bytes_read == -1) {
+    } else if (bytesocket_read == -1) {
         printf("Other error on blocking client fd:%d\n", fd);
         state_ = State::Closed;
     }
@@ -98,7 +106,7 @@ void Connection::ReadBlocking() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void Connection::ReadNonBlocking() {
-    int fd = s_->GetFd();
+    int fd = socket_->GetFd();
 
     char buf[1024];
     while (true) {  // because use io nonblocking,reading buf until is finished
@@ -125,27 +133,27 @@ void Connection::ReadNonBlocking() {
 }
 
 void Connection::WriteNonBlocking() {
-    int fd = s_->GetFd();
+    int fd = socket_->GetFd();
     char buf[writeBuffer_->Size()];
     memcpy(buf, writeBuffer_->ToStr(), writeBuffer_->Size());
 
     int data_size = writeBuffer_->Size();
     int data_left = data_size;
     while (data_left > 0) {
-        ssize_t bytes_write = write(fd, buf + data_size - data_left, data_left);
-        if (bytes_write == -1 && errno == EINTR) {
+        ssize_t bytesocket_write = write(fd, buf + data_size - data_left, data_left);
+        if (bytesocket_write == -1 && errno == EINTR) {
             printf("continue writing\n");
             continue;
         }
-        if (bytes_write == -1 && errno == EAGAIN) {
+        if (bytesocket_write == -1 && errno == EAGAIN) {
             break;
         }
-        if (bytes_write == -1) {
+        if (bytesocket_write == -1) {
             printf("Other error on client fd:%d\n", fd);
             state_ = State::Closed;
             break;
         }
-        data_left -= bytes_write;
+        data_left -= bytesocket_write;
     }
 }
 

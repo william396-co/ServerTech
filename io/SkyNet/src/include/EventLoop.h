@@ -1,11 +1,9 @@
 #pragma once
-#include <functional>
 
-#include "Macros.h"
+#include <memory>
 
-class Poller;
-class Channel;
-class ThreadPool;
+#include "Common.h"
+
 class EventLoop {
    public:
     EventLoop();
@@ -19,6 +17,6 @@ class EventLoop {
     void Quit() { quit_ = true; }
 
    private:
-    Poller* poller_{};
+    std::unique_ptr<Poller> poller_{};
     bool quit_{};
 };

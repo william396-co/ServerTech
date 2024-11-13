@@ -1,70 +1,53 @@
 #pragma once
 
-#include <functional>
-#include <string>
+#include <memory>
 
-#include "Macros.h"
-#include "Types.h"
-
-class EventLoop;
-class Socket;
-class Channel;
-class Buffer;
-class Connection;
+#include "Common.h"
 
 class Connection {
    public:
-    enum class State { Invalid = 1, Handshaking, Connected, Closed, Failed };
+    enum class State { Invalid = 1, Connecting, Connected, Closed };
 
-    Connection(EventLoop* loop, Socket* s);
+    Connection(int fd, Socket* s);
     ~Connection();
 
     DISALLOW_COPY_AND_MOVE(Connection);
 
-    void Read();
-    void Write();
-    void Send(std::string const& msg);
-    void Business();
-
-    void SetDeleteConnectionCallback(ConnectionCallback const& cb) { delete_connection_callback_ = cb; }
-    void SetOnConnectCallback(ConnectionMessageCallback const& cb);
-    void SetOnMessageCallback(ConnectionMessageCallback const& cb);
+    RC Recv();
+    RC Send();
+    RC Send(std::string const& msg);
     void Close();
+
+    void set_delete_connection(ConnectionCallback&& cb) { delete_connection_callback_ = cb; }
+    void set_on_connect(ConnectionMessageCallback&& cb);
+    void set_on_recv(ConnectionMessageCallback const& cb);
 
     Socket* GetSocket() const { return s_; }
     State GetState() const { return state_; }
-
-    void SetSendBuffer(const char* str);
-
-    Buffer* GetReadBuffer() const;
-    const char* ReadBuffer() const;
-    Buffer* GetSendBuffer() const;
-
-    const char* SendBuffer() const;
-    void GetlineSendBuffer();
-
-    void OnConnect(OnConnectFunction fn);
-    void OnMessage(OnMessageFunction fn);
     bool IsClosed() const { return state_ == State::Closed; }
 
-   private:
-    void ReadNonBlocking();
-    void WriteNonBlocking();
+    void set_send_buf(const char* str);
+    Buffer* recv_buf() const;
+    Buffer* send_buf() const;
 
-    void ReadBlocking();
-    void WriteBlocking();
+    void onConnect(OnConnectFunction fn);
+    void onMessage(OnMessageFunction fn);
 
    private:
-    EventLoop* loop_{};
-    Socket* s_{};
-    Channel* ch_{};
+    void Business();
+    RC ReadNonBlocking();
+    RC WriteNonBlocking();
+    RC ReadBlocking();
+    RC WriteBlocking();
+
+   private:
+    std::unique_ptr<Socket> socket_{};
+    std::unique_ptr<Channel> ch_{};
     State state_{State::Invalid};
 
-    ConnectionCallback delete_connection_callback_{};
+    std::unique_ptr<Buffer> send_buf_{};
+    std::unique_ptr<Buffer> recv_buf_{};
 
-    ConnectionMessageCallback on_connect_callback_{};
-    ConnectionMessageCallback on_message_callback_{};
-
-    Buffer* writeBuffer_{};
-    Buffer* readBuffer_{};
+    ConnectionCallback delete_connection_{};
+    ConnectionMessageCallback on_recv_{};
 };

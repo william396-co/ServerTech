@@ -5,15 +5,12 @@
 #include "Channel.h"
 #include "Poller.h"
 
-EventLoop::EventLoop() { poller_ = new Poller(); }
+EventLoop::EventLoop() { poller_ = std::make_unique<Poller>(); }
 
-EventLoop::~EventLoop() {
-    Quit();
-    delete poller_;
-}
+EventLoop::~EventLoop() {}
 
 void EventLoop::Loop() {
-    while (!quit_) {
+    while (true) {
         std::vector<Channel*> chs = poller_->Poll();
         for (auto& it : chs) {
             it->HandleEvent();

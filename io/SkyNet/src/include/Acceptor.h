@@ -1,26 +1,21 @@
 #pragma once
 #include <functional>
+#include <memory>
 
-#include "Macros.h"
-#include "Types.h"
-
-class EventLoop;
-class Channel;
-class Socket;
+#include "Common.h"
 
 class Acceptor {
    public:
-    Acceptor(EventLoop* loop_, char* port);
+    explicit Acceptor(char* port);
     ~Acceptor();
 
     DISALLOW_COPY_AND_MOVE(Acceptor);
 
-    void AcceptConnection();
-    void SetNewConnectionCallback(ConnectionCallback const& cb) { new_connection_callback_ = cb; }
+    RC AcceptConnection() const;
+    void set_new_connection_callback(ConnectionCallback&& cb) { new_connection_callback_ = std::move(cb); }
 
    private:
-    EventLoop* loop_{};
-    Socket* listenSocket_{};
-    Channel* acceptChannel_{};
+    std::unique_ptr<Socket> listenSocket_{};
+    std::unique_ptr<Channel> acceptChannel_{};
     ConnectionCallback new_connection_callback_{};
 };
