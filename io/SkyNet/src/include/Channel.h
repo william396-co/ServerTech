@@ -2,14 +2,11 @@
 #include <cstdint>
 #include <functional>
 
-#include "Macros.h"
-#include "Types.h"
+#include "Common.h"
 
-class Socket;
-class EventLoop;
 class Channel {
    public:
-    Channel(EventLoop* loop, Socket* s);
+    Channel(int fd, EventLoop* loop);
     ~Channel();
 
     enum {
@@ -24,26 +21,22 @@ class Channel {
     void EnableRead();
     void EnableWrite();
 
-    Socket* GetSocket() const { return s_; }
+    int fd() const { return fd_; }
+    short ready_events() const { return ready_events_; }
+    short listen_events() const { return listen_events_; }
+    bool exist() const { return exist_; }
+    void set_exist(bool in = true) { exist_ = in; }
+    void EnableET();
 
-    int GetReadyEvents() const { return ready_events_; }
-    int GetListenEvents() const { return listen_events_; }
-
-    bool GetExist() const { return exist_; }
-    void SetExist(bool in = true) { exist_ = in; }
-
-    void UseET();
-
-    void SetReadyEvents(int events);
-
-    void SetReadCallback(ReadCallback const& cb) { read_callback_ = cb; }
-    void SetWriteCallback(WriteCallback const& cb) { write_callback_ = cb; }
+    void set_ready_event(short events);
+    void set_read_callback(ReadCallback&& cb) { read_callback_ = std::move(cb); }
+    void set_write_callback(WriteCallback&& cb) { write_callback_ = std::move(cb); }
 
    private:
     EventLoop* loop_{};
-    Socket* s_{};
-    int listen_events_{};
-    int ready_events_{};
+    int fd_{};
+    short listen_events_{};
+    short ready_events_{};
     bool exist_{};
     ReadCallback read_callback_{};
     WriteCallback write_callback_{};

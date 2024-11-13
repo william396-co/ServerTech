@@ -1,37 +1,33 @@
 #include "Acceptor.h"
 
-#include <iostream>
+#include <cassert>
 
 #include "Channel.h"
 #include "EventLoop.h"
 #include "Socket.h"
 
-Acceptor::Acceptor(EventLoop* loop, char* port) : loop_{loop} {
-    listenSocket_ = new Socket();
-    listenSocket_->Listen(port);
-    // listenSocket_->Setnonblocking(); acceptor use blocking is better
+Acceptor::Acceptor(EventLoop* loop, char* port) {
+    listenSocket_ = std::make_unique<Socket>();
+    assert(listenSocket_->Listen(port) == RC_SUCCESS);
 
-    acceptChannel_ = new Channel(loop, listenSocket_);
+    acceptChannel_ = std::make_unique<Channel>(listenSocket_->fd(), loop);
+
     ReadCallback cb = std::bind(&Acceptor::AcceptConnection, this);
-    acceptChannel_->SetReadCallback(cb);
+    acceptChannel_->set_read_callback(cb);
+
     acceptChannel_->EnableRead();
 }
 
-Acceptor::~Acceptor() {
-    delete listenSocket_;
-    delete acceptChannel_;
-}
+Acceptor::~Acceptor() {}
 
-void Acceptor::AcceptConnection() {
-    // Accept new Socket
-    sockaddr_in addr{};
-    Socket* clientSocket = new Socket(listenSocket_->Accept(addr));
-    clientSocket->SetRemote(addr);
-    std::cout << "new client fd:" << clientSocket->GetFd() << " Ip:" << clientSocket->RemoteIp()
-              << " Port:" << clientSocket->RemotePort() << "\n";
-    clientSocket->SetNonBlocking();
+RC Acceptor::AcceptConnection() const {
+    int fd = -1;
+    if (listenSocket_->Accept(fd) != RC_SUCCESS) {
+        return RC_ACCEPTOR_ERROR;
+    }
 
     if (new_connection_callback_) {
         new_connection_callback_(clientSocket);
     }
+    return RC_SUCCESS;
 }

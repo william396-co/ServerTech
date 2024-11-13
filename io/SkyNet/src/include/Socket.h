@@ -8,32 +8,33 @@
 
 class Socket {
    public:
-    explicit Socket(int fd);
     Socket();
     ~Socket();
 
     DISALLOW_COPY_AND_MOVE(Socket);
 
 #ifndef WIN32
-    int GetFd() const { return fd_; }
+    int fd() const { return fd_; }
+    void set_fd(int fd) { fd_ = fd; }
 #else
     SOCKET GetFd() const { return fd_; }
 #endif
-    void SetNonBlocking();
+    RC SetNonBlocking();
     bool IsNonBlocking() const;
+    size_t RecvBufSize() const;
 
    public:
     ////////////////////////////////////////////////
     // Only Client Use
     // //////////////////////////////////////////////
-    bool Connect(const char* ip, const char* port);
+    RC Connect(const char* ip, const char* port);
 
    public:
     //////////////////////////////////////////////////
     // Only Server Use
     //////////////////////////////////////////////////
-    bool Listen(const char* port);
-    int Accept(sockaddr_in& addr);
+    RC Listen(const char* port);
+    RC Accept(sockaddr_in& addr);
 
     /* remote address ip port */
     const char* RemoteIp() const { return inet_ntoa(r_addr_.sin_addr); }

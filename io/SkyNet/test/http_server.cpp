@@ -19,6 +19,10 @@ int main(int argc, char** argv) {
     });
 
     server->OnMessage([](Connection* conn) {
+        if (conn->IsClosed()) {
+            conn->Close();
+            return;
+        }
         std::cout << "Message from client[" << conn->GetSocket()->GetFd() << "] :" << conn->ReadBuffer() << "\n ";
         if (conn->GetState() == Connection::State::Connected) {
             conn->Send(conn->ReadBuffer());

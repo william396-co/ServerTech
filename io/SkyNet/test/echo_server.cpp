@@ -12,8 +12,8 @@ int main(int argc, char** argv) {
     Server* server = new Server(loop, argv[1]);
 
     Signal::signal(SIGINT, [&] {
-        delete server;
         delete loop;
+        delete server;
         std::cout << "\nServer exit!\n";
         exit(0);
     });
@@ -22,6 +22,11 @@ int main(int argc, char** argv) {
         [](Connection* conn) { std::cout << "New Connection fd:" << conn->GetSocket()->GetFd() << "\n"; });
 
     server->OnMessage([](Connection* conn) {
+        if (conn->IsClosed()) {
+            conn->Close();
+            return;
+        }
+
         std::cout << "Message from client[" << conn->GetSocket()->GetFd() << "] :" << conn->ReadBuffer() << "\n ";
         if (conn->GetState() == Connection::State::Connected) {
             conn->Send(conn->ReadBuffer());

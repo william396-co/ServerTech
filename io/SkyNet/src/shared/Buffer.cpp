@@ -10,12 +10,7 @@ void Buffer::Append(const char* str, size_t sz) {
     }
 }
 
-void Buffer::Getline() {
-    buf_.clear();
-    std::getline(std::cin, buf_);
-}
-
-void Buffer::SetBuf(const char* buf) {
+void Buffer::set_buf(const char* buf) {
     buf_.clear();
     buf_.append(buf);
 }

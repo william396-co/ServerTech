@@ -24,6 +24,10 @@ int main(int argc, char** argv) {
     });
 
     server->OnMessage([&](Connection* conn) {
+        if (conn->IsClosed()) {
+            conn->Close();
+            return;
+        }
         std::cout << "Message from client:" << conn->ReadBuffer() << "\n";
 
         for (auto& it : clients) {
