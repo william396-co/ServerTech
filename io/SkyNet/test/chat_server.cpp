@@ -11,11 +11,10 @@ int main(int argc, char** argv) {
 
     std::map<int, Connection*> clients;
 
-    EventLoop* loop = new EventLoop();
-    Server* server = new Server(loop, argv[1]);
+    TcpServer* server = new TcpServer(argv[1]);
 
-    server->NewConnect([&](Connection* conn) {
-        int fd = conn->GetSocket()->GetFd();
+    server->onConnect([&](Connection* conn) {
+        int fd = conn->socket()->fd();
         std::cout << "New Connection fd:" << fd << "\n";
         clients[fd] = conn;
         for (auto& it : clients) {
@@ -23,7 +22,7 @@ int main(int argc, char** argv) {
         }
     });
 
-    server->OnMessage([&](Connection* conn) {
+    server->onRecv([&](Connection* conn) {
         if (conn->IsClosed()) {
             conn->Close();
             return;
@@ -34,8 +33,6 @@ int main(int argc, char** argv) {
             it.second->Send(conn->ReadBuffer());
         }
     });
-
-    loop->Loop();
 
     return 0;
 }

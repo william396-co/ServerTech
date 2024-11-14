@@ -2,6 +2,7 @@
 
 #include <functional>
 
+class Acceptor;
 class TcpServer;
 class EventLoop;
 class Poller;

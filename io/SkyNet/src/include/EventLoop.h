@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Common.h"
+#include "Poller.h"
 
 class EventLoop {
    public:
@@ -11,12 +12,10 @@ class EventLoop {
 
     DISALLOW_COPY_AND_MOVE(EventLoop);
 
-    void Loop();
-    void UpdateChannel(Channel* ch);
-    void DeleteChannel(Channel* ch);
-    void Quit() { quit_ = true; }
+    void Loop() const;
+    void UpdateChannel(Channel* ch) const;
+    void DeleteChannel(Channel* ch) const;
 
    private:
     std::unique_ptr<Poller> poller_{};
-    bool quit_{};
 };

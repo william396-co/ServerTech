@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Macros.h"
+#include "Common.h"
 
 #ifdef OS_LINUX
 #include <arpa/inet.h>
@@ -22,6 +22,7 @@ class Socket {
     RC SetNonBlocking();
     bool IsNonBlocking() const;
     size_t RecvBufSize() const;
+    std::string get_addr() const;
 
    public:
     ////////////////////////////////////////////////
@@ -34,12 +35,7 @@ class Socket {
     // Only Server Use
     //////////////////////////////////////////////////
     RC Listen(const char* port);
-    RC Accept(sockaddr_in& addr);
-
-    /* remote address ip port */
-    const char* RemoteIp() const { return inet_ntoa(r_addr_.sin_addr); }
-    uint16_t RemotePort() const { return ntohs(r_addr_.sin_port); }
-    void SetRemote(sockaddr_in& addr) { r_addr_ = addr; }
+    RC Accept(int& client_fd);
 
    private:
 #ifdef WIN32
@@ -47,6 +43,4 @@ class Socket {
 #else
     int fd_;
 #endif
-    // remote address(for server record client address info)
-    sockaddr_in r_addr_;
 };

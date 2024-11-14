@@ -27,34 +27,34 @@ Poller::~Poller() {
     delete[] events_;
 }
 
-void Poller::UpdateChannel(Channel* ch) {
-    int fd = ch->GetSocket()->GetFd();
+void Poller::UpdateChannel(Channel* ch) const {
+    int fd = ch->fd();
     struct epoll_event ev {};
     ev.data.ptr = ch;
-    if (ch->GetListenEvents() & Channel::READ_EVENT) {
+    if (ch->listen_events() & Channel::READ_EVENT) {
         ev.events |= EPOLLIN | EPOLLPRI;
     }
-    if (ch->GetListenEvents() & Channel::WRITE_EVENT) {
+    if (ch->listen_events() & Channel::WRITE_EVENT) {
         ev.events |= EPOLLOUT;
     }
-    if (ch->GetListenEvents() & Channel::ET) {
+    if (ch->listen_events() & Channel::ET) {
         ev.events |= EPOLLET;
     }
-    if (!ch->GetExist()) {
+    if (!ch->exist()) {
         ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &ev) == -1, "epoll add error");
-        ch->SetExist(true);
+        ch->set_exist(true);
     } else {
         ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &ev) == -1, "epoll modify error");
     }
 }
 
-void Poller::DeleteChannel(Channel* ch) {
-    int fd = ch->GetSocket()->GetFd();
+void Poller::DeleteChannel(Channel* ch) const {
+    int fd = ch->fd();
     ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, NULL) == -1, "epoll delete error");
-    ch->SetExist(false);
+    ch->set_exist(false);
 }
 
-std::vector<Channel*> Poller::Poll(int timeout) {
+std::vector<Channel*> Poller::Poll(int timeout) const {
     int nfds = epoll_wait(epfd_, events_, MAX_EVENTS, timeout);
     ErrorIf(nfds == -1, "epoll wait error");
     std::vector<Channel*> res(nfds);
@@ -62,13 +62,13 @@ std::vector<Channel*> Poller::Poll(int timeout) {
         Channel* ch = static_cast<Channel*>(events_[i].data.ptr);
         int events = events_[i].events;
         if (events & EPOLLIN) {
-            ch->SetReadyEvents(Channel::READ_EVENT);
+            ch->set_ready_event(Channel::READ_EVENT);
         }
         if (events & EPOLLOUT) {
-            ch->SetReadyEvents(Channel::WRITE_EVENT);
+            ch->set_ready_event(Channel::WRITE_EVENT);
         }
         if (events & EPOLLET) {
-            ch->SetReadyEvents(Channel::ET);
+            ch->set_ready_event(Channel::ET);
         }
         res[i] = ch;
     }
@@ -92,40 +92,40 @@ Poller::~Poller() {
     delete[] events_;
 }
 
-void Poller::UpdateChannel(Channel* ch) {
+void Poller::UpdateChannel(Channel* ch) const {
     struct kevent ev[2];
     memset(ev, 0, sizoef(*ev) * 2);
-    int fd = ch->GetSocket()->GetFd();
+    int fd = ch->fd();
     int op = EV_ADD;
     int n = 0;
-    if (ch->GetListenEvents() & ET) {
+    if (ch->listen_events() & ET) {
         op |= EV_CLEAR;
     }
-    if (ch->GetListenEvents() & Channel::READ_EVENT) {
+    if (ch->listen_events() & Channel::READ_EVENT) {
         EV_SET(&ev[n++], fd, EVFILT_READ, op, 0, 0, ch);
     }
-    if (ch->GetListenEvents() & Channel::WRITE_EVENT) {
+    if (ch->listen_events() & Channel::WRITE_EVENT) {
         EV_SET(&ev[n++], fd, EVFILT_WRITE, op, 0, 0, ch);
     }
     int r = kevent(fd_, ev, n, NULL, 0, NULL);
     ErrorIf(r == -1, "kqueue add event error");
 }
 
-void Poller::DeleteChannel(Channel* ch) {
+void Poller::DeleteChannel(Channel* ch) const {
     struct kevent ev[2];
     int n = 0;
-    int fd = ch->GetSocket()->GetFd();
-    if (ch->GetListenEvents() & Channel::READ_EVENT) {
+    int fd = ch->fd();
+    if (ch->listen_events() & Channel::READ_EVENT) {
         EV_SET(&ev[n++], fd, EVFILT_READ, EV_DELETE, 0, 0, ch);
     }
-    if (ch->GetListenEvents() & Channel::WRITE_EVENT) {
+    if (ch->listen_events() & Channel::WRITE_EVENT) {
         EV_SET(&ev[n++], fd, EVFILT_WRITE, EV_DELETE, 0, 0, ch);
     }
     int r = kevent(fd_, ev, NULL, 0，NULL);
     ErrorIf(r == -1, "kqueue delete event error");
 }
 
-std::vector<Channel*> Poller::Poll(int timeout) {
+std::vector<Channel*> Poller::Poll(int timeout) const {
     struct timespec ts;
     memset(&ts, 0, sizeof(ts));
     if (timeout != -1) {
@@ -145,10 +145,10 @@ std::vector<Channel*> Poller::Poll(int timeout) {
         Channel* ch = (Channel*)events_[i].udata;
         int events = events_[i].filter;
         if (events == EVFILT_READ) {
-            ch->SetReadyEvents(Channel::READ_EVENT | Channel::ET);
+            ch->set_ready_event(Channel::READ_EVENT | Channel::ET);
         }
         if (events == EVFILT_WRITE) {
-            ch->SetReadyEvents(Channel::WRITE_EVENT | Channel::ET);
+            ch->set_ready_event(Channel::WRITE_EVENT | Channel::ET);
         }
         res[i] = ch;
     }

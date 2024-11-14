@@ -12,10 +12,10 @@ int main(int argc, char** argv) {
     Socket* s = new Socket();
     s->Connect(argv[1], argv[2]);
 
-    Connection* conn = new Connection(nullptr, s);
+    Connection* conn = new Connection(s->fd(), nullptr);
     while (true) {
-        conn->Read();
-        std::cout << "Message from server:" << conn->ReadBuffer() << "\n";
+        conn->Recv();
+        std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
     }
 
     delete conn;

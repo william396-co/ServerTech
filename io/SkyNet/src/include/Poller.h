@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Macros.h"
+#include "Common.h"
 
 #ifdef OS_LINUX
 #include <sys/epoll.h>
@@ -12,7 +12,6 @@
 #include <sys/event.h>
 #endif
 
-class Channel;
 class Poller {
    public:
     Poller();
@@ -20,12 +19,10 @@ class Poller {
 
     DISALLOW_COPY_AND_MOVE(Poller);
 
-    int GetFd() const { return epfd_; }
+    void UpdateChannel(Channel* ch) const;
+    void DeleteChannel(Channel* ch) const;
 
-    void UpdateChannel(Channel* ch);
-    void DeleteChannel(Channel* ch);
-
-    std::vector<Channel*> Poll(int timeout = -1);
+    std::vector<Channel*> Poll(int timeout = -1) const;
 
    private:
     int epfd_{};

@@ -3,11 +3,9 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <string>
 
-#include "Buffer.h"
-#include "Connection.h"
-#include "Socket.h"
-#include "Util.h"
+#include "SkyNet.h"
 
 int main(int argc, char** argv) {
     if (argc != 3) {
@@ -17,18 +15,19 @@ int main(int argc, char** argv) {
 
     std::unique_ptr<Socket> clientSocket = std::make_unique<Socket>();
     clientSocket->Connect(argv[1], argv[2]);
-    ErrorIf(clientSocket->GetFd() == -1, "socket Conect error");
+    ErrorIf(clientSocket->fd() == -1, "socket Conect error");
 
-    std::unique_ptr<Connection> conn = std::make_unique<Connection>(nullptr, clientSocket.get());
+    std::unique_ptr<Connection> conn = std::make_unique<Connection>(clientSocket->fd(), nullptr);
     while (true) {
-        conn->GetlineSendBuffer();
-        conn->Write();
         if (conn->GetState() == Connection::State::Closed) {
             conn->Close();
             break;
         }
-        conn->Read();
-        std::cout << "Message from server:" << conn->ReadBuffer() << "\n";
+        std::string input;
+        std::getline(std::cin, input);
+        conn->Send(input.c_str());
+        conn->Recv();
+        std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
     }
 
     return 0;
