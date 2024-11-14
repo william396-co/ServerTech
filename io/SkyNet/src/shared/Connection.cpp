@@ -163,7 +163,7 @@ RC Connection::WriteNonBlocking() {
 void Connection::set_on_recv(ConnectionMessageCallback const& cb) {
     on_recv_ = std::move(cb);
     ReadCallback bus = std::bind(&Connection::Business, this);
-    channel_->set_read_callback(std::move(bus));
+    channel_->set_read_callback(bus);
 }
 
 void Connection::set_send_buf(const char* str) { send_buf_->set_buf(str); }

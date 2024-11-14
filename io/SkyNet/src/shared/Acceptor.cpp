@@ -13,7 +13,7 @@ Acceptor::Acceptor(EventLoop* loop, const char* port) {
     channel_ = std::make_unique<Channel>(socket_->fd(), loop);
     ReadCallback cb = std::bind(&Acceptor::AcceptConnection, this);
 
-    channel_->set_read_callback(std::move(cb));
+    channel_->set_read_callback(cb);
     channel_->EnableRead();
 }
 

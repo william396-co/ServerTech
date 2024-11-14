@@ -12,7 +12,7 @@ class Acceptor {
     DISALLOW_COPY_AND_MOVE(Acceptor);
 
     RC AcceptConnection() const;
-    void set_new_connection_callback(ConnectionCallback&& cb) { new_connection_callback_ = std::move(cb); }
+    void set_new_connection_callback(ConnectionCallback const& cb) { new_connection_callback_ = std::move(cb); }
 
    private:
     std::unique_ptr<Socket> socket_{};

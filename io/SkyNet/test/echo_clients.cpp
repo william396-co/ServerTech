@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #include "Buffer.h"
 #include "Connection.h"
@@ -23,6 +24,7 @@ void oneClient(int msgs, int wait) {
 
     std::unique_ptr<Connection> conn = std::make_unique<Connection>(std::move(clientSocket));
 
+    std::this_thread::sleep_for(std::chrono::milliseconds{1});
     int count{};
 
     while (count < msgs) {

@@ -66,8 +66,8 @@ RC TcpServer::NewConnection(int fd) {
     std::unique_ptr<Connection> conn = std::make_unique<Connection>(fd, sub_reactors_[rand].get());
     ConnectionCallback cb = std::bind(&TcpServer::DeleteConnection, this, std::placeholders::_1);
 
-    conn->set_delete_connection(std::move(cb));
-    conn->set_on_recv(std::move(on_recv_));
+    conn->set_delete_connection(cb);
+    conn->set_on_recv(on_recv_);
     connections_[fd] = std::move(conn);
     if (on_connect_) {
         on_connect_(connections_[fd].get());

@@ -16,7 +16,7 @@ class Channel {
 
     DISALLOW_COPY_AND_MOVE(Channel);
 
-    void HandleEvent();
+    void HandleEvent() const;
     void EnableRead();
     void EnableWrite();
 
@@ -28,8 +28,8 @@ class Channel {
     void EnableET();
 
     void set_ready_event(short events);
-    void set_read_callback(ReadCallback&& cb) { read_callback_ = std::move(cb); }
-    void set_write_callback(WriteCallback&& cb) { write_callback_ = std::move(cb); }
+    void set_read_callback(ReadCallback const& cb) { read_callback_ = std::move(cb); }
+    void set_write_callback(WriteCallback const& cb) { write_callback_ = std::move(cb); }
 
    private:
     EventLoop* loop_{};

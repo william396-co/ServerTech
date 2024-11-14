@@ -26,8 +26,8 @@ class TcpServer {
     RC NewConnection(int fd);
     RC DeleteConnection(int fd);
 
-    void onConnect(ConnectionMessageCallback&& fn) { on_connect_ = std::move(fn); }
-    void onRecv(ConnectionMessageCallback&& fn) { on_recv_ = std::move(fn); }
+    void onConnect(ConnectionMessageCallback const& fn) { on_connect_ = std::move(fn); }
+    void onRecv(ConnectionMessageCallback const& fn) { on_recv_ = std::move(fn); }
 
    private:
     std::unique_ptr<EventLoop> main_reactor_{};

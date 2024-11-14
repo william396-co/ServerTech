@@ -7,7 +7,7 @@ Channel::Channel(int fd, EventLoop* loop) : loop_{loop}, fd_{fd} {}
 
 Channel::~Channel() { loop_->DeleteChannel(this); }
 
-void Channel::HandleEvent() {
+void Channel::HandleEvent() const {
     if (ready_events_ & READ_EVENT) {
         read_callback_();
     }
