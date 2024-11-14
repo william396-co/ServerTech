@@ -12,6 +12,7 @@ class Connection {
     enum class State { Invalid = 1, Connecting, Connected, Closed };
 
     Connection(int fd, EventLoop* loop);
+    explicit Connection(std::unique_ptr<Socket> socket);
     ~Connection();
 
     DISALLOW_COPY_AND_MOVE(Connection);

@@ -10,13 +10,18 @@ int main(int argc, char** argv) {
 
     TcpServer* server = new TcpServer(argv[1]);
 
-    Signal::signal(SIGINT, [&] {
+    auto doQuit = [&]() {
         delete server;
-        std::cout << "\nTcpServer exit!\n";
+        std::cout << "\nServer exit!\n";
         exit(0);
-    });
+    };
 
-    server->onConnect([](Connection* conn) { std::cout << "New Connection fd:" << conn->socket()->fd() << "\n"; });
+    Signal::signal(SIGINT, [&] { doQuit(); });
+
+    server->onConnect([](Connection* conn) {
+        std::cout << "New Connection fd:" << conn->socket()->fd() << " ip:port:[" << conn->socket()->get_addr()
+                  << "]\n";
+    });
 
     server->onRecv([](Connection* conn) {
         if (conn->IsClosed()) {
@@ -31,6 +36,5 @@ int main(int argc, char** argv) {
     });
 
     server->Start();
-
-    return 0;
+    doQuit();
 }

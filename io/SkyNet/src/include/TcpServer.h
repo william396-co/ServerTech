@@ -7,6 +7,9 @@
 #include <vector>
 
 #include "Common.h"
+#ifdef USE_THREADPOOL
+#include "ThreadPool.h"
+#endif
 
 class TcpServer {
     using ConnectionMap = std::unordered_map<int, std::unique_ptr<Connection>>;
@@ -33,7 +36,7 @@ class TcpServer {
 #ifndef USE_THREADPOOL
     ThreadList thpool_;
 #else
-    ThreadPool* thread_pool_;
+    std::unique_ptr<ThreadPool> thread_pool_{};
 #endif
 
     ConnectionMap connections_;

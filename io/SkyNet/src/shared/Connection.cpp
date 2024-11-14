@@ -11,13 +11,19 @@
 Connection::Connection(int fd, EventLoop* loop) {
     socket_ = std::make_unique<Socket>();
     socket_->set_fd(fd);
+    socket_->SetNonBlocking();
     if (loop) {
-        socket_->SetNonBlocking();  // server connection socket use blocking mode
         channel_ = std::make_unique<Channel>(fd, loop);
         channel_->EnableET();
         channel_->EnableRead();
     }
 
+    recv_buf_ = std::make_unique<Buffer>();
+    send_buf_ = std::make_unique<Buffer>();
+    state_ = State::Connected;
+}
+
+Connection::Connection(std::unique_ptr<Socket> socket) : socket_{std::move(socket)} {
     recv_buf_ = std::make_unique<Buffer>();
     send_buf_ = std::make_unique<Buffer>();
     state_ = State::Connected;
@@ -85,7 +91,7 @@ RC Connection::WriteBlocking() {
 
 RC Connection::ReadBlocking() {
     int fd = socket_->fd();
-    char buf[socket_->RecvBufSize()];
+    char buf[1024];
     ssize_t bytes_read = read(fd, buf, sizeof(buf));
     if (bytes_read > 0) {
         recv_buf_->Append(buf, bytes_read);

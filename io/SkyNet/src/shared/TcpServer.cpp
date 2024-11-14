@@ -23,31 +23,36 @@ TcpServer::TcpServer(const char* port) {
     ConnectionCallback cb = std::bind(&TcpServer::NewConnection, this, std::placeholders::_1);
     acceptor_->set_new_connection_callback(std::move(cb));
 
-    auto size = std::thread::hardware_concurrency();
+    size_t size = std::thread::hardware_concurrency();
     for (size_t i = 0; i != size; ++i) {
         std::unique_ptr<EventLoop> sub_loop = std::make_unique<EventLoop>();
         sub_reactors_.emplace_back(std::move(sub_loop));
     }
-}
-
-TcpServer::~TcpServer() {
-#ifndef USE_THREADPOOL
-    for (size_t i = 0; i != thpool_.size(); ++i) {
-        if (thpool_[i].joinable()) {
-            thpool_[i].join();
-        }
-    }
-#endif
-}
-
-void TcpServer::Start() {
 #ifndef USE_THREADPOOL
     for (size_t i = 0; i != sub_reactors_.size(); ++i) {
         thpool_.emplace_back(std::thread(&EventLoop::Loop, sub_reactors_[i].get()));
     }
 #else
     thread_pool_ = std::make_unique<ThreadPool>(size);
-    for (size_t i = 0; i != size; ++i) {
+#endif
+}
+
+TcpServer::~TcpServer() {
+#ifndef USE_THREADPOOL
+    for (size_t i = 0; i != thpool_.size(); ++i) {
+        thpool_[i].detach();
+        /*    if (thpool_[i].joinable()) {
+                thpool_[i].join();
+            }*/
+    }
+#endif
+}
+
+void TcpServer::Start() {
+#ifndef USE_THREADPOOL
+
+#else
+    for (size_t i = 0; i != sub_reactors_.size(); ++i) {
         std::function<void()> sub_loop = std::bind(&EventLoop::Loop, sub_reactors_[i].get());
         thread_pool_->Add(std::move(sub_loop));
     }
