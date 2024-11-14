@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #include "Buffer.h"
 #include "Connection.h"
@@ -17,23 +18,24 @@
 using namespace std;
 
 void oneClient(int msgs, int wait) {
-    Socket* clientSocket = new Socket();
+    std::unique_ptr<Socket> clientSocket = std::make_unique<Socket>();
     clientSocket->Connect("127.0.0.1", "9527");
-    ErrorIf(clientSocket->GetFd() == -1, "clientSocketet Connect error");
+    ErrorIf(clientSocket->fd() == -1, "clientSocketet Connect error");
 
-    std::unique_ptr<Connection> conn = std::make_unique<Connection>(nullptr, clientSocket);
+    std::unique_ptr<Connection> conn = std::make_unique<Connection>(std::move(clientSocket));
 
+    std::this_thread::sleep_for(std::chrono::milliseconds{1});
     int count{};
 
     while (count < msgs) {
-        conn->SetSendBuffer("I'm client!");
-        conn->Write();
-        if (conn->GetState() == Connection::State::Closed) {
+        if (conn->IsClosed()) {
             conn->Close();
             break;
         }
-        conn->Read();
-        std::cout << "msg count" << count++ << ": " << conn->ReadBuffer() << "\n";
+        conn->set_send_buf("I'm client!");
+        conn->Send();
+        conn->Recv();
+        std::cout << "msg count" << count++ << ": " << conn->recv_buf()->c_str() << "\n";
     }
 }
 

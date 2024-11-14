@@ -1,4 +1,6 @@
 #include <iostream>
+#include <memory>
+#include <string>
 
 #include "Connection.h"
 #include "Socket.h"
@@ -9,11 +11,18 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    Socket* s = new Socket();
+    std::unique_ptr<Socket> s = std::make_unique<Socket>();
     s->Connect(argv[1], argv[2]);
 
-    Connection* conn = new Connection(s->fd(), nullptr);
+    Connection* conn = new Connection(std::move(s));
     while (true) {
+        if (conn->IsClosed()) {
+            conn->Close();
+            break;
+        }
+
+        conn->Send("Hello Server");
+
         conn->Recv();
         std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
     }

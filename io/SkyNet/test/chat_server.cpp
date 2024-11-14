@@ -13,12 +13,20 @@ int main(int argc, char** argv) {
 
     TcpServer* server = new TcpServer(argv[1]);
 
+    auto doQuit = [&]() {
+        delete server;
+        std::cout << "Server exit!\n";
+        exit(0);
+    };
+
+    Signal::signal(SIGINT, [&]() { doQuit(); });
+
     server->onConnect([&](Connection* conn) {
         int fd = conn->socket()->fd();
         std::cout << "New Connection fd:" << fd << "\n";
         clients[fd] = conn;
         for (auto& it : clients) {
-            it.second->Send(conn->ReadBuffer());
+            it.second->Send(conn->recv_buf()->c_str());
         }
     });
 
@@ -27,12 +35,14 @@ int main(int argc, char** argv) {
             conn->Close();
             return;
         }
-        std::cout << "Message from client:" << conn->ReadBuffer() << "\n";
+        std::cout << "Message from client:" << conn->recv_buf()->c_str() << "\n";
 
         for (auto& it : clients) {
-            it.second->Send(conn->ReadBuffer());
+            it.second->Send(conn->recv_buf()->c_str());
         }
     });
 
-    return 0;
+    server->Start();
+
+    doQuit();
 }

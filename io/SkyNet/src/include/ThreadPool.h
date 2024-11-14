@@ -16,7 +16,7 @@ using Task = std::function<void()>;
 
 class ThreadPool {
    public:
-    ThreadPool(int size = 10);
+    ThreadPool(size_t size = 10);
     ~ThreadPool();
 
     DISALLOW_COPY_AND_MOVE(ThreadPool);

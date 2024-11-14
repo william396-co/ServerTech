@@ -7,6 +7,9 @@
 #include <vector>
 
 #include "Common.h"
+#ifdef USE_THREADPOOL
+#include "ThreadPool.h"
+#endif
 
 class TcpServer {
     using ConnectionMap = std::unordered_map<int, std::unique_ptr<Connection>>;
@@ -23,8 +26,8 @@ class TcpServer {
     RC NewConnection(int fd);
     RC DeleteConnection(int fd);
 
-    void onConnect(ConnectionMessageCallback&& fn) { on_connect_ = std::move(fn); }
-    void onRecv(ConnectionMessageCallback&& fn) { on_recv_ = std::move(fn); }
+    void onConnect(ConnectionMessageCallback const& fn) { on_connect_ = std::move(fn); }
+    void onRecv(ConnectionMessageCallback const& fn) { on_recv_ = std::move(fn); }
 
    private:
     std::unique_ptr<EventLoop> main_reactor_{};
@@ -33,7 +36,7 @@ class TcpServer {
 #ifndef USE_THREADPOOL
     ThreadList thpool_;
 #else
-    ThreadPool* thread_pool_;
+    std::unique_ptr<ThreadPool> thread_pool_{};
 #endif
 
     ConnectionMap connections_;

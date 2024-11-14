@@ -17,15 +17,17 @@ int main(int argc, char** argv) {
     clientSocket->Connect(argv[1], argv[2]);
     ErrorIf(clientSocket->fd() == -1, "socket Conect error");
 
-    std::unique_ptr<Connection> conn = std::make_unique<Connection>(clientSocket->fd(), nullptr);
+    std::unique_ptr<Connection> conn = std::make_unique<Connection>(std::move(clientSocket));
     while (true) {
-        if (conn->GetState() == Connection::State::Closed) {
+        std::string input;
+        std::getline(std::cin, input);
+        // input = "this is debug";
+        conn->set_send_buf(input.c_str());
+        conn->Send();
+        if (conn->IsClosed()) {
             conn->Close();
             break;
         }
-        std::string input;
-        std::getline(std::cin, input);
-        conn->Send(input.c_str());
         conn->Recv();
         std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
     }

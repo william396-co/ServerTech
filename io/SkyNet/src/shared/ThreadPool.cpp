@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-ThreadPool::ThreadPool(int size) {
-    for (auto i = 0; i != size; ++i) {
+ThreadPool::ThreadPool(size_t size) {
+    for (size_t i = 0; i != size; ++i) {
         workers_.emplace_back(std::thread([this]() {
             while (true) {
                 Task task{};
@@ -28,6 +28,7 @@ ThreadPool::~ThreadPool() {
     }
     cv_.notify_one();
     std::for_each(workers_.begin(), workers_.end(), [](auto&& t) {
-        if (t.joinable()) t.join();
+        // if (t.joinable()) t.join();
+        t.detach();
     });
 }

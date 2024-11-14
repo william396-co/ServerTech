@@ -12,6 +12,7 @@ class Connection {
     enum class State { Invalid = 1, Connecting, Connected, Closed };
 
     Connection(int fd, EventLoop* loop);
+    explicit Connection(std::unique_ptr<Socket> socket);
     ~Connection();
 
     DISALLOW_COPY_AND_MOVE(Connection);
@@ -21,7 +22,7 @@ class Connection {
     RC Send(std::string const& msg);
     void Close();
 
-    void set_delete_connection(ConnectionCallback&& cb) { delete_connection_ = std::move(cb); }
+    void set_delete_connection(ConnectionCallback const& cb) { delete_connection_ = std::move(cb); }
     void set_on_recv(ConnectionMessageCallback const& cb);
 
     Socket* socket() const { return socket_.get(); }
