@@ -17,6 +17,10 @@ Acceptor::Acceptor(EventLoop* loop, const char* port) {
     channel_->EnableRead();
 }
 
+void Acceptor::Close() const {
+    socket_->Close();
+    channel_->Close();
+}
 Acceptor::~Acceptor() {}
 
 RC Acceptor::AcceptConnection() const {

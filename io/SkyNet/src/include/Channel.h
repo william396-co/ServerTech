@@ -16,6 +16,7 @@ class Channel {
 
     DISALLOW_COPY_AND_MOVE(Channel);
 
+    void Close() const { is_open_ = true; }
     void HandleEvent() const;
     void EnableRead();
     void EnableWrite();
@@ -32,6 +33,7 @@ class Channel {
     void set_write_callback(WriteCallback const& cb) { write_callback_ = std::move(cb); }
 
    private:
+    mutable bool is_open_{true};
     EventLoop* loop_{};
     int fd_{};
     short listen_events_{};

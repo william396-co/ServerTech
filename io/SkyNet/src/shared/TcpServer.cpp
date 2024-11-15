@@ -29,35 +29,49 @@ TcpServer::TcpServer(const char* port) {
         sub_reactors_.emplace_back(std::move(sub_loop));
     }
 #ifndef USE_THREADPOOL
-    for (size_t i = 0; i != sub_reactors_.size(); ++i) {
-        thpool_.emplace_back(std::thread(&EventLoop::Loop, sub_reactors_[i].get()));
-    }
 #else
     thread_pool_ = std::make_unique<ThreadPool>(size);
 #endif
 }
 
-TcpServer::~TcpServer() {
+TcpServer::~TcpServer() {}
+
+void TcpServer::spawnWorkerThreads() {
 #ifndef USE_THREADPOOL
-    for (size_t i = 0; i != thpool_.size(); ++i) {
-        thpool_[i].detach();
-        /*    if (thpool_[i].joinable()) {
-                thpool_[i].join();
-            }*/
+    for (size_t i = 0; i != sub_reactors_.size(); ++i) {
+        thpool_.emplace_back(&EventLoop::Loop, sub_reactors_[i].get());
     }
-#endif
-}
-
-void TcpServer::Start() {
-#ifndef USE_THREADPOOL
-
 #else
     for (size_t i = 0; i != sub_reactors_.size(); ++i) {
         std::function<void()> sub_loop = std::bind(&EventLoop::Loop, sub_reactors_[i].get());
         thread_pool_->Add(std::move(sub_loop));
     }
 #endif
-    main_reactor_->Loop();
+}
+
+void TcpServer::closeAll() const {
+    for (size_t i = 0; i != sub_reactors_.size(); ++i) {
+        sub_reactors_[i]->Close();
+    }
+    for (auto const& it : connections_) {
+        it.second->Close();
+    }
+}
+void TcpServer::closeAccept() const {
+    acceptor_->Close();
+    main_reactor_->Close();
+}
+
+void TcpServer::listenRun() { main_reactor_->Loop(); }
+
+void TcpServer::recyle() {
+    for (auto it = connections_.begin(); it != connections_.end();) {
+        if (it->second->IsClosed()) {
+            it = connections_.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 RC TcpServer::NewConnection(int fd) {

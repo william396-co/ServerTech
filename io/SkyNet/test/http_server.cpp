@@ -27,6 +27,6 @@ int main(int argc, char** argv) {
         conn->Send(conn->recv_buf()->c_str());
     });
 
-    server->Start();
+    server->spawnWorkerThreads();
     doQuit();
 }

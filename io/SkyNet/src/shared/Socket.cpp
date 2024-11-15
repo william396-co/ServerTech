@@ -13,7 +13,9 @@
 
 Socket::Socket() : fd_{-1} {}
 
-Socket::~Socket() {
+Socket::~Socket() { Close(); }
+
+void Socket::Close() const {
     if (fd_ != -1) {
         close(fd_);
         fd_ = -1;

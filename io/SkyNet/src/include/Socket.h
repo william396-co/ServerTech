@@ -23,6 +23,7 @@ class Socket {
     bool IsNonBlocking() const;
     size_t RecvBufSize() const;
     std::string get_addr() const;
+    void Close() const;
 
    public:
     ////////////////////////////////////////////////
@@ -41,6 +42,6 @@ class Socket {
 #ifdef WIN32
     SOCKET fd_;
 #else
-    int fd_;
+    mutable int fd_;
 #endif
 };

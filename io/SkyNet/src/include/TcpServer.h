@@ -7,19 +7,25 @@
 #include <vector>
 
 #include "Common.h"
-#ifdef USE_THREADPOOL
+#ifndef USE_THREADPOOL
+#include "joining_thread.h"
+#else
 #include "ThreadPool.h"
 #endif
 
 class TcpServer {
     using ConnectionMap = std::unordered_map<int, std::unique_ptr<Connection>>;
     using ReactorList = std::vector<std::unique_ptr<EventLoop>>;
-    using ThreadList = std::vector<std::thread>;
+    using ThreadList = std::vector<joining_thread>;
 
    public:
     explicit TcpServer(const char* port);
     ~TcpServer();
-    void Start();
+    void listenRun();
+    void spawnWorkerThreads();
+    void recyle();
+    void closeAll() const;
+    void closeAccept() const;
 
     DISALLOW_COPY_AND_MOVE(TcpServer);
 
