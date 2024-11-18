@@ -18,19 +18,14 @@ class BipBuffer {
     size_t GetSize() const { return m_buffer == nullptr ? 0 : m_regionASize + m_regionBSize; }
     // Returns the number of continguous bytes(that can be pushed out in one operation)
     size_t GetContiguiousBytes() const;
-
-   private:
     // Removes len bytes from the front of the buffer
     void Remove(size_t len);
     // Returns a pointer an the "end" of the buffer, where new data can be written
     void* GetBuffer();
-
     // Allocate the buffer with room for size bytes
     void Allocate(size_t size);
-
     // Increments the "Written" pointer forward len bytes
     void IncrementWritten(size_t len);
-
     // Returns a pointer at the "beginning" of the buffer, where data can be pulled from
     void* GetBufferStart();
 

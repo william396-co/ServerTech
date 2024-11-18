@@ -8,7 +8,7 @@
 
 #include "EventLoop.h"
 
-Connection::Connection(int fd, EventLoop* loop) {
+Connection::Connection(int fd, EventLoop* loop, size_t sendbufsize, size_t recvbufsize) {
     socket_ = std::make_unique<Socket>();
     socket_->set_fd(fd);
     socket_->SetNonBlocking();
@@ -18,14 +18,21 @@ Connection::Connection(int fd, EventLoop* loop) {
         channel_->EnableRead();
     }
 
-    recv_buf_ = std::make_unique<Buffer>();
-    send_buf_ = std::make_unique<Buffer>();
+    recv_buf_ = std::make_unique<BipBuffer>();
+    send_buf_ = std::make_unique<BipBuffer>();
+
+    recv_buf_->Allocate(recvbufsize);
+    send_buf_->Allocate(sendbufsize);
     state_ = State::Connected;
 }
 
-Connection::Connection(std::unique_ptr<Socket> socket) : socket_{std::move(socket)} {
-    recv_buf_ = std::make_unique<Buffer>();
-    send_buf_ = std::make_unique<Buffer>();
+Connection::Connection(std::unique_ptr<Socket> socket, size_t sendbufsize, size_t recvbufsize)
+    : socket_{std::move(socket)} {
+    recv_buf_ = std::make_unique<BipBuffer>();
+    send_buf_ = std::make_unique<BipBuffer>();
+    recv_buf_->Allocate(recvbufsize);
+    send_buf_->Allocate(sendbufsize);
+
     state_ = State::Connected;
 }
 
@@ -171,6 +178,6 @@ void Connection::set_on_recv(ConnectionMessageCallback const& cb) {
 }
 
 void Connection::set_send_buf(const char* str) { send_buf_->set_buf(str); }
-Buffer* Connection::send_buf() const { return send_buf_.get(); }
-Buffer* Connection::recv_buf() const { return recv_buf_.get(); }
+BipBuffer* Connection::send_buf() const { return send_buf_.get(); }
+BipBuffer* Connection::recv_buf() const { return recv_buf_.get(); }
 
