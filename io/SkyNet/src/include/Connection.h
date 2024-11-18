@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Buffer.h"
+#include "BipBuffer.h"
 #include "Channel.h"
 #include "Common.h"
 #include "Socket.h"
@@ -11,8 +11,8 @@ class Connection {
    public:
     enum class State { Invalid = 1, Connecting, Connected, Closed };
 
-    Connection(int fd, EventLoop* loop);
-    explicit Connection(std::unique_ptr<Socket> socket);
+    Connection(int fd, EventLoop* loop, size_t sendbufsize, size_t recvbufsize);
+    Connection(std::unique_ptr<Socket> socket, size_t sendbufsize, size_t recvbufsize);
     ~Connection();
 
     DISALLOW_COPY_AND_MOVE(Connection);
@@ -30,8 +30,8 @@ class Connection {
     bool IsClosed() const { return state_ == State::Closed; }
 
     void set_send_buf(const char* str);
-    Buffer* recv_buf() const;
-    Buffer* send_buf() const;
+    BipBuffer* recv_buf() const;
+    BipBuffer* send_buf() const;
 
     void onConnect(OnConnectFunction fn);
     void onMessage(OnMessageFunction fn);
@@ -48,8 +48,8 @@ class Connection {
     std::unique_ptr<Channel> channel_{};
     State state_{State::Invalid};
 
-    std::unique_ptr<Buffer> send_buf_{};
-    std::unique_ptr<Buffer> recv_buf_{};
+    std::unique_ptr<BipBuffer> send_buf_{};
+    std::unique_ptr<BipBuffer> recv_buf_{};
 
     ConnectionCallback delete_connection_{};
     ConnectionMessageCallback on_recv_{};

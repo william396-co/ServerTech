@@ -10,7 +10,7 @@ class Acceptor;
 class Connection;
 class Channel;
 class Socket;
-class Buffer;
+class BipBuffer;
 class ThreadPool;
 
 // Macros to disable copying and moving
