@@ -20,7 +20,7 @@ class Connection {
     RC Recv();
     RC Send();
     RC Send(std::string const& msg);
-    void Close();
+    void Close() const;
 
     void set_delete_connection(ConnectionCallback const& cb) { delete_connection_ = std::move(cb); }
     void set_on_recv(ConnectionMessageCallback const& cb);

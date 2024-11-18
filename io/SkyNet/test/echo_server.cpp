@@ -1,6 +1,9 @@
 #include <iostream>
 
 #include "SkyNet.h"
+#include "xtime.h"
+
+bool m_Stop = false;
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -10,13 +13,7 @@ int main(int argc, char** argv) {
 
     TcpServer* server = new TcpServer(argv[1]);
 
-    auto doQuit = [&]() {
-        delete server;
-        std::cout << "\nServer exit!\n";
-        exit(0);
-    };
-
-    Signal::signal(SIGINT, [&] { doQuit(); });
+    Signal::signal(SIGINT, [&] { m_Stop = true; });
 
     server->onConnect([](Connection* conn) {
         std::cout << "New Connection fd:" << conn->socket()->fd() << " ip:port:[" << conn->socket()->get_addr()
@@ -35,6 +32,24 @@ int main(int argc, char** argv) {
         }
     });
 
-    server->Start();
-    doQuit();
+    auto mainLoop = [&server] {
+        auto current = utils::now();
+        // main thread
+        while (!m_Stop) {
+            if (utils::now() - current > 500) {
+                server->recyle();
+                current = utils::now();
+            }
+        }
+
+        // exit
+        server->closeAccept();
+        server->closeAll();
+        delete server;
+    };
+
+    joining_thread mainRun(mainLoop);
+    joining_thread listenRun(&TcpServer::listenRun, server);
+    server->spawnWorkerThreads();
+    return 0;
 }

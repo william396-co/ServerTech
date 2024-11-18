@@ -31,9 +31,13 @@ Connection::Connection(std::unique_ptr<Socket> socket) : socket_{std::move(socke
 
 Connection::~Connection() {}
 
-void Connection::Close() {
+void Connection::Close() const {
     if (delete_connection_) {
         delete_connection_(socket_->fd());
+    }
+    socket_->Close();
+    if (channel_) {
+        channel_->Close();
     }
 }
 

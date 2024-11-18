@@ -14,6 +14,8 @@ class Acceptor {
     RC AcceptConnection() const;
     void set_new_connection_callback(ConnectionCallback const& cb) { new_connection_callback_ = std::move(cb); }
 
+    void Close() const;
+
    private:
     std::unique_ptr<Socket> socket_{};
     std::unique_ptr<Channel> channel_{};

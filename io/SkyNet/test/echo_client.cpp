@@ -13,24 +13,22 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::unique_ptr<Socket> clientSocket = std::make_unique<Socket>();
-    clientSocket->Connect(argv[1], argv[2]);
-    ErrorIf(clientSocket->fd() == -1, "socket Conect error");
-
-    std::unique_ptr<Connection> conn = std::make_unique<Connection>(std::move(clientSocket));
-    while (true) {
-        std::string input;
-        std::getline(std::cin, input);
-        // input = "this is debug";
-        conn->set_send_buf(input.c_str());
-        conn->Send();
-        if (conn->IsClosed()) {
-            conn->Close();
-            break;
+    std::unique_ptr<TcpClient> client = std::make_unique<TcpClient>(argv[1], argv[2]);
+    client->onRun([](Connection* conn) {
+        while (true) {
+            std::string input;
+            std::getline(std::cin, input);
+            // input = "this is debug";
+            conn->set_send_buf(input.c_str());
+            conn->Send();
+            if (conn->IsClosed()) {
+                conn->Close();
+                return;
+            }
+            conn->Recv();
+            std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
         }
-        conn->Recv();
-        std::cout << "Message from server:" << conn->recv_buf()->c_str() << "\n";
-    }
-
+    });
+    client->Start();
     return 0;
 }

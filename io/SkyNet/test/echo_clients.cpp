@@ -1,5 +1,7 @@
 #include <unistd.h>
 
+#include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -7,36 +9,31 @@
 #include <iostream>
 #include <memory>
 #include <thread>
-#include <chrono>
 
-#include "Buffer.h"
-#include "Connection.h"
-#include "Socket.h"
-#include "ThreadPool.h"
-#include "Util.h"
+#include "SkyNet.h"
 
 using namespace std;
 
 void oneClient(int msgs, int wait) {
-    std::unique_ptr<Socket> clientSocket = std::make_unique<Socket>();
-    clientSocket->Connect("127.0.0.1", "9527");
-    ErrorIf(clientSocket->fd() == -1, "clientSocketet Connect error");
-
-    std::unique_ptr<Connection> conn = std::make_unique<Connection>(std::move(clientSocket));
+    std::unique_ptr<TcpClient> client = std::make_unique<TcpClient>("127.0.0.1", "9527");
 
     std::this_thread::sleep_for(std::chrono::milliseconds{1});
     int count{};
 
-    while (count < msgs) {
-        if (conn->IsClosed()) {
-            conn->Close();
-            break;
+    client->onRun([&](Connection* conn) {
+        while (count < msgs) {
+            if (conn->IsClosed()) {
+                conn->Close();
+                break;
+            }
+            conn->set_send_buf("I'm client!");
+            conn->Send();
+            conn->Recv();
+            std::cout << "msg count" << count++ << ": " << conn->recv_buf()->c_str() << "\n";
         }
-        conn->set_send_buf("I'm client!");
-        conn->Send();
-        conn->Recv();
-        std::cout << "msg count" << count++ << ": " << conn->recv_buf()->c_str() << "\n";
-    }
+    });
+
+    client->Start();
 }
 
 int main(int argc, char** argv) {
@@ -63,10 +60,17 @@ int main(int argc, char** argv) {
         }
     }
 
+#ifndef USE_THREADPOOL
+    std::vector<joining_thread> threadlist(threads);
+    for (int i = 0; i != threads; ++i) {
+        threadlist.emplace_back(oneClient, msgs, wait);
+    }
+#else
     ThreadPool* poll = new ThreadPool(threads);
     std::function<void()> func = std::bind(oneClient, msgs, wait);
     for (int i = 0; i < threads; ++i) {
         poll->Add(func);
     }
     delete poll;
+#endif
 }
