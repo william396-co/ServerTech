@@ -22,9 +22,14 @@
     <ClInclude Include="..\..\src\Shared\Common.h" />
     <ClInclude Include="..\..\src\Shared\CommonType.h" />
     <ClInclude Include="..\..\src\Shared\CrashInspector.h" />
+    <ClInclude Include="..\..\src\Shared\Log.h" />
+    <ClInclude Include="..\..\src\Shared\Singleton.h" />
+    <ClInclude Include="..\..\src\Shared\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Shared\CrashInspector.cpp" />
+    <ClCompile Include="..\..\src\Shared\Log.cpp" />
+    <ClCompile Include="..\..\src\Shared\Util.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -85,7 +90,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
