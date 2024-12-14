@@ -73,7 +73,7 @@ enum MsTimeVariables : unsigned int
 //# include <config.h>
 #endif
 
-#include "arcemuConfig.h"
+//#include "arcemuConfig.h"
 
 #include <cstdlib>
 #include <stdio.h>
@@ -85,7 +85,7 @@ enum MsTimeVariables : unsigned int
 
 #if defined( __WIN32__ ) || defined( WIN32 ) || defined( _WIN32 )
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0600
+//#define _WIN32_WINNT 0x0600
 #define NOMINMAX
 #include <windows.h>
 #include <corecrt_io.h>

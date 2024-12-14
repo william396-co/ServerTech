@@ -144,7 +144,4 @@ public:
 	}
 };
 
-#define sLog oLog::getSingleton()
-
-
 

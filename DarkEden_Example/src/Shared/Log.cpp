@@ -19,8 +19,9 @@
 
 //#include "Config/ConfigEnv.h"
 #include "Log.h"
-//#include "CrashInspector.h"
 #include <stdarg.h>
+#include "CrashInspector.h"
+#include "Util.h"
 
 time_t UNIXTIME;
 
@@ -289,7 +290,8 @@ void oLog::close()
 	m_Terminated = true;
 	if (m_LoggerThread) {
 		m_LoggerThread->join();
-		m_LoggerThread.reset();
+		m_LoggerThread.reset(); 
+
 		fclose(m_file);
 		fclose(m_Sqlfile);
 		m_file = nullptr;
@@ -302,7 +304,7 @@ void oLog::open()
 	if (!m_LoggerThread) {
 		openLogFile(m_file, "Log");
 		openLogFile(m_Sqlfile, "SQL");
-		m_LoggerThread = make_shared<std::thread>(bind(&oLog::logLooping, this));
+		m_LoggerThread = std::make_shared<std::thread>(bind(&oLog::logLooping, this));
 	}
 }
 
