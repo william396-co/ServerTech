@@ -1,24 +1,16 @@
 #include <iostream>
-#include <cstdio>
+
+#include "macros.h"
+#include "../win/basic_of_macros/macros.h"
 
 template<typename...Args>
 void testArgsCountBySizeof(Args&&...args) {
 	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << sizeof...(args) << "\n";
 }
 
-#define GET_VARAGES(_0,_1,_2,_3,_4,N,...) N
-#ifndef USE_DOUBLE
-#define COUNT_VARAGES(...) \
-		GET_VARAGES("ignored", __VA_OPT_(,)__VA_ARGS__,4,3,2,1,0)
-#else
-#define COUNT_VARAGES(...) \
-		GET_VARAGES("ignored", ##__VA_ARGS__,4,3,2,1,0)
-#endif
-
-
 template<typename ...Args>
 void testArgCountByMacros(Args&&...args) {
-	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << COUNT_VARAGES(args) << "\n";
+	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << COUNT_VARARGS(args) << "\n";
 }
 
 
@@ -27,18 +19,19 @@ int main() {
 
 	printf("version:%ld\n", __cplusplus);
 
+	testArgsCountBySizeof();
 	testArgsCountBySizeof(1);
-	testArgsCountBySizeof(1,2,3,4,5,6);
+	testArgsCountBySizeof(1, 2);
+	testArgsCountBySizeof(1, 2, 3);
+	testArgsCountBySizeof(1, 2, 3, 4);
 
-
-	int i = 0, j = 0;
-	printf("zero arg:%d\n", COUNT_VARAGES());
-	printf("one arg:%d\n", COUNT_VARAGES(1));
-	printf("two arg:%d\n", COUNT_VARAGES(1,2));
-	printf("three arg:%d\n", COUNT_VARAGES(1, "2", 3));
-	printf("four arg:%d\n", COUNT_VARAGES(1, true, 3, "dd"));
-	printf("five arg:%d\n", COUNT_VARAGES(1, true, j, 3, "dd"));
-	printf("six arg:%d\n", COUNT_VARAGES(1, true, 4, i, 3, "dd"));
+	printf("%d %d %d %d %d\n",
+		COUNT_VARARGS(),
+		COUNT_VARARGS(1),
+		COUNT_VARARGS('a', 'b'),
+		COUNT_VARARGS('a', 'b', 'c'),
+		COUNT_VARARGS('a', 'b', 1, 2));
+	
 
 
 	return 0;
