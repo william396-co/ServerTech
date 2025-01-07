@@ -15,3 +15,4 @@ set(CXX_FLAGS
 
 add_subdirectory(using_crtp)
 add_subdirectory(basic_of_macros)
+add_subdirectory(basic_template)

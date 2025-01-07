@@ -1,23 +1,17 @@
 #include <iostream>
+#include <cstdio>
 
 #include "macros.h"
-#include "../win/basic_of_macros/macros.h"
 
 template<typename...Args>
 void testArgsCountBySizeof(Args&&...args) {
 	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << sizeof...(args) << "\n";
 }
 
-template<typename ...Args>
-void testArgCountByMacros(Args&&...args) {
-	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << COUNT_VARARGS(args) << "\n";
-}
-
-
 
 int main() {
 
-	printf("version:%ld\n", __cplusplus);
+	std::cout << "version:" << __cplusplus << "\n";
 
 	testArgsCountBySizeof();
 	testArgsCountBySizeof(1);
@@ -31,7 +25,6 @@ int main() {
 		COUNT_VARARGS('a', 'b'),
 		COUNT_VARARGS('a', 'b', 'c'),
 		COUNT_VARARGS('a', 'b', 1, 2));
-	
 
 
 	return 0;
