@@ -1,10 +1,10 @@
 #pragma once
 
+#include "concate.h"
+
 //////////////////////////////////////////////////////////
 // OVERLOAD_INVOKE
 //////////////////////////////////////////////////////////
-#define CONCAT_HELPER(a, b) a ## b
-#define CONCAT(a, b) CONCAT_HELPER(a, b)
 
 #define OVERLOAD_INVOKE_1(call, v1) \
 	CONCAT(CONCAT(call, _), v1)

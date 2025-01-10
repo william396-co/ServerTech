@@ -1,6 +1,6 @@
 #pragma once 
-#include "../common/overload_invoke.h"
-#include "../common/count_varages.h"
+#include "overload_invoke.h"
+#include "count_varages.h"
 
 //////////////////////////////////////////////////////////
 // FOR_EACH
