@@ -1,6 +1,9 @@
 #pragma once
-
 #include <cstdio>
+
+//////////////////////////////////////////////////////////
+// COUNT_VARARGS
+//////////////////////////////////////////////////////////
 
 #if defined(__cplusplus) && __cplusplus >= 202002L
 
@@ -47,34 +50,3 @@
  IS_EMPTY(__VA_ARGS__))(__VA_ARGS__) )
 
 #endif
-
-
-inline void macros_test() {
-	std::cout << __PRETTY_FUNCTION__ << "\n";
-	std::cout << "version:" << __cplusplus << "\n";
-
-	printf("%d %d %d %d %d\n",
-		COUNT_VARARGS(),
-		COUNT_VARARGS(1),
-		COUNT_VARARGS('a', 'b'),
-		COUNT_VARARGS('a', 'b', 'c'),
-		COUNT_VARARGS('a', 'b', 1, 2));
-}
-
-
-template<typename...Args>
-void testArgsCountBySizeof(Args&&...args) {
-	std::cout << __PRETTY_FUNCTION__ << " parameter count: " << sizeof...(args) << "\n";
-}
-
-inline void sizeof_test() {
-
-	std::cout << __PRETTY_FUNCTION__ << "\n";
-
-	testArgsCountBySizeof();
-	testArgsCountBySizeof(1);
-	testArgsCountBySizeof(1, 2);
-	testArgsCountBySizeof(1, 2, 3);
-	testArgsCountBySizeof(1, 2, 3, 4);
-
-}
